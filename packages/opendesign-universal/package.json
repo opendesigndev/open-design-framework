@@ -1,0 +1,13 @@
+{
+  "name": "@avocode/opendesign-universal",
+  "description": "Works in both node.js and browser.",
+  "version": "0.0.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "github:opendesigndev/open-design-framework",
+    "directory": "packages/opendesign-react"
+  },
+  "author": "Open Design Contributors",
+  "license": "UNLICENSED"
+}

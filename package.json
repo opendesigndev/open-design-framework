@@ -1,0 +1,24 @@
+{
+  "name": "open-design-framework",
+  "version": "0.0.0",
+  "repository": "github:opendesigndev/open-design-framework",
+  "author": "Open Design Contributors",
+  "license": "UNLICENSED",
+  "private": true,
+  "packageManager": "yarn@3.2.3+sha512.hash",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "eslint": "eslint --cache"
+  },
+  "devDependencies": {
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-react-app": "^7.0.1",
+    "typescript": "4.8.3"
+  },
+  "engines": {
+    "corepack": ">=0.12.0"
+  }
+}

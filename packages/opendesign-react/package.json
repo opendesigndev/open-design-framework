@@ -1,0 +1,19 @@
+{
+  "name": "@avocode/opendesign-react",
+  "description": "React bindings for @opendesign/universal",
+  "version": "0.0.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "github:opendesigndev/open-design-framework",
+    "directory": "packages/opendesign-react"
+  },
+  "author": "Open Design Contributors",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "react": "^18.1.0"
+  },
+  "devDependencies": {
+    "react": "^18.2.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "Node16",
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true
+  }
+}
