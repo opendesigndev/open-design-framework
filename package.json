@@ -5,7 +5,7 @@
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
   "private": true,
-  "packageManager": "yarn@3.2.3+sha512.hash",
+  "packageManager": "yarn@3.2.3+sha256.311cd84f5f144680cc21b4bbbdeba97d1a5f32ee8a2eae7037ccbdeff8a3c1ce",
   "workspaces": [
     "packages/*"
   ],

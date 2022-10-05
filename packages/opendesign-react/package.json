@@ -10,10 +10,18 @@
   },
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
+  "exports": "./dist/index.js",
+  "scripts": {
+    "build": "yarn run -T tsc"
+  },
+  "dependencies": {
+    "@avocode/opendesign-universal": "workspace:*"
+  },
   "peerDependencies": {
     "react": "^18.1.0"
   },
   "devDependencies": {
+    "@types/react": "^18.0.21",
     "react": "^18.2.0"
   }
 }

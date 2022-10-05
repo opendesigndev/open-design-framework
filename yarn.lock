@@ -15,17 +15,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@avocode/opendesign-react@workspace:packages/opendesign-react":
+"@avocode/opendesign-react@workspace:*, @avocode/opendesign-react@workspace:packages/opendesign-react":
   version: 0.0.0-use.local
   resolution: "@avocode/opendesign-react@workspace:packages/opendesign-react"
   dependencies:
+    "@avocode/opendesign-universal": "workspace:*"
+    "@types/react": ^18.0.21
     react: ^18.2.0
   peerDependencies:
     react: ^18.1.0
   languageName: unknown
   linkType: soft
 
-"@avocode/opendesign-universal@workspace:packages/opendesign-universal":
+"@avocode/opendesign-universal@workspace:*, @avocode/opendesign-universal@workspace:packages/opendesign-universal":
   version: 0.0.0-use.local
   resolution: "@avocode/opendesign-universal@workspace:packages/opendesign-universal"
   languageName: unknown
@@ -1671,14 +1673,6 @@ __metadata:
   checksum: 52dc02259d98da517fae4cb3a0a3850227bdae4939dda1980b788a7670636ca2b4a01b58df03dd5f65c1e3cb70c50fa8ce5762b582b3f499ec30ee5ce1fd9380
   languageName: node
   linkType: hard
-
-"@opendesign/react@portal:../opendesign-react::locator=react-test-app%40workspace%3Apackages%2Freact-test-app":
-  version: 0.0.0-use.local
-  resolution: "@opendesign/react@portal:../opendesign-react::locator=react-test-app%40workspace%3Apackages%2Freact-test-app"
-  peerDependencies:
-    react: ^18.1.0
-  languageName: node
-  linkType: soft
 
 "@rushstack/eslint-patch@npm:^1.1.0":
   version: 1.2.0
@@ -4533,7 +4527,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-test-app@workspace:packages/react-test-app"
   dependencies:
-    "@opendesign/react": "portal:../opendesign-react"
+    "@avocode/opendesign-react": "workspace:*"
     "@types/react": ^18.0.21
     "@types/react-dom": ^18.0.6
     "@vitejs/plugin-react": ^2.1.0

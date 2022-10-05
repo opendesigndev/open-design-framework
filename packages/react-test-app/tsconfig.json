@@ -1,3 +1,7 @@
 {
-  "extends": "../config/tsconfig.json"
+  "extends": "../config/tsconfig.json",
+  "references": [{ "path": "../opendesign-react" }],
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"]
+  }
 }

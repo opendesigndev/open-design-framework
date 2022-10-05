@@ -1,5 +1,8 @@
 package-lock.json
 
+# Build artifacts
+dist
+
 # This would provide zero-install and we might commit it later, but let's leave
 # it out for now.
 .pnp*

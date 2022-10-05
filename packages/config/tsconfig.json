@@ -2,8 +2,14 @@
   "compilerOptions": {
     "strict": true,
     "module": "Node16",
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "lib": ["ES2022"],
     "target": "ES2022",
     "jsx": "react-jsx",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "composite": true
   }
 }
