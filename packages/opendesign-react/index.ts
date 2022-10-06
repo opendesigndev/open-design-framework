@@ -1,6 +1,23 @@
 import { useState } from "react";
-import { createDesign } from "@avocode/opendesign-universal";
+import {
+  createEditor,
+  designFromUrl,
+  Editor,
+} from "@avocode/opendesign-universal";
 
-export function useDesignData(url: string) {
-  const [design] = useState(() => createDesign(url));
+// NOTE: I did not spend too much time thinking about editor API
+
+export function useEditor(url: string) {
+  const [editor] = useState(() =>
+    createEditor({ content: designFromUrl(url) })
+  );
+  return editor;
+}
+
+export function EditorCanvas({ editor }: { editor: Editor }): JSX.Element {
+  todo();
+}
+
+function todo(): never {
+  throw new Error("todo");
 }
