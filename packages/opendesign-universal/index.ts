@@ -1,22 +1,17 @@
-type Design = {};
+type Design = { __marker: "design" };
 
-type RecursiveArray<T> = T | readonly T[];
+type Page = { __marker: "page" };
+
+type Artboard = { __marker: "artboard" };
 
 type EditorOptions = {
   content: Design;
-  plugins?: RecursiveArray<Plugin>;
-};
-
-type PluginRegistration = {
-  unregister: () => void;
 };
 
 export type Editor = {
+  destroy: () => void;
   // this is mostly to make react wrapper triv. using useSyncExternalStore
   subscribe: (onStoreChange: () => void) => () => void;
-
-  // plugins, see relevant section below
-  registerPlugin: (plugin: Plugin) => PluginRegistration;
 };
 
 /**
@@ -31,13 +26,17 @@ export type Editor = {
 export function createEditor(options: EditorOptions): Editor {
   // ...
   return {
+    destroy() {},
     subscribe: () => () => {},
-    registerPlugin(plugin: Plugin) {
-      return {
-        unregister() {},
-      };
-    },
   };
+}
+
+export type Renderer = { destroy: () => void; __marker: "renderer" };
+export function createCanvasRenderer(
+  editor: Editor,
+  canvas: any /* HTMLCanvasElement|OffscreenCanvas|??? */
+): Renderer {
+  todo();
 }
 
 /////////
@@ -91,6 +90,10 @@ export function designFromNodeFile(file: unknown): Promise<Design> {
   todo();
 }
 
+export function designCreateEmpty(): Design {
+  todo();
+}
+
 /////////
 // OPERATIONS
 // always take object they operate on as a first argument. They are not declared
@@ -126,73 +129,81 @@ export function moveBy(
   todo();
 }
 
-/////////
-// PLUGINS
-// They listen for events and implement behavior. You usually set them up at the
-// start and then forget about them.
-////////
+export function createPage(
+  editor: Editor,
+  spec: {
+    name: string;
+    // You usually do not have to specify this, but it is useful in tests and
+    // other situations which require deterministic ids.
+    id?: string;
+  }
+): Page {
+  todo();
+}
+
+export function createArtboard(
+  page: Page,
+  spec: {
+    name: string;
+    position: readonly [number, number];
+    size: readonly [number, number];
+    id?: string;
+  }
+): Artboard {
+  todo();
+}
+
+export function setName(
+  object: Page | Artboard /* | ... */,
+  name: string
+): void {
+  todo();
+}
+
+export function setViewport(
+  renderer: Renderer,
+  options: {
+    scale: number;
+    position: readonly [number, number];
+  }
+): void {
+  todo();
+}
+
+export function getArtboard(editor: Editor, spec: { id: string }): Artboard {
+  todo();
+}
+
+export function getMetrics(object: Page | Artboard /* | ... */): Promise<{
+  // TODO: use same form and names as octopus
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+}> {
+  todo();
+}
 
 /**
- * Vision here is to use plugin API similar to https://rollupjs.org/guide/en/#plugins-overview
- * with the big difference that we'll allow plugins to attach, detach and attach
- * again to allow for dynamic changes in configuration. There might be some
- * plugins which do not allow this, but vast majority should have no problem.
- * I used this API for some things and it is very ergonomic, allows good typescript
- * typing. Also, the reason I did not use EventTarget is that this should be much
- * faster than dispatching real heavyweight DOM events.
+ * Makes it so that center of a given object is in the center of the viewport.
  *
- * Note on stability: we can consider Plugin API unstable and the rest stable.
- * At least at first. This would mean that if you are not writing plugins you
- * can count on the API, but if you are, then you would have to update the plugin
- * from time to time. But the plugins themselves should not be too big, so this
- * would be mostly self-contained.
+ * If object is on invisible page, switches the page.
  *
- * Most functionality should be implemented in plugin and editor should be just
- * wiring it together.
+ * @param object
  */
-export type Plugin = {
-  // required, so that we can emit reasonable errors and so that we can guarantee
-  // that same plugin is not used multiple times.
-  // recommended values:
-  // - if you are npm package implementing single plugin: package-name
-  // - if you are npm package implementing multiple plugins: package-name/plugin-name
-  // - if you are an application: application-name or application-name/plugin-name
-  name: string;
-  attached?: (editor: Editor) => void;
-  detached?: () => void;
-  engineLoaded?: (ode: unknown) => void;
-
-  // Editor will emit error if this plugin is enabled before its dependencies.
-  // Or if dependencies are disabled before this plugin.
-  dependsOn?: () => readonly string[];
-  // many, many, many more hooks
-};
-
-/**
- * Deals with rendering the design into canvas
- */
-export function canvasPlugin(target: unknown /* HTMLCanvasElement */): Plugin {
+export function centerObject(renderer: Renderer, object: Artboard) {
   todo();
 }
 
-/**
- * Enables user to select stuff on canvas using mouse/touch. Requires canvasPlugin.
- */
-export function pointerSelectionPlugin(): Plugin {
+export function fillViewWithObject(renderer: Renderer, object: Artboard) {
   todo();
 }
 
-/**
- * Saves changes you made to the design and allows you to roll them back/forward.
- */
-export function undoRedoPlugin(): Plugin {
-  todo();
-}
-
-/**
- * Attaches event listeners to DOM and triggers various actions. Requires canvasPlugin.
- */
-export function shortcutPlugin(): Plugin {
+export function listenToEvent(
+  renderer: Renderer,
+  event: string,
+  handler: (event: any) => void
+): () => void {
   todo();
 }
 
@@ -217,10 +228,19 @@ export function waitForFullLoad(editor: Editor): Promise<void> {
  * @param selector
  */
 export function exportImage(
-  editor: Editor,
+  renderer: Renderer,
   selector: unknown = "selection"
 ): Promise<unknown /* some kind of image */> {
   todo();
+}
+
+/**
+ * Destroys object. Exported for API consistency - identical to calling .destroy()
+ * directly.
+ * @param destroyable
+ */
+export function destroy(destroyable: { destroy: () => void }) {
+  destroyable.destroy();
 }
 
 // NOTE: we might want to split-out things that only work in DOM into @opendesign/dom

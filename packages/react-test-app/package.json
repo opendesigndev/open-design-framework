@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@avocode/opendesign-react": "workspace:*",
+    "@avocode/opendesign-universal": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -4528,6 +4528,7 @@ __metadata:
   resolution: "react-test-app@workspace:packages/react-test-app"
   dependencies:
     "@avocode/opendesign-react": "workspace:*"
+    "@avocode/opendesign-universal": "workspace:*"
     "@types/react": ^18.0.21
     "@types/react-dom": ^18.0.6
     "@vitejs/plugin-react": ^2.1.0
