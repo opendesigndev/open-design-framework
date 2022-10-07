@@ -5,7 +5,7 @@
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
   "private": true,
-  "packageManager": "yarn@3.2.3+sha256.311cd84f5f144680cc21b4bbbdeba97d1a5f32ee8a2eae7037ccbdeff8a3c1ce",
+  "packageManager": "yarn@3.2.4+sha256.ca1a380d840c676152fbf8635a82d838113fe77e1665466699a4e106df4930d2",
   "workspaces": [
     "packages/*"
   ],
@@ -16,7 +16,7 @@
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^7.0.1",
-    "typescript": "4.8.3"
+    "typescript": "^4.8.4"
   },
   "engines": {
     "corepack": ">=0.12.0"
