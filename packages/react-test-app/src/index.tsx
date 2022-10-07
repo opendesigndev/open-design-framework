@@ -15,7 +15,6 @@ root.render(<App />);
 function App() {
   const editor = useEditor("/path/to/manifest.json", (editor) => {
     const artboard = getArtboard(editor, { id: "feed-dead" });
-    centerObject(artboard);
     setName(artboard, "hello there");
   });
 

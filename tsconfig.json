@@ -1,3 +1,4 @@
 {
-  "references": [{ "path": "packages/react-test-app" }]
+  "references": [{ "path": "packages/react-test-app" }],
+  "include": []
 }

@@ -10,6 +10,7 @@
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "composite": true
+    "composite": true,
+    "resolveJsonModule": true
   }
 }

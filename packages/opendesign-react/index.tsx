@@ -21,10 +21,8 @@ export function useEditor(url: string, setup?: (editor: Editor) => void) {
 export function EditorCanvas({ editor }: { editor: Editor }): JSX.Element {
   const canvas = useRef<HTMLCanvasElement>(null);
   useLayoutEffect(() => {
-    const remove = editor.addRenderer(
-      createCanvasRenderer(editor, canvas.current)
-    );
-    return remove;
+    const renderer = createCanvasRenderer(editor, canvas.current);
+    return renderer.destroy;
   }, [editor]);
   return <canvas ref={canvas} />;
 }
