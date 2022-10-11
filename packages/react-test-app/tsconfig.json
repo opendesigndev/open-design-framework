@@ -5,7 +5,9 @@
     { "path": "../opendesign-universal" }
   ],
   "compilerOptions": {
-    "lib": ["ES2022", "DOM"]
+    "lib": ["ES2022", "DOM"],
+    "emitDeclarationOnly": true,
+    "outDir": "dist"
   },
-  "include": ["package.json"]
+  "include": [".", "package.json"]
 }

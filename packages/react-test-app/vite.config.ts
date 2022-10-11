@@ -4,6 +4,11 @@ import packageJson from "./package.json";
 // @ts-expect-error
 import fs from "node:fs";
 
+// TODO: remove once usage starts giving errors (= vite fixes its typedefs)
+function hackDefault<T>(v: { default: T }): T {
+  return v as any;
+}
+
 // Resolve all local packages directly so that development does not require
 // running typescript watcher.
 const alias = Object.fromEntries(
@@ -21,5 +26,5 @@ export default defineConfig({
   server: {
     fs: { allow: ["../.."] },
   },
-  plugins: [react()],
+  plugins: [hackDefault(react)()],
 });

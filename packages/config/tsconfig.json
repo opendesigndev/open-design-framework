@@ -2,8 +2,8 @@
   "compilerOptions": {
     "strict": true,
     "module": "Node16",
+    "moduleResolution": "Node16",
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
     "skipLibCheck": true,
     "lib": ["ES2022"],
     "target": "ES2022",
