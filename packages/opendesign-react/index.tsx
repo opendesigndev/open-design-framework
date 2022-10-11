@@ -9,7 +9,14 @@ import {
 // NOTE: I did not spend too much time thinking about react API, yet
 // but most of it would be done by using universal functions anyway.
 
-export function useEditor(url: string, setup?: (editor: Editor) => void) {
+export function useEditor(
+  options?:
+    | {
+        url?: string;
+        onLoad?: (editor: Editor) => void;
+      }
+    | string
+) {
   const [editor] = useState(() => {
     const ed = createEditor({ content: designFromUrl(url) });
     setup?.(ed);
