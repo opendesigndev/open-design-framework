@@ -13,5 +13,9 @@
   "exports": "./dist/index.js",
   "scripts": {
     "build": "yarn run -T tsc"
-  }
+  },
+  "files": [
+    "dist",
+    "!dist/*.tsbuildinfo"
+  ]
 }
