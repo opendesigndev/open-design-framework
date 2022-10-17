@@ -23,8 +23,8 @@
   ],
   "imports": {
     "#env": {
-      "node": "./dist/env-node.js",
-      "default": "./dist/env-dom.js"
+      "node": "./dist/src/env-node.js",
+      "default": "./dist/src/env-dom.js"
     }
   }
 }
