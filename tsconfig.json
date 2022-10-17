@@ -1,4 +1,7 @@
 {
-  "references": [{ "path": "packages/react-test-app" }],
+  "references": [
+    { "path": "packages/react-test-app" },
+    { "path": "packages/opendesign-universal/tsconfig.dom.json" }
+  ],
   "include": []
 }

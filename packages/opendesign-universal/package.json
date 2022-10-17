@@ -10,12 +10,21 @@
   },
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./dom": "./dist/dom.js"
+  },
   "scripts": {
     "build": "yarn run -T tsc"
   },
   "files": [
     "dist",
     "!dist/*.tsbuildinfo"
-  ]
+  ],
+  "imports": {
+    "#env": {
+      "node": "./dist/env-node.js",
+      "default": "./dist/env-dom.js"
+    }
+  }
 }

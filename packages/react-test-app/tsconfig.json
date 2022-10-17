@@ -9,5 +9,6 @@
     "emitDeclarationOnly": true,
     "outDir": "dist"
   },
-  "include": [".", "package.json"]
+  "include": [".", "package.json"],
+  "exclude": ["dist"]
 }

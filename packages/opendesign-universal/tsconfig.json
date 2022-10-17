@@ -1,5 +1,6 @@
 {
   "extends": "../config/tsconfig.json",
   "compilerOptions": { "outDir": "dist" },
-  "include": ["."]
+  "include": ["."],
+  "exclude": ["dist", "src/env-dom.ts", "src/dom.ts"]
 }

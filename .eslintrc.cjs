@@ -2,7 +2,7 @@ module.exports = {
   extends: ["react-app", "prettier"],
   plugins: ["simple-import-sort"],
   parserOptions: {
-    project: ["./tsconfig.json", "packages/*/tsconfig.json"],
+    project: ["./tsconfig.json", "packages/*/tsconfig.*"],
   },
   rules: {
     "@typescript-eslint/consistent-type-imports": [
