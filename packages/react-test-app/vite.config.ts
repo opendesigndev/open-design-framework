@@ -26,16 +26,34 @@ const alias = Object.fromEntries(
 
 export default defineConfig({
   optimizeDeps: { exclude: localDeps },
-  resolve: {
-    alias: {
-      ...alias,
-      // bypass package.json['import'] for @opendesign/universal too
-      "#env": new URL("../opendesign-universal/src/env-dom.ts", import.meta.url)
-        .pathname,
-    },
-  },
+  resolve: { alias },
   server: {
     fs: { allow: ["../.."] },
   },
-  plugins: [hackDefault(react)()],
+  plugins: [
+    {
+      // Replaces package/dist local imports with package/src/...tsx import
+      // only required in monorepo to avoid having to build any local deps
+      name: "custom-local-resolver",
+      resolveId(source, importer, options) {
+        if (!importer) return;
+        if (source.startsWith("#")) {
+          const path = importer.replace(
+            /(\/packages\/[^/]+)\/.*$/,
+            "$1/package.json"
+          );
+          if (!path.endsWith("package.json")) return;
+          const pkgjson = JSON.parse(fs.readFileSync(path, "utf-8"));
+          const map = pkgjson.imports?.[source];
+          return path
+            .replace(/package\.json$/, map.default.slice(7))
+            .replace(/\.js$/, ".ts");
+        }
+        if (source.endsWith("index.ts/dom")) {
+          return source.replace("index.ts/dom", "src/dom.ts");
+        }
+      },
+    },
+    hackDefault(react)(),
+  ],
 });

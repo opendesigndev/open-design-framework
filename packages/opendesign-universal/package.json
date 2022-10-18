@@ -12,7 +12,7 @@
   "license": "UNLICENSED",
   "exports": {
     ".": "./dist/index.js",
-    "./dom": "./dist/dom.js"
+    "./dom": "./dist/src/dom.js"
   },
   "scripts": {
     "build": "yarn run -T tsc"

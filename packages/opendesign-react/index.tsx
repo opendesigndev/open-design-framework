@@ -1,4 +1,7 @@
-import type { CreateEditorOptions } from "@avocode/opendesign-universal";
+import type {
+  CreateEditorOptions,
+  Editor,
+} from "@avocode/opendesign-universal";
 import { createEditor } from "@avocode/opendesign-universal";
 import { mount } from "@avocode/opendesign-universal/dom";
 import { useLayoutEffect, useRef, useState } from "react";
@@ -16,10 +19,7 @@ export function useEditor(options?: UseEditorOptions) {
 }
 
 export function EditorCanvas({ editor }: { editor: Editor }): JSX.Element {
-  const canvas = useRef<HTMLCanvasElement>(null);
-  useLayoutEffect(() => {
-    const renderer = createCanvasRenderer(editor, canvas.current);
-    return renderer.destroy;
-  }, [editor]);
-  return <canvas ref={canvas} />;
+  const canvas = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
+  return <div ref={canvas} />;
 }

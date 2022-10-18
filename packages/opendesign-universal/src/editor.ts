@@ -1,9 +1,9 @@
 import { env } from "#env";
 
-import type { ToDo } from "./internals.js";
-import { todo } from "./internals.js";
 import type { DocumentNode } from "./nodes/document.js";
 import { Document } from "./nodes/document.js";
+import type { Renderer } from "./renderer.js";
+import { createRenderer } from "./renderer.js";
 
 export type CreateEditorOptions = {
   /**
@@ -14,7 +14,7 @@ export type CreateEditorOptions = {
 
 export type Editor = {
   readonly document: DocumentNode;
-  readonly renderer: ToDo;
+  readonly renderer: Renderer;
   /**
    * Cleans up editors resources (primarily server connection).
    */
@@ -26,6 +26,6 @@ export function createEditor(options: CreateEditorOptions): Editor {
   return {
     destroy() {},
     document: new Document(),
-    renderer: todo(),
+    renderer: createRenderer(),
   };
 }

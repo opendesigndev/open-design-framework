@@ -7,7 +7,7 @@ import { NodeBase } from "./node.js";
 import type { PageNode } from "./page.js";
 
 export type DocumentNode = BaseNode & {
-  [__internals]: true;
+  [__internals]: unknown;
   readonly currentPage: PageNode;
   /**
    * True when the document is still being loaded from the server
@@ -16,14 +16,20 @@ export type DocumentNode = BaseNode & {
 };
 
 export class Document extends NodeBase implements DocumentNode {
-  [__internals]: true;
-  currentPage: PageNode;
+  [__internals]: {
+    currentPage: PageNode | null;
+  } = {
+    currentPage: null,
+  };
   loading: DocumentNode["loading"] = false;
 
-  constructor() {
-    super();
-    this[__internals] = true;
-    this.currentPage = todo();
+  get currentPage(): PageNode {
+    let page = this[__internals].currentPage;
+    if (!page) {
+      page = todo();
+      this[__internals].currentPage = page;
+    }
+    return page;
   }
 }
 
