@@ -1,5 +1,5 @@
 {
-  "name": "@avocode/opendesign-universal",
+  "name": "@opendesign/universal",
   "description": "Works in both node.js and browser.",
   "version": "0.0.0",
   "type": "module",

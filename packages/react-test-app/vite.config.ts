@@ -12,7 +12,7 @@ function hackDefault<T>(v: { default: T }): T {
 }
 
 const localDeps = Object.entries(packageJson.dependencies)
-  .filter(([k, v]) => k.startsWith("@avocode/") && v.startsWith("workspace:"))
+  .filter(([k, v]) => v.startsWith("workspace:"))
   .map(([k]) => k);
 
 // Resolve all local packages directly so that development does not require

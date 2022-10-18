@@ -1,8 +1,4 @@
-import {
-  EditorCanvas,
-  useEditor,
-  useHoveredNode,
-} from "@avocode/opendesign-react";
+import { EditorCanvas, useEditor, useHoveredNode } from "@opendesign/react";
 import { Suspense } from "react";
 
 // Using pre-provided hook. Prefer in the declarative case (ie. doing something

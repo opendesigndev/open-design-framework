@@ -1,10 +1,17 @@
-import type {
-  CreateEditorOptions,
-  Editor,
-} from "@avocode/opendesign-universal";
-import { createEditor } from "@avocode/opendesign-universal";
-import { mount } from "@avocode/opendesign-universal/dom";
+import type { CreateEditorOptions, Editor } from "@opendesign/universal";
+import { createEditor } from "@opendesign/universal";
+import { mount } from "@opendesign/universal/dom";
 import { useLayoutEffect, useRef, useState } from "react";
+
+export type {
+  Renderer,
+  LayerNode,
+  PageNode,
+  DocumentNode,
+  BaseNode,
+  Node,
+} from "@opendesign/universal";
+export type { Editor, CreateEditorOptions };
 
 export type UseEditorOptions = CreateEditorOptions | string;
 

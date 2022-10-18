@@ -1,5 +1,5 @@
 {
-  "name": "@avocode/opendesign-react",
+  "name": "@opendesign/react",
   "description": "React bindings for @opendesign/universal",
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,9 @@
   },
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
-  "typedocMain": "index.tsx",
+  "typedoc": {
+    "entryPoint": "index.tsx"
+  },
   "exports": "./dist/index.js",
   "scripts": {
     "build": "yarn run -T tsc"
@@ -20,7 +22,7 @@
     "!dist/*.tsbuildinfo"
   ],
   "dependencies": {
-    "@avocode/opendesign-universal": "workspace:*"
+    "@opendesign/universal": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.1.0"

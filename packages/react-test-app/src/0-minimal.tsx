@@ -1,4 +1,4 @@
-import { EditorCanvas, useEditor } from "@avocode/opendesign-react";
+import { EditorCanvas, useEditor } from "@opendesign/react";
 import { Suspense } from "react";
 
 export function Minimal() {

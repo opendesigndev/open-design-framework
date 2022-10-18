@@ -1,5 +1,5 @@
-import { EditorCanvas, useEditor } from "@avocode/opendesign-react";
-import type { Editor } from "@avocode/opendesign-universal";
+import { EditorCanvas, useEditor } from "@opendesign/react";
+import type { Editor } from "@opendesign/universal";
 import { Suspense } from "react";
 
 // This example is supposed to represent more realistic case of an app, where

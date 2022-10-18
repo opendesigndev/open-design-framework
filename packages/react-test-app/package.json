@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@avocode/opendesign-react": "workspace:*",
-    "@avocode/opendesign-universal": "workspace:*",
+    "@opendesign/react": "workspace:*",
+    "@opendesign/universal": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.2"

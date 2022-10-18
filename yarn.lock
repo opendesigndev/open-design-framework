@@ -15,24 +15,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@avocode/opendesign-react@workspace:*, @avocode/opendesign-react@workspace:packages/opendesign-react":
-  version: 0.0.0-use.local
-  resolution: "@avocode/opendesign-react@workspace:packages/opendesign-react"
-  dependencies:
-    "@avocode/opendesign-universal": "workspace:*"
-    "@types/react": ^18.0.21
-    react: ^18.2.0
-  peerDependencies:
-    react: ^18.1.0
-  languageName: unknown
-  linkType: soft
-
-"@avocode/opendesign-universal@workspace:*, @avocode/opendesign-universal@workspace:packages/opendesign-universal":
-  version: 0.0.0-use.local
-  resolution: "@avocode/opendesign-universal@workspace:packages/opendesign-universal"
-  languageName: unknown
-  linkType: soft
-
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.18.6":
   version: 7.18.6
   resolution: "@babel/code-frame@npm:7.18.6"
@@ -1674,6 +1656,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opendesign/react@workspace:*, @opendesign/react@workspace:packages/opendesign-react":
+  version: 0.0.0-use.local
+  resolution: "@opendesign/react@workspace:packages/opendesign-react"
+  dependencies:
+    "@opendesign/universal": "workspace:*"
+    "@types/react": ^18.0.21
+    react: ^18.2.0
+  peerDependencies:
+    react: ^18.1.0
+  languageName: unknown
+  linkType: soft
+
+"@opendesign/universal@workspace:*, @opendesign/universal@workspace:packages/opendesign-universal":
+  version: 0.0.0-use.local
+  resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
+  languageName: unknown
+  linkType: soft
+
 "@remix-run/router@npm:1.0.2":
   version: 1.0.2
   resolution: "@remix-run/router@npm:1.0.2"
@@ -2506,8 +2506,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:packages/docs"
   dependencies:
-    "@avocode/opendesign-react": "workspace:*"
-    "@avocode/opendesign-universal": "workspace:*"
+    "@opendesign/react": "workspace:*"
+    "@opendesign/universal": "workspace:*"
     typedoc: 0.23.17
   languageName: unknown
   linkType: soft
@@ -4601,8 +4601,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-test-app@workspace:packages/react-test-app"
   dependencies:
-    "@avocode/opendesign-react": "workspace:*"
-    "@avocode/opendesign-universal": "workspace:*"
+    "@opendesign/react": "workspace:*"
+    "@opendesign/universal": "workspace:*"
     "@types/react": ^18.0.21
     "@types/react-dom": ^18.0.6
     "@vitejs/plugin-react": ^2.1.0
