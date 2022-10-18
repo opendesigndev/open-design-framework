@@ -10,6 +10,7 @@
   },
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
+  "typedocMain": "index.ts",
   "exports": {
     ".": "./dist/index.js",
     "./dom": "./dist/src/dom.js"

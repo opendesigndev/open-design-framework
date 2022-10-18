@@ -10,6 +10,7 @@
   },
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
+  "typedocMain": "index.tsx",
   "exports": "./dist/index.js",
   "scripts": {
     "build": "yarn run -T tsc"

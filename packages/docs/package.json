@@ -1,0 +1,14 @@
+{
+  "name": "docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "typedoc --entryPointStrategy packages --out dist ../.."
+  },
+  "dependencies": {
+    "@avocode/opendesign-react": "workspace:*",
+    "@avocode/opendesign-universal": "workspace:*",
+    "typedoc": "0.23.17"
+  }
+}
