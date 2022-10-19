@@ -11,7 +11,7 @@ frontend:
         - yarn install
     build:
       commands:
-        - yarn tsc -b
+        - yarn tsc -b || true
         - yarn workspace docs build
   artifacts:
     baseDirectory: /packages/docs/dist/
