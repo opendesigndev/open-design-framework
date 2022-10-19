@@ -2508,7 +2508,8 @@ __metadata:
   dependencies:
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
-    typedoc: 0.23.17
+    typedoc: ^0.23.17
+    typedoc-plugin-missing-exports: ^1.0.0
   languageName: unknown
   linkType: soft
 
@@ -5189,7 +5190,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc@npm:0.23.17":
+"typedoc-plugin-missing-exports@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "typedoc-plugin-missing-exports@npm:1.0.0"
+  peerDependencies:
+    typedoc: 0.22.x || 0.23.x
+  checksum: 11ef3ba347a88924397f2f2f84216e5d41f9714baba671e4f9a86dd4de22d5e5e47477a295776c4f489be91065a152fedcbfa9aa6cba90499894e6670441ce31
+  languageName: node
+  linkType: hard
+
+"typedoc@npm:^0.23.17":
   version: 0.23.17
   resolution: "typedoc@npm:0.23.17"
   dependencies:

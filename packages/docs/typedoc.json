@@ -1,6 +1,8 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "packages",
-  "entryPoints": ["../opendesign-react", "../opendesign-universal"],
+  "entryPoints": ["../opendesign-react", "../opendesign-universal", "./dom"],
+  "plugin": ["typedoc-plugin-missing-exports"],
+  "excludeExternals": true,
   "out": "dist"
 }

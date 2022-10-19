@@ -4,14 +4,14 @@ import { mount } from "@opendesign/universal/dom";
 import { useLayoutEffect, useRef, useState } from "react";
 
 export type {
-  Renderer,
-  LayerNode,
-  PageNode,
-  DocumentNode,
   BaseNode,
+  DocumentNode,
+  LayerNode,
   Node,
+  PageNode,
+  Renderer,
 } from "@opendesign/universal";
-export type { Editor, CreateEditorOptions };
+export type { CreateEditorOptions, Editor };
 
 export type UseEditorOptions = CreateEditorOptions | string;
 

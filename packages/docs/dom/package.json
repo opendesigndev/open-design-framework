@@ -1,0 +1,5 @@
+{
+  "name": "@opendesign/universal/dom",
+  "type": "module",
+  "types": "./index.ts"
+}
