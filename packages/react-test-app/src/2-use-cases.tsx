@@ -1,5 +1,6 @@
-import { EditorCanvas, useEditor } from "@opendesign/react";
-import { Suspense } from "react";
+import { EditorCanvas, RelativeMarker, useEditor } from "@opendesign/react";
+import type { Node } from "@opendesign/universal";
+import { Suspense, useState } from "react";
 
 export function UseCases() {}
 
@@ -21,19 +22,7 @@ function EmptyDesign() {
 function CreateArtboard() {
   const editor = useEditor({
     onLoad: (editor) => {
-      // We have a concept of "active page". Feels wrong from purity POV, but
-      // 1) if user does not use multiple pages, its hidden (complexity is opt-in)
-      // 2) we need to have concept active page anyway (what is displayed on canvas)
-      // 3) along with 2) it makes easier to implement "create artboard" button
-      // downsides:
-      // a) we have to either have all "Page" functions on Editor
-      // b) or using pages is harder to get right: editor.setActivePage(target).createArtboard().setActivePage(original)
-      // I vote for a)
-      //
-      // Implementation note: if you try to invoke a method which requires a page
-      // and no page is active we either select first page and use that, or if
-      // there is no page, we create it.
-      editor.createArtboard();
+      editor.currentPage.createArtboard();
     },
   });
 
@@ -47,7 +36,7 @@ function CreateArtboard() {
 function SetArtboardName() {
   const editor = useEditor({
     onLoad: (editor) => {
-      editor.createArtboard().setName("Hello there");
+      editor.currentPage.createArtboard().setName("Hello there");
     },
   });
 
@@ -63,9 +52,10 @@ function CenterArtboardFromDesign() {
     url: "/public/design.octopus",
     onLoad: (editor) => {
       editor
-        .findArtboard({ name: "General Kenobi" })
-        .setX(10)
-        .setPosition(editor.viewport.topCenter);
+        // TODO: this is inefficient. Let's add something like findArtboard
+        .findArtboard((n) => n.name === "General Kenobi")
+        ?.setX(10)
+        .setX(editor.viewport.width / 2 + editor.viewport.x);
     },
   });
 
@@ -82,7 +72,7 @@ function ZoomEvent() {
   return (
     <Suspense>
       <EditorCanvas
-        onViewportChange={(event) => void console.log(event)}
+        onZoom={(event) => void console.log(event)}
         editor={editor}
       />
     </Suspense>
@@ -106,14 +96,14 @@ function PinOnPosition() {
 // see 3-hovered-layer-overlay-alt.tsx for alternative implementation
 function HoveredLayerOverlay() {
   const editor = useEditor();
-  const [hoveredNode, setHoveredNode] = useState(null);
+  const [hoveredNode, setHoveredNode] = useState<Node | null>(null);
 
   return (
     <Suspense>
       <EditorCanvas
         editor={editor}
-        onHover={(event) => {
-          if (event.target.type === "LAYER") {
+        onNodeHover={(event) => {
+          if (event.target) {
             setHoveredNode(event.target);
           } else {
             setHoveredNode(null);
@@ -134,6 +124,7 @@ function HoveredLayerOverlay() {
   );
 }
 
+declare function saveAs(buffer: ArrayBuffer): void;
 function ExportLayerToPng() {
   const editor = useEditor({
     url: "/public/design.octopus",
@@ -145,7 +136,7 @@ function ExportLayerToPng() {
         editor={editor}
         onClick={(event) => {
           event.target
-            .exportBitmap({ format: "png" }) // returns Blob (supported both in node and browser)
+            ?.exportBitmap({ format: "png" }) // returns Blob (supported both in node and browser)
             .then(
               (buffer) => {
                 // lib: https://www.npmjs.com/package/file-saver
@@ -172,14 +163,19 @@ function ReadingLayers() {
   const editor = useEditor({
     url: "/public/design.octopus",
     onLoad: (editor) => {
-      // All layers in a design
-      let layers = editor.findLayers();
+      // All nodes in a design
+      let layers = editor.findAll();
+
+      // layers (not pages nor artboards)
+      layers = editor.findAll(
+        (node) => node.type !== "PAGE" && node.type !== "ARTBOARD"
+      );
 
       // All layers in active page
-      layers = editor.getActivePage().findLayers();
+      layers = editor.currentPage.findAll();
 
-      // All layers in specific page
-      layers = editor.findPage({ id: "PAGE_ID" }).findLayers();
+      // All nodes in specific page
+      layers = editor.findPage((page) => page.id === "PAGE_ID").findAll();
 
       // Naming
       // - get = reading state
@@ -199,7 +195,7 @@ function SelectingLayer() {
   const editor = useEditor({
     url: "/public/design.octopus",
     onLoad: (editor) => {
-      editor.findLayers({ name: "this is fine" })[0]?.select();
+      editor.findAll((n) => n.name === "this is fine")[0]?.select();
     },
   });
 

@@ -1,4 +1,9 @@
-import { EditorCanvas, useEditor, useHoveredNode } from "@opendesign/react";
+import {
+  EditorCanvas,
+  RelativeMarker,
+  useEditor,
+  useHoveredNode,
+} from "@opendesign/react";
 import { Suspense } from "react";
 
 // Using pre-provided hook. Prefer in the declarative case (ie. doing something
@@ -17,7 +22,7 @@ export function HoveredLayerOverlay() {
 
 function HoverOverlay() {
   const hoveredNode = useHoveredNode();
-  return hoveredNode?.type === "LAYER" ? (
+  return hoveredNode && hoveredNode.type !== "PAGE" ? (
     <RelativeMarker
       node={hoveredNode}
       // https://developer.mozilla.org/en-US/docs/Web/CSS/inset

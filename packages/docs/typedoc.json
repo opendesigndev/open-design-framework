@@ -2,7 +2,7 @@
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "packages",
   "entryPoints": ["../opendesign-react", "../opendesign-universal", "./dom"],
-  "plugin": ["typedoc-plugin-missing-exports"],
+  "plugin": ["typedoc-plugin-resolve-crossmodule-references"],
   "excludeExternals": true,
   "out": "dist"
 }

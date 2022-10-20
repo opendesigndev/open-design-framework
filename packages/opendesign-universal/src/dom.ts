@@ -21,7 +21,7 @@ import { __internals } from "./internals.js";
  * @returns
  */
 export function mount(editor: Editor, div: HTMLDivElement): () => void {
-  const canvas: HTMLCanvasElement = (editor.renderer[__internals] as any)
+  const canvas: HTMLCanvasElement = (editor[__internals] as any).renderer
     .canvas;
 
   div.appendChild(canvas);

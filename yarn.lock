@@ -2510,6 +2510,7 @@ __metadata:
     "@opendesign/universal": "workspace:*"
     typedoc: ^0.23.17
     typedoc-plugin-missing-exports: ^1.0.0
+    typedoc-plugin-resolve-crossmodule-references: ^0.3.2
   languageName: unknown
   linkType: soft
 
@@ -5196,6 +5197,15 @@ __metadata:
   peerDependencies:
     typedoc: 0.22.x || 0.23.x
   checksum: 11ef3ba347a88924397f2f2f84216e5d41f9714baba671e4f9a86dd4de22d5e5e47477a295776c4f489be91065a152fedcbfa9aa6cba90499894e6670441ce31
+  languageName: node
+  linkType: hard
+
+"typedoc-plugin-resolve-crossmodule-references@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "typedoc-plugin-resolve-crossmodule-references@npm:0.3.2"
+  peerDependencies:
+    typedoc: ">=0.22 <=0.23"
+  checksum: b78f2473136e55f86c118030b21965d8eeb17eb33eb6f0adfa1fab25977914a1b4c9f79887b4d6b4456b57fc05af9b80880e30b2340c12848888231166583ea1
   languageName: node
   linkType: hard
 

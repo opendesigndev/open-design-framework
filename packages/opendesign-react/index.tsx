@@ -1,17 +1,9 @@
-import type { CreateEditorOptions, Editor } from "@opendesign/universal";
+import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
 import { mount } from "@opendesign/universal/dom";
 import { useLayoutEffect, useRef, useState } from "react";
 
-export type {
-  BaseNode,
-  DocumentNode,
-  LayerNode,
-  Node,
-  PageNode,
-  Renderer,
-} from "@opendesign/universal";
-export type { CreateEditorOptions, Editor };
+import { todo } from "../opendesign-universal/src/internals.js";
 
 export type UseEditorOptions = CreateEditorOptions | string;
 
@@ -25,8 +17,38 @@ export function useEditor(options?: UseEditorOptions) {
   return editor;
 }
 
-export function EditorCanvas({ editor }: { editor: Editor }): JSX.Element {
+export function EditorCanvas({
+  editor,
+  ...rest
+}: {
+  editor: Editor;
+  children?: React.ReactNode;
+  onNodeHover?: (event: { target: Node | null }) => void;
+  onViewportChange?: (event: { viewport: unknown }) => void;
+  onZoom?: (event: { zoom: number }) => void;
+  onClick?: (event: { target: Node | null }) => void;
+}): JSX.Element {
   const canvas = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
+  if (Object.keys(rest).length) todo("this prop is not yet supported");
   return <div ref={canvas} />;
+}
+
+export function RelativeMarker(
+  props: { children: React.ReactNode } & (
+    | {
+        node: Node;
+        inset?: number;
+      }
+    | {
+        x: number;
+        y: number;
+      }
+  )
+): JSX.Element {
+  todo();
+}
+
+export function useHoveredNode(): Node | null {
+  todo();
 }
