@@ -1,6 +1,6 @@
 import type { BaseNode } from "./node.js";
 
-export type ArtboardNode = BaseNode & {
+export interface ArtboardNode extends BaseNode {
   type: "ARTBOARD";
   /**
    * Returns artboard's position within page. Use setX and setY to change this.
@@ -19,4 +19,4 @@ export type ArtboardNode = BaseNode & {
    * @param value
    */
   setY(value: number): ArtboardNode;
-};
+}

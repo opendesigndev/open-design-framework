@@ -22,7 +22,7 @@ function EmptyDesign() {
 function CreateArtboard() {
   const editor = useEditor({
     onLoad: (editor) => {
-      editor.design.currentPage.createArtboard();
+      editor.currentPage.createArtboard();
     },
   });
 
@@ -36,7 +36,7 @@ function CreateArtboard() {
 function SetArtboardName() {
   const editor = useEditor({
     onLoad: (editor) => {
-      editor.design.currentPage.createArtboard().setName("Hello there");
+      editor.currentPage.createArtboard().setName("Hello there");
     },
   });
 
@@ -162,7 +162,8 @@ function ExportLayerToPng() {
 function ReadingLayers() {
   const editor = useEditor({
     url: "/public/design.octopus",
-    onLoad: ({ design }) => {
+    onLoad: (editor) => {
+      const { design } = editor;
       // All nodes in a design
       let layers = design.findAll();
 
@@ -172,7 +173,7 @@ function ReadingLayers() {
       );
 
       // All layers in active page
-      layers = design.currentPage.findAll();
+      layers = editor.currentPage.findAll();
 
       // All nodes in specific page
       layers = design.findPage((page) => page.id === "PAGE_ID").findAll();
@@ -194,8 +195,8 @@ function ReadingLayers() {
 function SelectingLayer() {
   const editor = useEditor({
     url: "/public/design.octopus",
-    onLoad: ({ design }) => {
-      design.findAll((n) => n.name === "this is fine")[0]?.select();
+    onLoad: (editor) => {
+      editor.select(editor.design.findAll((n) => n.name === "this is fine")[0]);
     },
   });
 

@@ -6,14 +6,7 @@ import type { BaseNode, NodeFilter } from "./node.js";
 import { NodeBase } from "./node.js";
 import type { PageNode } from "./page.js";
 
-export type DesignNode = BaseNode & {
-  readonly currentPage: PageNode;
-
-  /**
-   * True when the document is still being loaded from the server
-   */
-  readonly loading: Promise<void> | false;
-
+export interface DesignNode extends BaseNode {
   /**
    * Returns first page which matches the filter
    */
@@ -29,24 +22,12 @@ export type DesignNode = BaseNode & {
    * @param filter
    */
   findArtboard(filter?: NodeFilter<ArtboardNode>): ArtboardNode | null;
-};
+}
 
 /**
  * @internal
  */
 export class DesignImplementation extends NodeBase implements DesignNode {
-  #currentPage: PageNode | null = null;
-  loading: DesignNode["loading"] = false;
-
-  get currentPage(): PageNode {
-    let page = this.#currentPage;
-    if (!page) {
-      page = todo();
-      this.#currentPage = page;
-    }
-    return page;
-  }
-
   findPage(filter: NodeFilter<PageNode>): PageNode {
     todo();
   }
@@ -60,15 +41,4 @@ export class DesignImplementation extends NodeBase implements DesignNode {
   ): ArtboardNode | null {
     todo();
   }
-}
-
-export function fetchDocument(url: string) {
-  const document = new DesignImplementation();
-  document.loading = env
-    .fetch(url)
-    .then((r) => r.arrayBuffer())
-    .then((data) => {
-      todo("Read document from ArrayBuffer");
-    });
-  return document;
 }

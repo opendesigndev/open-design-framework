@@ -1,6 +1,10 @@
 // Do NOT do export *
 // I'd set a eslint rule for it, but it does not exist and I am not writing one
-export type { CreateEditorOptions, Editor } from "./src/editor.js";
+export type {
+  CreateEditorOptions,
+  Editor,
+  EditorViewport,
+} from "./src/editor.js";
 export { createEditor } from "./src/editor.js";
 export type { ArtboardNode } from "./src/nodes/artboard.js";
 export type { DesignNode } from "./src/nodes/design.js";

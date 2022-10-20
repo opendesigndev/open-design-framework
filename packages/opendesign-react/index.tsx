@@ -4,10 +4,18 @@ import { mount } from "@opendesign/universal/dom";
 import { useLayoutEffect, useRef, useState } from "react";
 
 import { todo } from "../opendesign-universal/src/internals.js";
+import { useEditorContext } from "./src/context.js";
 
-export type UseEditorOptions = CreateEditorOptions | string;
+export { EditorProvider, useEditorContext } from "./src/context.js";
 
-export function useEditor(options?: UseEditorOptions) {
+/**
+ * Creates Editor object to be used. This is the main entrypoint for react apps.
+ * Use {@link @opendesign/react!EditorCanvas} component to display the content.
+ *
+ * @param options
+ * @returns
+ */
+export function useEditor(options?: CreateEditorOptions | string) {
   const [editor] = useState(() => {
     const ed = createEditor(
       typeof options === "object" ? options : { url: options }
@@ -17,19 +25,37 @@ export function useEditor(options?: UseEditorOptions) {
   return editor;
 }
 
-/**
- * React component which displays the design on canvas <canvas>
- * @param props
- * @returns
- */
-export function EditorCanvas(props: {
+export type EditorCanvasProps = {
   editor: Editor;
   children?: React.ReactNode;
   onNodeHover?: (event: { target: Node | null }) => void;
   onViewportChange?: (event: { viewport: unknown }) => void;
   onZoom?: (event: { zoom: number }) => void;
   onClick?: (event: { target: Node | null }) => void;
-}): JSX.Element {
+};
+
+/**
+ * React component which displays the design on canvas `<canvas>`. May suspend.
+ * Use in conjunction with {@link @opendesign/react!useEditor}
+ *
+ * ## Example
+ *
+ * ```typescript
+ *   function App() {
+ *     const editor = useEditor("/public/design.octopus");
+ *
+ *     return (
+ *       <Suspense>
+ *         <EditorCanvas editor={editor} />
+ *       </Suspense>
+ *     );
+ *   }
+ * ```
+ *
+ * @param props
+ * @returns
+ */
+export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   const { editor, ...rest } = props;
   const canvas = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
@@ -37,21 +63,42 @@ export function EditorCanvas(props: {
   return <div ref={canvas} />;
 }
 
+/**
+ * Renders absolutely positioned element at position of given node or at given
+ * coordinates. Must be a child of {@link @opendesign/react!EditorCanvas}
+ * component.
+ *
+ * If node is specified, then also width/height is applied and the element is
+ * also hidden if it goes out of the viewport.
+ *
+ * @param props
+ */
 export function RelativeMarker(
-  props: { children: React.ReactNode } & (
+  props:
     | {
+        children: React.ReactNode;
         node: Node;
+        /**
+         * The element's size will be reduced by this many CSS pixels.
+         * Can be negative.
+         */
         inset?: number;
       }
     | {
+        children: React.ReactNode;
         x: number;
         y: number;
       }
-  )
 ): JSX.Element {
   todo();
 }
 
-export function useHoveredNode(): Node | null {
+/**
+ * Returns a node under the cursor.
+ *
+ * See {@link @opendesign/react!useEditorContext} for rules on where to use this.
+ */
+export function useHoveredNode(editorOverride?: Editor): Node | null {
+  const editor = useEditorContext(editorOverride);
   todo();
 }

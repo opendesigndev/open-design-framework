@@ -1,7 +1,7 @@
 import type { ArtboardNode } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";
 
-export type PageNode = BaseNode & {
+export interface PageNode extends BaseNode {
   type: "PAGE";
   id: string;
 
@@ -12,4 +12,4 @@ export type PageNode = BaseNode & {
    * @param filter
    */
   findArtboard(filter?: NodeFilter<ArtboardNode>): ArtboardNode | null;
-};
+}

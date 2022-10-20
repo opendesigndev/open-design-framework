@@ -1,5 +1,5 @@
 import type { BaseNode } from "./node.js";
 
-export type LayerNode = BaseNode & {
+export interface LayerNode extends BaseNode {
   type: "SHAPE" | "TEXT" | "COMPONENT_REFERENCE" | "GROUP" | "MASK_GROUP";
-};
+}

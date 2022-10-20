@@ -40,3 +40,8 @@ Then you'll want to switch to workspace's typescript version:
 - open the repository in vscode
 - open any typescript file
 - ctrl-shift-p (or ⌘-shift-p on mac) and run `typescript: select typescript version...` and choose `Use workspace version`
+
+## Notes
+
+- If you typescript `type` has methods, change it to interface. It renders
+  better in typedoc.
