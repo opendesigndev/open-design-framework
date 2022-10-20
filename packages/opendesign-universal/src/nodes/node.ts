@@ -25,8 +25,15 @@ export type BaseNode = {
    */
   find(filter?: NodeFilter): Node | null;
 
+  /**
+   * Renders contents of the node and returns image in specified format.
+   * @param options
+   */
   exportBitmap(options: { format: "png" }): Promise<ArrayBuffer>;
 
+  /**
+   * Marks node as selected, deselecting any other currently-selected node.
+   */
   select(): void;
 
   readonly name: string;

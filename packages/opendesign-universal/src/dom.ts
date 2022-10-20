@@ -1,5 +1,5 @@
 import type { Editor } from "./editor.js";
-import { __internals } from "./internals.js";
+import { editorInternals } from "./editor.js";
 
 /**
  * Attaches editor into provided div. Only available in DOM environments.
@@ -21,8 +21,7 @@ import { __internals } from "./internals.js";
  * @returns
  */
 export function mount(editor: Editor, div: HTMLDivElement): () => void {
-  const canvas: HTMLCanvasElement = (editor[__internals] as any).renderer
-    .canvas;
+  const canvas: HTMLCanvasElement = editorInternals.get(editor).canvas;
 
   div.appendChild(canvas);
 

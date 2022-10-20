@@ -1,6 +1,5 @@
 import { env } from "#env";
 
-import { __internals } from "../internals.js";
 import { todo } from "../internals.js";
 import type { ArtboardNode } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";
@@ -8,7 +7,6 @@ import { NodeBase } from "./node.js";
 import type { PageNode } from "./page.js";
 
 export type DesignNode = BaseNode & {
-  [__internals]: unknown;
   readonly currentPage: PageNode;
 
   /**
@@ -37,18 +35,14 @@ export type DesignNode = BaseNode & {
  * @internal
  */
 export class DesignImplementation extends NodeBase implements DesignNode {
-  [__internals]: {
-    currentPage: PageNode | null;
-  } = {
-    currentPage: null,
-  };
+  #currentPage: PageNode | null = null;
   loading: DesignNode["loading"] = false;
 
   get currentPage(): PageNode {
-    let page = this[__internals].currentPage;
+    let page = this.#currentPage;
     if (!page) {
       page = todo();
-      this[__internals].currentPage = page;
+      this.#currentPage = page;
     }
     return page;
   }

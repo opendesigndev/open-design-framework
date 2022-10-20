@@ -1,8 +1,6 @@
-import type { __internals } from "../internals.js";
 import type { BaseNode } from "./node.js";
 
 export type ArtboardNode = BaseNode & {
-  [__internals]: true;
   type: "ARTBOARD";
   /**
    * Returns artboard's position within page. Use setX and setY to change this.

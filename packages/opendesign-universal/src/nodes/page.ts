@@ -1,9 +1,7 @@
-import type { __internals } from "../internals.js";
 import type { ArtboardNode } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";
 
 export type PageNode = BaseNode & {
-  [__internals]: true;
   type: "PAGE";
   id: string;
 
