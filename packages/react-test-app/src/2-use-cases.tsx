@@ -8,7 +8,7 @@ function EmptyDesign() {
   const editor = useEditor({
     /* url: none, blank design by default */
     onLoad: (editor) => {
-      editor.createPage();
+      editor.design.createPage();
     },
   });
 
@@ -22,7 +22,7 @@ function EmptyDesign() {
 function CreateArtboard() {
   const editor = useEditor({
     onLoad: (editor) => {
-      editor.currentPage.createArtboard();
+      editor.design.currentPage.createArtboard();
     },
   });
 
@@ -36,7 +36,7 @@ function CreateArtboard() {
 function SetArtboardName() {
   const editor = useEditor({
     onLoad: (editor) => {
-      editor.currentPage.createArtboard().setName("Hello there");
+      editor.design.currentPage.createArtboard().setName("Hello there");
     },
   });
 
@@ -50,8 +50,8 @@ function SetArtboardName() {
 function CenterArtboardFromDesign() {
   const editor = useEditor({
     url: "/public/design.octopus",
-    onLoad: (editor) => {
-      editor
+    onLoad: ({ design }) => {
+      design
         // TODO: this is inefficient. Let's add something like findArtboard
         .findArtboard((n) => n.name === "General Kenobi")
         ?.setX(10)
@@ -162,20 +162,20 @@ function ExportLayerToPng() {
 function ReadingLayers() {
   const editor = useEditor({
     url: "/public/design.octopus",
-    onLoad: (editor) => {
+    onLoad: ({ design }) => {
       // All nodes in a design
-      let layers = editor.findAll();
+      let layers = design.findAll();
 
       // layers (not pages nor artboards)
-      layers = editor.findAll(
+      layers = design.findAll(
         (node) => node.type !== "PAGE" && node.type !== "ARTBOARD"
       );
 
       // All layers in active page
-      layers = editor.currentPage.findAll();
+      layers = design.currentPage.findAll();
 
       // All nodes in specific page
-      layers = editor.findPage((page) => page.id === "PAGE_ID").findAll();
+      layers = design.findPage((page) => page.id === "PAGE_ID").findAll();
 
       // Naming
       // - get = reading state
@@ -194,8 +194,8 @@ function ReadingLayers() {
 function SelectingLayer() {
   const editor = useEditor({
     url: "/public/design.octopus",
-    onLoad: (editor) => {
-      editor.findAll((n) => n.name === "this is fine")[0]?.select();
+    onLoad: ({ design }) => {
+      design.findAll((n) => n.name === "this is fine")[0]?.select();
     },
   });
 

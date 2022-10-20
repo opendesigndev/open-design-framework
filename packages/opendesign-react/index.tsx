@@ -17,10 +17,12 @@ export function useEditor(options?: UseEditorOptions) {
   return editor;
 }
 
-export function EditorCanvas({
-  editor,
-  ...rest
-}: {
+/**
+ * React component which displays the design on canvas <canvas>
+ * @param props
+ * @returns
+ */
+export function EditorCanvas(props: {
   editor: Editor;
   children?: React.ReactNode;
   onNodeHover?: (event: { target: Node | null }) => void;
@@ -28,6 +30,7 @@ export function EditorCanvas({
   onZoom?: (event: { zoom: number }) => void;
   onClick?: (event: { target: Node | null }) => void;
 }): JSX.Element {
+  const { editor, ...rest } = props;
   const canvas = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");

@@ -7,7 +7,7 @@ import type { BaseNode, NodeFilter } from "./node.js";
 import { NodeBase } from "./node.js";
 import type { PageNode } from "./page.js";
 
-export type DocumentNode = BaseNode & {
+export type DesignNode = BaseNode & {
   [__internals]: unknown;
   readonly currentPage: PageNode;
 
@@ -33,13 +33,16 @@ export type DocumentNode = BaseNode & {
   findArtboard(filter?: NodeFilter<ArtboardNode>): ArtboardNode | null;
 };
 
-export class Document extends NodeBase implements DocumentNode {
+/**
+ * @internal
+ */
+export class DesignImplementation extends NodeBase implements DesignNode {
   [__internals]: {
     currentPage: PageNode | null;
   } = {
     currentPage: null,
   };
-  loading: DocumentNode["loading"] = false;
+  loading: DesignNode["loading"] = false;
 
   get currentPage(): PageNode {
     let page = this[__internals].currentPage;
@@ -66,7 +69,7 @@ export class Document extends NodeBase implements DocumentNode {
 }
 
 export function fetchDocument(url: string) {
-  const document = new Document();
+  const document = new DesignImplementation();
   document.loading = env
     .fetch(url)
     .then((r) => r.arrayBuffer())
