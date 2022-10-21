@@ -1,6 +1,6 @@
 import { env } from "#env";
 
-import { createInternals } from "./internals.js";
+import { createInternals, queueMicrotask } from "./internals.js";
 import { todo } from "./internals.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
@@ -85,9 +85,15 @@ export interface Editor {
  * @returns Editor
  */
 export function createEditor(options: CreateEditorOptions = {}): Editor {
-  if (options.onLoad) todo("onLoad is not supported yet");
+  if (options.url) todo("url is not supported yet");
 
-  return new EditorImplementation();
+  const editor = new EditorImplementation();
+  if (options.onLoad) {
+    queueMicrotask(() => {
+      options.onLoad?.(editor);
+    });
+  }
+  return editor;
 }
 
 const canvasSymbol = Symbol();

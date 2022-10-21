@@ -2,13 +2,19 @@
 <html>
   <head>
     <style>
-      :root,
-      body,
-      #root {
+      html {
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
+      }
+      html,
+      body,
+      #root {
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+        flex: 1;
       }
     </style>
   </head>

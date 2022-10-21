@@ -22,3 +22,7 @@ export function createInternals<Thing extends object, Data>() {
     },
   };
 }
+
+export const queueMicrotask: (cb: () => void) => void =
+  (globalThis as any).queueMicrotask ||
+  ((cb) => void Promise.resolve().then(cb));
