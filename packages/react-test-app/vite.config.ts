@@ -19,7 +19,10 @@ const localDeps = Object.entries(packageJson.dependencies)
 // running typescript watcher.
 const alias = Object.fromEntries(
   localDeps.map((k) => {
-    const nox = new URL(`../${k.slice(9)}/index.ts`, import.meta.url).pathname;
+    const nox = new URL(
+      `../${k.slice(1).replace("/", "-")}/index.ts`,
+      import.meta.url
+    ).pathname;
     return [k, fs.existsSync(nox) ? nox : nox + "x"];
   })
 );

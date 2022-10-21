@@ -5,7 +5,7 @@ import { Minimal } from "./0-minimal.js";
 import { Nested } from "./1-nested.js";
 import { ErrorBoundary } from "./error-boundary.js";
 
-const el = document.getElementById("#root")!;
+const el = document.querySelector("#root")!;
 const root = createRoot(el);
 root.render(
   <BrowserRouter>
