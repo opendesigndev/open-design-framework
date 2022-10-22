@@ -5,7 +5,7 @@ module.exports = {
     project: [
       "./tsconfig.json",
       "packages/*/tsconfig.*",
-      "packages/docs/dom/tsconfig.json",
+      "packages/docs/*/tsconfig.json",
     ],
   },
   rules: {

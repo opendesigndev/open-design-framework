@@ -13,6 +13,9 @@
   "typedoc": {
     "entryPoint": "index.ts"
   },
+  "dependencies": {
+    "@opendesign/engine": "0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836"
+  },
   "exports": {
     ".": "./dist/index.js",
     "./dom": "./dist/src/dom.js"

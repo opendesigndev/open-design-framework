@@ -1,11 +1,15 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "packages",
-  "entryPoints": ["../opendesign-react", "../opendesign-universal", "./dom"],
+  "entryPoints": [
+    "../opendesign-react",
+    "../opendesign-universal",
+    "./dom",
+    "./engine"
+  ],
   "plugin": [
     "typedoc-plugin-resolve-crossmodule-references",
     "typedoc-plugin-mdn-links"
   ],
-  "excludeExternals": true,
   "out": "dist"
 }

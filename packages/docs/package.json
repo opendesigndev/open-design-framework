@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "typedoc"
+    "build": "node prebuild.js && typedoc"
   },
   "dependencies": {
+    "@opendesign/engine": "0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "typedoc": "^0.23.17",
