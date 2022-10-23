@@ -8,6 +8,8 @@ import { useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
+const loadedSet = new WeakSet<Editor>();
+
 /**
  * Creates Editor object to be used. This is the main entrypoint for react apps.
  * Use {@link @opendesign/react!EditorCanvas} component to display the content.
@@ -16,9 +18,15 @@ export { EditorProvider, useEditorContext } from "./src/context.js";
  * @returns
  */
 export function useEditor(options?: CreateEditorOptions | string) {
+  const [error, setError] = useState<any>(null);
+  if (error) throw error;
   const [editor] = useState(() => {
     const ed = createEditor(
       typeof options === "object" ? options : { url: options }
+    );
+    ed.loaded.then(
+      () => void loadedSet.add(ed),
+      (loadError) => void setError(loadError)
     );
     return ed;
   });
@@ -58,6 +66,10 @@ export type EditorCanvasProps = {
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   const { editor, ...rest } = props;
+  if (!loadedSet.has(editor)) {
+    throw editor.loaded;
+  }
+
   const canvas = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");

@@ -82,9 +82,9 @@ export function createStringRef(ode: ODENative, scope: Scope, text: string) {
  * function which helps with all that. Let's look at an example:
  *
  * ```typescript
- * const createDesign = createObject<DesignHandle, [EngineHandle]>(
- *   (ode, engine) => [
- *     ode.DesignHandle,
+ * const createDesign = createObject(
+ *   'DesignHandle',
+ *   (ode, engine: EngineHandle) => [
  *     (design) => { ode.createDesign(engine, design); },
  *     ode.destroyDesign,
  *   ]
@@ -99,15 +99,12 @@ export function createStringRef(ode: ODENative, scope: Scope, text: string) {
  *   automatic.
  * - you do not have to handle almost anything - just pass create and destroy functions.
  *
- * Okay so, the type arguments to createObject function are:
- * - type of the object handle
- * - extra arguments required to work with the object
+ * Okay so, the arguments are:
+ * - type of the object handle as a string - a key into ODE
+ * - configuration function
  *
- * JS argument is a function which takes ODE and the extra arguments and returns
- * array containing:
- * - the handle's constructor
- * - init function
- * - finish function
+ * The configuration function takes ODE and the extra arguments and returns
+ * array containing init function and finish function.
  *
  * Init function is usually the most complicated part. Everything else is handled
  * automatically. Hope this helps.
@@ -120,16 +117,16 @@ export function createStringRef(ode: ODENative, scope: Scope, text: string) {
  * @returns
  */
 export function createObject<
-  T extends { delete(): void },
+  Name extends KeysOfType<ODENative, new () => { delete(): void }>,
   Args extends readonly any[] = []
 >(
-  descriptor: (
+  name: Name,
+  descriptor?: (
     ode: ODENative,
     ...args: Args
   ) => [
-    handleCls: new () => T,
-    init?: (handle: T) => void | number,
-    finish?: (handle: T) => void | number
+    init?: (handle: InstanceType<ODENative[Name]>) => void | number,
+    finish?: (handle: InstanceType<ODENative[Name]>) => void | number
   ]
 ) {
   /**
@@ -142,15 +139,31 @@ export function createObject<
     scope: Scope,
     ...args: Args
   ) {
-    const [Cls, init, finish] = descriptor(ode, ...args);
-    const handle = scope(new Cls(), deleter);
-    check(init?.(handle));
-    if (finish) scope(handle, (_) => check(finish(handle)));
+    const Cls = ode[name];
+    const [init, finish] = descriptor?.(ode, ...args) ?? [];
+    const handle: InstanceType<ODENative[Name]> = scope(
+      new Cls(),
+      deleter
+    ) as any;
+    check(name, init?.(handle));
+    if (finish) scope(handle, (_) => check(name, finish(handle)));
     return handle;
   };
 }
 
-function check(v: unknown) {
+function check(type: string, v: unknown) {
   if (typeof v === "number" && v !== 0)
-    throw new Error("ODE call failed with code " + v);
+    throw new Error("ODE call for object " + type + " failed with code " + v);
 }
+
+type KeysOfType<T, U, B = false> = {
+  [P in keyof T]: B extends true
+    ? T[P] extends U
+      ? U extends T[P]
+        ? P
+        : never
+      : never
+    : T[P] extends U
+    ? P
+    : never;
+}[keyof T];

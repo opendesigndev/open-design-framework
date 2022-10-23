@@ -1,9 +1,6 @@
 import type {
   DesignHandle,
-  DesignImageBaseHandle,
-  EngineAttributes,
   EngineHandle,
-  PR1_FrameView,
   RendererContextHandle,
 } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
@@ -15,14 +12,11 @@ import {
   detachedScope,
 } from "./memory.js";
 
-const createEngineAttributes = createObject<EngineAttributes>((ode) => [
-  ode.EngineAttributes,
+const createEngineAttributes = createObject("EngineAttributes", (ode) => [
   (handle) => ode.initializeEngineAttributes(handle),
-  () => {},
 ]);
 
-const createEngine = createObject<EngineHandle>((ode) => [
-  ode.EngineHandle,
+const createEngine = createObject("EngineHandle", (ode) => [
   (engine) =>
     automaticScope((scope) => {
       const engineAttributes = createEngineAttributes(ode, scope);
@@ -31,60 +25,57 @@ const createEngine = createObject<EngineHandle>((ode) => [
   ode.destroyEngine,
 ]);
 
-const createRendererContext = createObject<
-  RendererContextHandle,
-  [engine: EngineHandle, canvas: any]
->((ode, engine, canvas) => [
-  ode.RendererContextHandle,
-  (rendererContext) =>
-    automaticScope((scope) => {
-      let uniqueClass: string;
+const createRendererContext = createObject(
+  "RendererContextHandle",
+  (ode, engine: EngineHandle, canvas: any) => [
+    (rendererContext) =>
+      automaticScope((scope) => {
+        let uniqueClass: string;
 
-      // TODO: modify engine to add option to pass in canvas instead of using selectors
-      // https://emscripten.org/docs/api_reference/html5.h.html#registration-functions
-      if ((globalThis as any).document) {
-        uniqueClass =
-          "ode-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
-        canvas.classList.add(uniqueClass);
-        scope(() => {
-          canvas.classList.remove(uniqueClass);
-        });
-      } else {
-        // we do not have document. Let's monkey-patch the global so that Engine
-        // still works.
-        uniqueClass = "";
-        (globalThis as any).document = { querySelector: () => canvas };
-        scope(() => {
-          delete (globalThis as any).document;
-        });
-      }
-      const selector = createStringRef(ode, scope, "." + uniqueClass);
+        // TODO: modify engine to add option to pass in canvas instead of using selectors
+        // https://emscripten.org/docs/api_reference/html5.h.html#registration-functions
+        if ((globalThis as any).document) {
+          uniqueClass =
+            "ode-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+          canvas.classList.add(uniqueClass);
+          scope(() => {
+            canvas.classList.remove(uniqueClass);
+          });
+        } else {
+          // we do not have document. Let's monkey-patch the global so that Engine
+          // still works.
+          uniqueClass = "";
+          (globalThis as any).document = { querySelector: () => canvas };
+          scope(() => {
+            delete (globalThis as any).document;
+          });
+        }
+        const selector = createStringRef(ode, scope, "." + uniqueClass);
 
-      return ode.createRendererContext(engine, rendererContext, selector);
-    }),
-  ode.destroyRendererContext,
-]);
+        return ode.createRendererContext(engine, rendererContext, selector);
+      }),
+    ode.destroyRendererContext,
+  ]
+);
 
-const createDesign = createObject<DesignHandle, [EngineHandle]>(
-  (ode, engine) => [
-    ode.DesignHandle,
+const createDesign = createObject(
+  "DesignHandle",
+  (ode, engine: EngineHandle) => [
     (design) => ode.createDesign(engine, design),
     ode.destroyDesign,
   ]
 );
 
-const createDesignImageBase = createObject<
-  DesignImageBaseHandle,
-  [RendererContextHandle, DesignHandle]
->((ode, rendererContext, design) => [
-  ode.DesignImageBaseHandle,
-  (imageBase) => ode.createDesignImageBase(rendererContext, design, imageBase),
-  ode.destroyDesignImageBase,
-]);
+const createDesignImageBase = createObject(
+  "DesignImageBaseHandle",
+  (ode, rendererContext: RendererContextHandle, design: DesignHandle) => [
+    (imageBase) =>
+      ode.createDesignImageBase(rendererContext, design, imageBase),
+    ode.destroyDesignImageBase,
+  ]
+);
 
-const createPR1FrameView = createObject<PR1_FrameView>((ode) => [
-  ode.PR1_FrameView,
-]);
+const createPR1FrameView = createObject("PR1_FrameView");
 
 export async function initEngine(canvas: any /* HTMLCanvasElement */) {
   const ode = await createEngineWasm();

@@ -89,12 +89,8 @@ export interface Editor {
 export function createEditor(options: CreateEditorOptions = {}): Editor {
   if (options.url) todo("url is not supported yet");
 
-  const editor = new EditorImplementation();
-  if (options.onLoad) {
-    queueMicrotask(() => {
-      options.onLoad?.(editor);
-    });
-  }
+  const editor = new EditorImplementation(options);
+
   return editor;
 }
 
@@ -110,11 +106,17 @@ class EditorImplementation implements Editor {
   design = new DesignImplementation();
   loaded: Promise<void>;
 
-  constructor() {
+  constructor(options: CreateEditorOptions) {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
     this.loaded = initEngine(canvas).then((engine) => {
       this.#engine = engine;
+
+      if (options.onLoad) {
+        queueMicrotask(() => {
+          options.onLoad?.(this);
+        });
+      }
     });
   }
 
