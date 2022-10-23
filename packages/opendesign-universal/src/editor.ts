@@ -1,5 +1,7 @@
 import { env } from "#env";
 
+import type { Engine } from "./engine/engine.js";
+import { initEngine } from "./engine/engine.js";
 import { createInternals, queueMicrotask } from "./internals.js";
 import { todo } from "./internals.js";
 import type { DesignNode } from "./nodes/design.js";
@@ -65,9 +67,9 @@ export interface Editor {
   readonly selected: readonly Node[];
 
   /**
-   * Truthy while the document is still being loaded from the server
+   * Resolves when editor is loaded (engine + design).
    */
-  readonly loading: Promise<void> | false;
+  readonly loaded: Promise<void>;
 }
 
 /**
@@ -102,10 +104,19 @@ const canvasSymbol = Symbol();
  */
 class EditorImplementation implements Editor {
   #currentPage: null | PageNode = null;
-  [canvasSymbol] = env.createCanvas();
+  #engine: Engine | null = null;
+  [canvasSymbol]: any;
 
   design = new DesignImplementation();
-  loading = false as const;
+  loaded: Promise<void>;
+
+  constructor() {
+    const canvas = env.createCanvas();
+    this[canvasSymbol] = canvas;
+    this.loaded = initEngine(canvas).then((engine) => {
+      this.#engine = engine;
+    });
+  }
 
   get viewport() {
     return todo();
@@ -115,6 +126,10 @@ class EditorImplementation implements Editor {
   }
 
   get currentPage(): PageNode {
+    if (!this.#engine) {
+      throw new Error("You must wait until editor has finished loading");
+    }
+
     let page = this.#currentPage;
     if (!page) {
       page = todo();

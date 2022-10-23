@@ -1,10 +1,16 @@
 // @ts-expect-error
 import fs from "node:fs";
+// @ts-expect-error
+import { createRequire } from "node:module";
+// @ts-expect-error
+import path from "node:path";
 
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 import packageJson from "./package.json";
+
+const require = createRequire(import.meta.url);
 
 // TODO: remove once usage starts giving errors (= vite fixes its typedefs)
 function hackDefault<T>(v: { default: T }): T {
@@ -28,10 +34,12 @@ const alias = Object.fromEntries(
 );
 
 export default defineConfig({
-  optimizeDeps: { exclude: localDeps },
+  optimizeDeps: { exclude: [...localDeps, "@opendesign/engine"] },
   resolve: { alias },
   server: {
-    fs: { allow: ["../.."] },
+    fs: {
+      allow: ["../..", path.join(require.resolve("@opendesign/engine"), "..")],
+    },
   },
   plugins: [
     {

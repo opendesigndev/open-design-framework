@@ -4898,6 +4898,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-test-app@workspace:packages/react-test-app"
   dependencies:
+    "@opendesign/engine": 0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     "@types/react": ^18.0.21
