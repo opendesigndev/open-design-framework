@@ -1,5 +1,9 @@
 import type { Editor } from "./editor.js";
+import { editorGetEngine } from "./editor.js";
 import { editorGetCanvas } from "./editor.js";
+import { createPR1Renderer } from "./engine/engine.js";
+import { leakMemory } from "./engine/memory.js";
+import type { PageNodeImpl } from "./nodes/page.js";
 
 /**
  * Attaches editor into provided div. Only available in DOM environments.
@@ -22,10 +26,20 @@ import { editorGetCanvas } from "./editor.js";
  */
 export function mount(editor: Editor, div: HTMLDivElement): () => void {
   const canvas: HTMLCanvasElement = editorGetCanvas(editor);
+  const engine = editorGetEngine(editor);
 
   div.appendChild(canvas);
   div.style.boxSizing = "border-box";
   canvas.style.position = "absolute";
+
+  const renderer = createPR1Renderer(
+    engine.ode,
+    leakMemory, // TODO
+    engine.rendererContext,
+    (editor.currentPage as PageNodeImpl).__artboard?.__component!,
+    engine.designImageBase
+  );
+  engine.ode.pr1_animation_drawFrame(renderer, engine.frameView, 0);
 
   // Resize gets fired on zoom, which changes devicePixelRatio
   window.addEventListener("resize", listener);

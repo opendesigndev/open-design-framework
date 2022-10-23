@@ -37,6 +37,13 @@ export function detachedScope() {
   };
 }
 
+/**
+ * @internal @deprecated
+ * @param args
+ * @returns
+ */
+export const leakMemory: Scope = (...args) => args[0];
+
 function deleter(arg: { delete: () => void }) {
   arg.delete();
 }

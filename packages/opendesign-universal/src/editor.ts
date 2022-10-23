@@ -8,6 +8,7 @@ import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
 import type { Node } from "./nodes/node.js";
 import type { PageNode } from "./nodes/page.js";
+import { PageNodeImpl } from "./nodes/page.js";
 
 export type CreateEditorOptions = {
   /**
@@ -95,12 +96,13 @@ export function createEditor(options: CreateEditorOptions = {}): Editor {
 }
 
 const canvasSymbol = Symbol();
+const engineSymbol = Symbol();
 /**
  * @internal
  */
 class EditorImplementation implements Editor {
   #currentPage: null | PageNode = null;
-  #engine: Engine | null = null;
+  [engineSymbol]: Engine | null = null;
   [canvasSymbol]: any;
 
   design = new DesignImplementation();
@@ -110,7 +112,7 @@ class EditorImplementation implements Editor {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
     this.loaded = initEngine(canvas).then((engine) => {
-      this.#engine = engine;
+      this[engineSymbol] = engine;
 
       if (options.onLoad) {
         queueMicrotask(() => {
@@ -128,13 +130,11 @@ class EditorImplementation implements Editor {
   }
 
   get currentPage(): PageNode {
-    if (!this.#engine) {
-      throw new Error("You must wait until editor has finished loading");
-    }
+    const engine = editorGetEngine(this);
 
     let page = this.#currentPage;
     if (!page) {
-      page = todo();
+      page = new PageNodeImpl(engine);
       this.#currentPage = page;
     }
     return page;
@@ -154,4 +154,14 @@ class EditorImplementation implements Editor {
  */
 export function editorGetCanvas(editor: Editor) {
   return (editor as EditorImplementation)[canvasSymbol];
+}
+/**
+ * @internal
+ */
+export function editorGetEngine(editor: Editor): Engine {
+  const engine = (editor as EditorImplementation)[engineSymbol];
+  if (!engine) {
+    throw new Error("You must wait until editor has finished loading");
+  }
+  return engine;
 }

@@ -35,7 +35,7 @@ export interface BaseNode {
   setName(name: string): void;
 }
 
-export class NodeBase implements BaseNode {
+export class BaseNodeImpl implements BaseNode {
   findAll(filter?: NodeFilter): Node[] {
     todo();
   }

@@ -1,7 +1,10 @@
 import type {
+  ComponentHandle,
   DesignHandle,
+  DesignImageBaseHandle,
   EngineHandle,
   RendererContextHandle,
+  StringRef,
 } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
 
@@ -65,6 +68,25 @@ const createRendererContext = createObject(
   ]
 );
 
+export const createPR1Renderer = createObject(
+  "PR1_AnimationRendererHandle",
+  (
+    ode,
+    ctx: RendererContextHandle,
+    component: ComponentHandle,
+    imageBase: DesignImageBaseHandle
+  ) => [
+    (renderer) => {
+      return ode.pr1_createAnimationRenderer(
+        ctx,
+        component,
+        renderer,
+        imageBase
+      );
+    },
+    ode.pr1_destroyAnimationRenderer,
+  ]
+);
 const createDesign = createObject(
   "DesignHandle",
   (ode, engine: EngineHandle) => [
@@ -84,6 +106,36 @@ const createDesignImageBase = createObject(
 
 const createPR1FrameView = createObject("PR1_FrameView");
 
+const createComponentMetadata = createObject(
+  "ComponentMetadata",
+  (ode, page: StringRef, id: StringRef) => [
+    (metadata) => {
+      metadata.page = page;
+      metadata.id = id;
+      metadata.position = [0, 0] as any;
+    },
+  ]
+);
+
+export const createComponentFromOctopus = createObject(
+  "ComponentHandle",
+  (ode, design: DesignHandle, page: string, id: string, octopus: string) => [
+    (handle) =>
+      automaticScope((scope) => {
+        const pageRef = createStringRef(ode, scope, page);
+        const idRef = createStringRef(ode, scope, id);
+        const octopusRef = createStringRef(ode, scope, octopus);
+        const metadata = createComponentMetadata(ode, scope, pageRef, idRef);
+        return ode.design_addComponentFromOctopusString(
+          design,
+          handle,
+          metadata,
+          octopusRef
+        );
+      }),
+  ]
+);
+
 export async function initEngine(canvas: any /* HTMLCanvasElement */) {
   const ode = await createEngineWasm();
   const { scope, destroy: finish } = detachedScope();
@@ -100,6 +152,7 @@ export async function initEngine(canvas: any /* HTMLCanvasElement */) {
     frameView.scale = 1;
 
     return {
+      ode,
       engine,
       rendererContext: rendererCtx,
       design,

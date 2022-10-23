@@ -3,7 +3,7 @@ import { env } from "#env";
 import { todo } from "../internals.js";
 import type { ArtboardNode } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";
-import { NodeBase } from "./node.js";
+import { BaseNodeImpl } from "./node.js";
 import type { PageNode } from "./page.js";
 
 export interface DesignNode extends BaseNode {
@@ -27,7 +27,7 @@ export interface DesignNode extends BaseNode {
 /**
  * @internal
  */
-export class DesignImplementation extends NodeBase implements DesignNode {
+export class DesignImplementation extends BaseNodeImpl implements DesignNode {
   findPage(filter: NodeFilter<PageNode>): PageNode {
     todo();
   }
