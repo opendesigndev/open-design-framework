@@ -35,12 +35,19 @@ const createRendererContext = createObject(
         // TODO: modify engine to add option to pass in canvas instead of using selectors
         // https://emscripten.org/docs/api_reference/html5.h.html#registration-functions
         if ((globalThis as any).document) {
+          let document = (globalThis as any).document;
           uniqueClass =
             "ode-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
           canvas.classList.add(uniqueClass);
           scope(() => {
             canvas.classList.remove(uniqueClass);
           });
+          if (!canvas.parentElement) {
+            document.body.appendChild(canvas);
+            scope(() => {
+              document.body.removeChild(canvas);
+            });
+          }
         } else {
           // we do not have document. Let's monkey-patch the global so that Engine
           // still works.
