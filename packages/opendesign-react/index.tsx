@@ -31,6 +31,7 @@ export type EditorCanvasProps = {
   onNodeHover?: (event: { target: Node | null }) => void;
   onViewportChange?: (event: { viewport: unknown }) => void;
   onZoom?: (event: { zoom: number }) => void;
+  onPan?: (event: {}) => void;
   onClick?: (event: { target: Node | null }) => void;
 };
 
