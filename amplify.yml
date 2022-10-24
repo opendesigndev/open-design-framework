@@ -11,10 +11,9 @@ frontend:
         - yarn install
     build:
       commands:
-        - yarn tsc -b || true
-        - yarn workspace docs build
+        - node build.js
   artifacts:
-    baseDirectory: /packages/docs/dist/
+    baseDirectory: /dist/
     files:
       - "**/*"
   cache:
