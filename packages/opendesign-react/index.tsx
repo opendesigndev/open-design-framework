@@ -8,7 +8,7 @@ import { useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
-const loadedSet = new WeakSet<Editor>();
+const loadingSet = new WeakSet<Editor>();
 
 /**
  * Creates Editor object to be used. This is the main entrypoint for react apps.
@@ -24,10 +24,10 @@ export function useEditor(options?: CreateEditorOptions | string) {
     const ed = createEditor(
       typeof options === "object" ? options : { url: options }
     );
-    ed.loaded.then(
-      () => void loadedSet.add(ed),
-      (loadError) => void setError(loadError)
-    );
+    loadingSet.add(ed);
+    ed.loaded
+      .catch((loadError) => void setError(loadError))
+      .then(() => void loadingSet.delete(ed));
     return ed;
   });
   return editor;
@@ -66,7 +66,7 @@ export type EditorCanvasProps = {
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   const { editor, ...rest } = props;
-  if (!loadedSet.has(editor)) {
+  if (loadingSet.has(editor)) {
     throw editor.loaded;
   }
 

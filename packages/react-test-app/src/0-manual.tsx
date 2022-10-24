@@ -10,7 +10,7 @@ export function Manual() {
   });
 
   return (
-    <Suspense>
+    <Suspense fallback="Loading...">
       <EditorCanvas editor={editor} />
     </Suspense>
   );
