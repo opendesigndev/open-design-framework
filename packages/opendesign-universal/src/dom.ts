@@ -35,6 +35,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   canvas.style.position = "absolute";
   canvas.style.transformOrigin = "top left";
   let frameRequested = false;
+  let offset: [number, number] = [0, 0];
 
   const renderer = createPR1Renderer(
     engine.ode,
@@ -53,6 +54,9 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   scope(observer, disconnect);
 
   scopedListen(div)(scope, "wheel", onWheel);
+  scopedListen(div)(scope, "click", (event) => {
+    console.log(parsePosition(event));
+  });
 
   return destroy;
 
@@ -69,8 +73,30 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   }
 
   function onWheel(event: WheelEvent) {
-    engine.frameView.scale *= Math.pow(1.1, -parseScrollDelta(event) / 120);
-    requestFrame();
+    event.preventDefault();
+    const scrollDelta = parseScrollDelta(event);
+    if (event.ctrlKey) {
+      const prevScale = engine.frameView.scale;
+      const change = Math.pow(1.1, -scrollDelta / 96);
+      const scale = prevScale * change;
+      let [x, y] = parsePosition(event);
+
+      offset = [
+        x - (1 / change) * (x - offset[0]),
+        y - (1 / change) * (y - offset[1]),
+      ];
+      engine.frameView.offset = offset as any;
+      engine.frameView.scale = scale;
+      requestFrame();
+    } else if (event.shiftKey) {
+      offset[0] += scrollDelta / engine.frameView.scale;
+      engine.frameView.offset = offset as any;
+      requestFrame();
+    } else {
+      offset[1] += scrollDelta / engine.frameView.scale;
+      engine.frameView.offset = offset as any;
+      requestFrame();
+    }
   }
 
   function onResize() {
@@ -87,6 +113,16 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     engine.frameView.width = canvas.width;
     engine.frameView.height = canvas.height;
     requestFrame();
+  }
+
+  function parsePosition(event: WheelEvent | MouseEvent) {
+    const scale = engine.frameView.scale;
+    return [
+      ((event.clientX - div.clientLeft) * window.devicePixelRatio) / scale +
+        offset[0],
+      ((event.clientY - div.clientTop) * window.devicePixelRatio) / scale +
+        offset[1],
+    ] as const;
   }
 }
 
