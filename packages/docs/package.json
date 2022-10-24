@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "node prebuild.js && typedoc"
+    "prebuild": "node prebuild.js",
+    "build": "typedoc"
   },
   "dependencies": {
     "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f",

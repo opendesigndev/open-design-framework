@@ -2,6 +2,8 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+console.info("Preparing docs...");
+run("yarn", ["workspace", "docs", "prebuild"]);
 console.info("Running typescript...");
 run("yarn", ["tsc", "-b"]);
 console.info("Building docs...");
