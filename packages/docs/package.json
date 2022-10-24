@@ -7,7 +7,7 @@
     "build": "node prebuild.js && typedoc"
   },
   "dependencies": {
-    "@opendesign/engine": "0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836",
+    "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "typedoc": "^0.23.17",

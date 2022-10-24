@@ -1656,10 +1656,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/engine@npm:0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836":
-  version: 0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836
-  resolution: "@opendesign/engine@npm:0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836"
-  checksum: 8a1aa0969c9ffc7377436e9212725a0b4e6f89b5b93ef890b8e42c624e0de768f5d2ead41801133eef8bdd432b5c25611fe88cc80b048ade89903f08b376b532
+"@opendesign/engine@npm:0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f":
+  version: 0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f
+  resolution: "@opendesign/engine@npm:0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f"
+  checksum: 78b67ed81b4649903e1e2073a65d4e9d51d9134fc841bb168abb51b3719e0364033c7d363252d9b50b280abcb3348a0762e977d3e2a715220970583e2954d16e
   languageName: node
   linkType: hard
 
@@ -1679,7 +1679,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
-    "@opendesign/engine": 0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836
+    "@opendesign/engine": 0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f
   languageName: unknown
   linkType: soft
 
@@ -2660,7 +2660,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:packages/docs"
   dependencies:
-    "@opendesign/engine": 0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836
+    "@opendesign/engine": 0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     typedoc: ^0.23.17
@@ -4898,7 +4898,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-test-app@workspace:packages/react-test-app"
   dependencies:
-    "@opendesign/engine": 0.0.0-51de4da4663d6ca095f52429a6adf7bcd7105836
+    "@opendesign/engine": 0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     "@types/react": ^18.0.21
