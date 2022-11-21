@@ -1,5 +1,10 @@
 {
   "extends": "../config/tsconfig.json",
-  "compilerOptions": { "outDir": "dist" },
-  "references": [{ "path": "../opendesign-universal" }]
+  "compilerOptions": { "outDir": "dist", "lib": ["DOM", "ES2021"] },
+  "references": [
+    { "path": "../opendesign-universal/tsconfig.dom.json" },
+    { "path": "../opendesign-universal" }
+  ],
+  "include": ["."],
+  "exclude": ["dist"]
 }

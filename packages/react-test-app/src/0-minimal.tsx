@@ -1,0 +1,12 @@
+import { EditorCanvas, useEditor } from "@opendesign/react";
+import { Suspense } from "react";
+
+export function Minimal() {
+  const editor = useEditor("/public/design.octopus");
+
+  return (
+    <Suspense>
+      <EditorCanvas editor={editor} />
+    </Suspense>
+  );
+}

@@ -1,7 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <head></head>
+  <head>
+    <style>
+      html {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #root {
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+        flex: 1;
+      }
+    </style>
+  </head>
   <body>
+    <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

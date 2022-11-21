@@ -1,0 +1,5 @@
+{
+  "extends": "../../opendesign-universal/tsconfig.dom.json",
+  "include": ["."],
+  "compilerOptions": { "outDir": "dist" }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@avocode/opendesign-universal",
+  "name": "@opendesign/universal",
   "description": "Works in both node.js and browser.",
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,27 @@
   },
   "author": "Open Design Contributors",
   "license": "UNLICENSED",
-  "exports": "./dist/index.js",
+  "typedoc": {
+    "entryPoint": "index.ts"
+  },
+  "dependencies": {
+    "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./dom": "./dist/src/dom.js"
+  },
   "scripts": {
     "build": "yarn run -T tsc"
+  },
+  "files": [
+    "dist",
+    "!dist/*.tsbuildinfo"
+  ],
+  "imports": {
+    "#env": {
+      "node": "./dist/src/env-node.js",
+      "default": "./dist/src/env-dom.js"
+    }
   }
 }

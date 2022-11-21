@@ -1,0 +1,21 @@
+---
+# This build Node image as base:  node:18.11.0
+# https://us-east-1.console.aws.amazon.com/amplify/home?region=us-east-1#/d2qv59nj3jqi4c/settings/build
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - corepack enable yarn
+        - yarn config set enableGlobalCache false
+        - yarn install
+    build:
+      commands:
+        - node build.js
+  artifacts:
+    baseDirectory: /dist/
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - .yarn/cache/*
