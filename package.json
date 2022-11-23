@@ -22,5 +22,8 @@
   },
   "engines": {
     "corepack": ">=0.12.0"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.25.2"
   }
 }

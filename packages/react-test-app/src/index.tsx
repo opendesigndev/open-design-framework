@@ -27,6 +27,7 @@ function App() {
   return (
     <div className="flex flex-col">
       <a href="/modules.html">API docs</a>
+      <a href="/changelog.html">Changelog</a>
       <Link to="/minimal">minimal</Link>
       <Link to="/manual">manual</Link>
       <Link to="/nested">nested</Link>

@@ -11,5 +11,7 @@
     "typedoc-plugin-resolve-crossmodule-references",
     "typedoc-plugin-mdn-links"
   ],
-  "out": "dist"
+  "out": "dist",
+  "readme": "README.md",
+  "includes": ".."
 }
