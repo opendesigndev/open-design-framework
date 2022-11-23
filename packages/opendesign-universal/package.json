@@ -14,7 +14,9 @@
     "entryPoint": "index.ts"
   },
   "dependencies": {
-    "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f"
+    "@avocode/octopus-xd": "3.0.0-rc.18",
+    "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f",
+    "fflate": "^0.7.4"
   },
   "exports": {
     ".": "./dist/index.js",
