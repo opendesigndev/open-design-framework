@@ -71,14 +71,17 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   }
 
   const canvas = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
+  useLayoutEffect(() => {
+    const c = canvas.current!;
+    c.style.width = "100%";
+    c.style.height = "100%";
+    c.style.inset = "0";
+    c.style.margin = "0";
+    c.style.padding = "0";
+    mount(editor, c);
+  }, [editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");
-  return (
-    <div
-      style={{ width: "100%", height: "100%", inset: 0, margin: 0, padding: 0 }}
-      ref={canvas}
-    />
-  );
+  return <div ref={canvas} />;
 }
 
 /**

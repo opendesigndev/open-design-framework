@@ -30,7 +30,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
 
   const { scope, destroy } = detachedScope();
   div.appendChild(canvas);
-  scope(() => void div.removeChild(canvas));
+  scope(() => void canvas.parentElement?.removeChild(canvas));
   div.style.boxSizing = "border-box";
   canvas.style.position = "absolute";
   canvas.style.transformOrigin = "top left";
