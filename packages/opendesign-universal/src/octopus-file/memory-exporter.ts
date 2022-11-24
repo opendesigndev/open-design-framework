@@ -1,6 +1,7 @@
 import * as fflate from "fflate";
 
 import { generateUUID } from "../internals.js";
+import { headerContent, headerFile } from "./detect.js";
 
 // TODO: import from octopus
 type ArtboardConversionResult = any;
@@ -51,12 +52,9 @@ export class MemoryExporter {
       }
     });
     this._completed = detachPromiseControls();
-    const file = new fflate.ZipPassThrough("Octopus");
+    const file = new fflate.ZipPassThrough(headerFile);
     this._zip.add(file);
-    file.push(
-      fflate.strToU8(" is universal design format. opendesign.dev."),
-      true
-    );
+    file.push(fflate.strToU8(headerContent), true);
   }
 
   private _stringify(value: unknown) {
@@ -64,6 +62,11 @@ export class MemoryExporter {
   }
 
   private async _save(name: string | null, body: string | Uint8Array) {
+    if (name === headerFile) {
+      if (body !== headerContent)
+        throw new Error("Octopus file must contain correct message");
+      return name;
+    }
     const fullPath = typeof name === "string" ? name : generateUUID();
 
     if (typeof body === "string") {
