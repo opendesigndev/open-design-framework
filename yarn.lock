@@ -15,51 +15,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@avocode/manifest-ts@npm:3.0.0-alpha.33":
-  version: 3.0.0-alpha.33
-  resolution: "@avocode/manifest-ts@npm:3.0.0-alpha.33"
-  checksum: 05ea665396fdd574a9e9e5a721ade2bd567506a177af438121a7c347506f6566b29e63c03ab8dbd9701c1038a67448c15dd2972171036882bf8a882da93964a9
-  languageName: node
-  linkType: hard
-
-"@avocode/octopus-common@npm:3.0.0-rc.22":
-  version: 3.0.0-rc.22
-  resolution: "@avocode/octopus-common@npm:3.0.0-rc.22"
-  dependencies:
-    lodash: ^4.17.21
-    uuid: ^8.3.2
-  checksum: e2b7baa0d35d930d23754418efed9c6753aa82b6d8da4b680b2161bfaa50d5f21490e668fcd495cfe79d4478c7344f690f3de2ca993aa30d290a4e5c02f1ff3f
-  languageName: node
-  linkType: hard
-
-"@avocode/octopus-ts@npm:3.0.0-alpha.33":
-  version: 3.0.0-alpha.33
-  resolution: "@avocode/octopus-ts@npm:3.0.0-alpha.33"
-  checksum: 91f61a4595a72665b105213e2c67ef2bab7abae5ef5dbe8edbef87b56e67538b04010c4c7e8a4932ad936c74524b9ad16fcd08669c75b1230682345325cc9532
-  languageName: node
-  linkType: hard
-
-"@avocode/octopus-xd@npm:3.0.0-rc.18":
-  version: 3.0.0-rc.18
-  resolution: "@avocode/octopus-xd@npm:3.0.0-rc.18"
-  dependencies:
-    "@avocode/manifest-ts": 3.0.0-alpha.33
-    "@avocode/octopus-common": 3.0.0-rc.22
-    "@avocode/octopus-ts": 3.0.0-alpha.33
-    blueimp-md5: ^2.19.0
-    dotenv: 16.0.0
-    fflate: ^0.7.1
-    lodash: ^4.17.21
-    paper: 0.12.4
-    pino: ^6.7.0
-    pino-pretty: ^4.3.0
-    read-pkg-up: 7.0.1
-    time-stamp: ^2.2.0
-    uuid: ^8.3.2
-  checksum: 6fded9a6ab7f1835a95460ef2709d52875e7063bf4743ffdf7797cf16338e2961fb9fe7d386df6460d05343ffbdbfac7916699c90ad3f795b83ab2085d8b6381
-  languageName: node
-  linkType: hard
-
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.18.6":
   version: 7.18.6
   resolution: "@babel/code-frame@npm:7.18.6"
@@ -1985,6 +1940,58 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opendesign/manifest-ts@npm:3.0.0-alpha.38":
+  version: 3.0.0-alpha.38
+  resolution: "@opendesign/manifest-ts@npm:3.0.0-alpha.38"
+  checksum: dd8f9c2add69b19db7ac7411388f6124d7a84b7453265e6f7e9a29bc2985462f9b40e6ee69423098fdd387769f3747b5973ae6bc519d606f871e815b2bc12219
+  languageName: node
+  linkType: hard
+
+"@opendesign/octopus-common@npm:3.0.0-rc.27":
+  version: 3.0.0-rc.27
+  resolution: "@opendesign/octopus-common@npm:3.0.0-rc.27"
+  dependencies:
+    "@opendesign/octopus-ts": 3.0.0-alpha.38
+    "@types/lodash": ^4.14.178
+    "@types/uuid": ^8.3.1
+    crc-32: ^1.2.2
+    lodash: ^4.17.21
+    uuid: ^8.3.2
+  checksum: fcbf2f8bea42cc4c7706ef2817184caad08189a1eab959879cd83348a32f7aec614c9bb172658a4f2a28f2499a5164d8880da55bdfbb28518e47fb62912af32c
+  languageName: node
+  linkType: hard
+
+"@opendesign/octopus-ts@npm:3.0.0-alpha.38":
+  version: 3.0.0-alpha.38
+  resolution: "@opendesign/octopus-ts@npm:3.0.0-alpha.38"
+  checksum: 71a3aff2229a8933bceb91db5cfcb16bc29f36440bf05c73737556b3c5838dde8cbb3584a0542b0bcc97ac1d4fceacbbc0636b530391e1b8a8966018ceff649c
+  languageName: node
+  linkType: hard
+
+"@opendesign/octopus-xd@npm:3.0.0-rc.19":
+  version: 3.0.0-rc.19
+  resolution: "@opendesign/octopus-xd@npm:3.0.0-rc.19"
+  dependencies:
+    "@opendesign/manifest-ts": 3.0.0-alpha.38
+    "@opendesign/octopus-common": 3.0.0-rc.27
+    "@opendesign/octopus-ts": 3.0.0-alpha.38
+    "@types/blueimp-md5": ^2.18.0
+    "@types/lodash": ^4.14.178
+    "@types/pino": ^6.3.3
+    "@types/uuid": ^8.3.1
+    blueimp-md5: ^2.19.0
+    dotenv: 16.0.0
+    fflate: ^0.7.1
+    lodash: ^4.17.21
+    paper: 0.12.4
+    pino: ^6.7.0
+    pino-pretty: ^4.3.0
+    time-stamp: ^2.2.0
+    uuid: ^8.3.2
+  checksum: 5a86ddbad34fd1b97f91d1583786b6fbb458e68561d5dc3cb7a153fd313ee153485f8507d86b840f43e7063a23014c23ed0113becd28c229898e459af66b627c
+  languageName: node
+  linkType: hard
+
 "@opendesign/react@workspace:*, @opendesign/react@workspace:packages/opendesign-react":
   version: 0.0.0-use.local
   resolution: "@opendesign/react@workspace:packages/opendesign-react"
@@ -2001,8 +2008,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
-    "@avocode/octopus-xd": 3.0.0-rc.18
     "@opendesign/engine": 0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f
+    "@opendesign/octopus-xd": 3.0.0-rc.19
     fflate: ^0.7.4
   languageName: unknown
   linkType: soft
@@ -2025,6 +2032,13 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
+  languageName: node
+  linkType: hard
+
+"@types/blueimp-md5@npm:^2.18.0":
+  version: 2.18.0
+  resolution: "@types/blueimp-md5@npm:2.18.0"
+  checksum: 95df99e314485327b2d0030de7ae343b6653c1bf9a227151509da94e1e9883f7d11260a028d03facba56c24a4dadb0c37745decdb43efa58b35d9504c5dc254c
   languageName: node
   linkType: hard
 
@@ -2058,10 +2072,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4.14.178":
+  version: 4.14.190
+  resolution: "@types/lodash@npm:4.14.190"
+  checksum: 353a55a1222a57224ead8bd3379fabb2e3e3f6685f599c48b1b66f099d8e9e015e6c6352c6e2275954004c3bb510377804c63117233c6f187700b6ab78adfa02
+  languageName: node
+  linkType: hard
+
 "@types/minimist@npm:^1.2.0":
   version: 1.2.2
   resolution: "@types/minimist@npm:1.2.2"
   checksum: b8da83c66eb4aac0440e64674b19564d9d86c80ae273144db9681e5eeff66f238ade9515f5006ffbfa955ceff8b89ad2bd8ec577d7caee74ba101431fb07045d
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:*":
+  version: 18.11.9
+  resolution: "@types/node@npm:18.11.9"
+  checksum: cc0aae109e9b7adefc32eecb838d6fad931663bb06484b5e9cbbbf74865c721b03d16fd8d74ad90e31dbe093d956a7c2c306ba5429ba0c00f3f7505103d7a496
   languageName: node
   linkType: hard
 
@@ -2083,6 +2111,37 @@ __metadata:
   version: 4.0.0
   resolution: "@types/parse-json@npm:4.0.0"
   checksum: fd6bce2b674b6efc3db4c7c3d336bd70c90838e8439de639b909ce22f3720d21344f52427f1d9e57b265fcb7f6c018699b99e5e0c208a1a4823014269a6bf35b
+  languageName: node
+  linkType: hard
+
+"@types/pino-pretty@npm:*":
+  version: 4.7.5
+  resolution: "@types/pino-pretty@npm:4.7.5"
+  dependencies:
+    "@types/node": "*"
+    "@types/pino": 6.3
+  checksum: 80b3e80d1d9b52f015382bbd544206228d0c35eed1a0e1443245568eee01191b5fe916e7821de2922846f267e5d0693f4796562d3bcf24266156d1abc9e2e673
+  languageName: node
+  linkType: hard
+
+"@types/pino-std-serializers@npm:*":
+  version: 2.4.1
+  resolution: "@types/pino-std-serializers@npm:2.4.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: a156e25882db9aade2576dbe6414379efcdd4fad24211d3f22f20e0cd4bee569215799ee5cd9b2b15282f18461a8a54573ff42bf6bee5d35b72513be2f78bdec
+  languageName: node
+  linkType: hard
+
+"@types/pino@npm:6.3, @types/pino@npm:^6.3.3":
+  version: 6.3.12
+  resolution: "@types/pino@npm:6.3.12"
+  dependencies:
+    "@types/node": "*"
+    "@types/pino-pretty": "*"
+    "@types/pino-std-serializers": "*"
+    sonic-boom: ^2.1.0
+  checksum: 801735146669312d02459781e5180220630eaef643da36dc5a9a97520e7ecc3da7270f31a86fcdcb1dc835073c9143fc628024ba5e3a0ea7cbb86aada4897709
   languageName: node
   linkType: hard
 
@@ -2124,6 +2183,13 @@ __metadata:
   version: 6.2.3
   resolution: "@types/semver@npm:6.2.3"
   checksum: 83c86d7005b229df9c4c0d6d13825b839a01932895504596140aea19e2b88f63ac27ab1575347451b50eedb63f72309e845ce1a0ca78360c4f719bbb38371594
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^8.3.1":
+  version: 8.3.4
+  resolution: "@types/uuid@npm:8.3.4"
+  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
   languageName: node
   linkType: hard
 
@@ -3030,6 +3096,15 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: 4be63e7117955fd88333d7460e4c466a90f556df6ef34efd59034d2463484e339666c41f02b523d574a797ec61f4a91918c5b89a316db2ea2f834e0d2d09465b
+  languageName: node
+  linkType: hard
+
+"crc-32@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "crc-32@npm:1.2.2"
+  bin:
+    crc32: bin/crc32.njs
+  checksum: ad2d0ad0cbd465b75dcaeeff0600f8195b686816ab5f3ba4c6e052a07f728c3e70df2e3ca9fd3d4484dc4ba70586e161ca5a2334ec8bf5a41bf022a6103ff243
   languageName: node
   linkType: hard
 
@@ -6124,7 +6199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"read-pkg-up@npm:7.0.1, read-pkg-up@npm:^7.0.1":
+"read-pkg-up@npm:^7.0.1":
   version: 7.0.1
   resolution: "read-pkg-up@npm:7.0.1"
   dependencies:
@@ -6609,6 +6684,15 @@ __metadata:
     atomic-sleep: ^1.0.0
     flatstr: ^1.0.12
   checksum: 189fa8fe5c2dc05d3513fc1a4926a2f16f132fa6fa0b511745a436010cdcd9c1d3b3cb6a9d7c05bd32a965dc77673a5ac0eb0992e920bdedd16330d95323124f
+  languageName: node
+  linkType: hard
+
+"sonic-boom@npm:^2.1.0":
+  version: 2.8.0
+  resolution: "sonic-boom@npm:2.8.0"
+  dependencies:
+    atomic-sleep: ^1.0.0
+  checksum: c7f9c89f931d7f60f8e0741551a729f0d81e6dc407a99420fc847a9a4c25af048a615b1188ab3c4f1fb3708fe4904973ddab6ebcc8ed5b78b50ab81a99045910
   languageName: node
   linkType: hard
 

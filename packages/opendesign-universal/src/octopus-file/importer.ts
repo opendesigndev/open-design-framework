@@ -1,4 +1,4 @@
-import { createConverter, XDFileReader } from "@avocode/octopus-xd";
+import { createConverter, XDFileReader } from "@opendesign/octopus-xd";
 
 import { MemoryExporter } from "./memory-exporter.js";
 

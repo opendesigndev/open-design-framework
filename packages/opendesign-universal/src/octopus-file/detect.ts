@@ -8,7 +8,7 @@ export function isOctopusFile(buffer: ArrayBuffer) {
   if (
     view.getUint32(0, true) !== 0x04034b50 ||
     view.getUint16(8) !== 0 ||
-    view.getUint32(26) !== 0x00070000
+    view.getUint32(26) !== 0x07000000
   ) {
     return false;
   }

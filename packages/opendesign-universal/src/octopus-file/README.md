@@ -41,7 +41,7 @@ explains which fields are guaranteed to be identical between all octopus files.
 | 6      |   2   | 0 or 8      | General purpose bit flag                    |
 | 8      |   2   | 0           | Compression method; e.g. none = 0, DEFLATE = 8 (or "\0x08\0x00") |
 | 10     |   2   | should be 0 | File last modification time                 |
-| 12     |   2   | should be 0 | File last modification date                 |
+| 12     |   2   | should be 33 | File last modification date                 |
 | 14     |   4   | valid or 0  | CRC-32 of uncompressed data                 |
 | 18     |   4   | 0 or 44     | Compressed size (or 0xffffffff for ZIP64)   |
 | 22     |   4   | 0 or 44     | Uncompressed size (or 0xffffffff for ZIP64) |
@@ -56,11 +56,13 @@ Therefore detection code must look for:
 - file size is at least 134 bytes (smallest possible empty octopus file)
 - bytes 0-3 are 0x04034b50 in little-endian
 - bytes 8-9 are 0
-- bytes 26-29 are 00 07 00 00
+- bytes 26-29 are 07 00 00 00
 - bytes 30+ are "Octopus is universal design format. opendesign.dev." in ASCII
 
 There should be an option not to require this detection in case we want to allow
 local modification of octopus files.
+
+*Date note*: zip's date format uses [MS-DOS date format](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-dosdatetimetofiletime). 33 corresponds to 1980/1/1 which is the lowest date possible. It effectively means 0.
 
 ## Impact
 

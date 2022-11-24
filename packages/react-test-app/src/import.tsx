@@ -1,4 +1,4 @@
-import { importFile } from "@opendesign/universal";
+import { importFile, isOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
 import { useLoaderData } from "react-router-dom";
 
@@ -14,14 +14,16 @@ export function Import() {
   const data: Awaited<ReturnType<typeof loader>> = useLoaderData() as any;
   return (
     <div>
-      Hello
-      <button
-        onClick={() => {
-          saveAs(new Blob([data]), "file.octopus");
-        }}
-      >
-        Download
-      </button>
+      <div>Is octopus: {isOctopusFile(data.buffer) + ""}</div>
+      <div>
+        <button
+          onClick={() => {
+            saveAs(new Blob([data]), "file.octopus");
+          }}
+        >
+          Download
+        </button>
+      </div>
     </div>
   );
 }

@@ -53,8 +53,13 @@ export class MemoryExporter {
     });
     this._completed = detachPromiseControls();
     const file = new fflate.ZipPassThrough(headerFile);
-    this._zip.add(file);
+    this._zip.add(this._handleFile(file));
     file.push(fflate.strToU8(headerContent), true);
+  }
+
+  private _handleFile(file: fflate.ZipInputFile) {
+    file.mtime = new Date("1/1/1980");
+    return file;
   }
 
   private _stringify(value: unknown) {
@@ -73,12 +78,12 @@ export class MemoryExporter {
       const data = fflate.strToU8(body);
       // Text file - compress
       const file = new fflate.ZipDeflate(fullPath, { level: 9 });
-      this._zip.add(file);
+      this._zip.add(this._handleFile(file));
       file.push(data, true);
     } else {
       // Binary file - do not compress
       const file = new fflate.ZipPassThrough(fullPath);
-      this._zip.add(file);
+      this._zip.add(this._handleFile(file));
       file.push(body, true);
     }
     return fullPath;
