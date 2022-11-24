@@ -9,7 +9,7 @@ with a few specifics.
   - this means in javascript we can just use [fflate](https://github.com/101arrowz/fflate)
     without any extra trickery
 - first file in the archive has to be named `Octopus` with contents of
-  ` is universal design format. opendesign.dev.` (including the starting space).
+  `" is universal design format. opendesign.dev."` (including the starting space, excluding quotes).
   It is not compressed.
 
 This means that hexdump outputs something like this:
