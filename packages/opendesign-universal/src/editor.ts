@@ -9,6 +9,7 @@ import { DesignImplementation } from "./nodes/design.js";
 import type { Node } from "./nodes/node.js";
 import type { PageNode } from "./nodes/page.js";
 import { PageNodeImpl } from "./nodes/page.js";
+import { loadFile } from "./octopus-file/load-file.js";
 
 export type CreateEditorOptions = {
   /**
@@ -88,8 +89,6 @@ export interface Editor {
  * @returns Editor
  */
 export function createEditor(options: CreateEditorOptions = {}): Editor {
-  if (options.url) todo("url is not supported yet");
-
   const editor = new EditorImplementation(options);
 
   return editor;
@@ -111,14 +110,21 @@ class EditorImplementation implements Editor {
   constructor(options: CreateEditorOptions) {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
-    this.loaded = initEngine(canvas).then((engine) => {
-      this[engineSymbol] = engine;
-
-      if (options.onLoad) {
-        queueMicrotask(() => {
-          options.onLoad?.(this);
-        });
+    this.loaded = initEngine(canvas).then(async (engine) => {
+      if (options.url) {
+        const response = await env.fetch(options.url);
+        loadFile(new Uint8Array(await response.arrayBuffer()), engine);
       }
+
+      this[engineSymbol] = engine;
+      // Make sure that we have at least one artboard.
+      // We should remove this once multi-artboard support is implemented
+      if (!(this.currentPage as PageNodeImpl).__artboard) {
+        this.currentPage.createArtboard();
+      }
+      queueMicrotask(() => {
+        options.onLoad?.(this);
+      });
     });
   }
 

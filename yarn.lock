@@ -1947,6 +1947,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opendesign/manifest-ts@npm:^3.0.0-alpha.40":
+  version: 3.0.0-alpha.40
+  resolution: "@opendesign/manifest-ts@npm:3.0.0-alpha.40"
+  checksum: fbecd06bdd66b941b42eae0e07ad90e3cd023c48c725081e26bf4c257fd373c3cfdc6ca616dc3d47b6c6208692c029b79404c0c30135cba277b64a922dfd243d
+  languageName: node
+  linkType: hard
+
 "@opendesign/octopus-common@npm:3.0.0-rc.27":
   version: 3.0.0-rc.27
   resolution: "@opendesign/octopus-common@npm:3.0.0-rc.27"
@@ -2009,6 +2016,7 @@ __metadata:
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
     "@opendesign/engine": 0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f
+    "@opendesign/manifest-ts": ^3.0.0-alpha.40
     "@opendesign/octopus-xd": 3.0.0-rc.19
     fflate: ^0.7.4
   languageName: unknown

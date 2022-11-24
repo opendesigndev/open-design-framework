@@ -4,5 +4,5 @@ export const env: Env = {
   createCanvas: () => {
     return document.createElement("canvas");
   },
-  fetch,
+  fetch: fetch.bind(globalThis),
 };
