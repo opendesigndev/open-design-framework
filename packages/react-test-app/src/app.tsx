@@ -1,6 +1,5 @@
 import "./index.css";
 
-import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -13,7 +12,7 @@ import { Manual } from "./0-manual.js";
 import { Minimal } from "./0-minimal.js";
 import { Nested } from "./1-nested.js";
 import { RouteError } from "./error-boundary.js";
-import { Import, loader as importLoader } from "./import.js";
+import { Import } from "./import.js";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -22,7 +21,7 @@ const router = createBrowserRouter(
       <Route element={<Minimal />} path="/minimal" />
       <Route element={<Manual />} path="/manual" />
       <Route element={<Nested />} path="/nested" />
-      <Route element={<Import />} path="/import" loader={importLoader} />
+      <Route element={<Import />} path="/import" />
     </Route>
   )
 );

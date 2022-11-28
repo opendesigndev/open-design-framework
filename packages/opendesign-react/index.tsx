@@ -22,7 +22,7 @@ export function useEditor(options?: CreateEditorOptions | string) {
   if (error) throw error;
   const [editor] = useState(() => {
     const ed = createEditor(
-      typeof options === "object" ? options : { url: options }
+      typeof options === "object" ? options : { design: options }
     );
     loadingSet.add(ed);
     ed.loaded

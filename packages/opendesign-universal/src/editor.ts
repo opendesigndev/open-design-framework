@@ -10,12 +10,16 @@ import type { Node } from "./nodes/node.js";
 import type { PageNode } from "./nodes/page.js";
 import { PageNodeImpl } from "./nodes/page.js";
 import { loadFile } from "./octopus-file/load-file.js";
+import { canvasSymbol, engineSymbol } from "./symbols.js";
 
 export type CreateEditorOptions = {
   /**
-   * No URL means in-memory empty design
+   * No design means in-memory empty design
+   *
+   * - `string` - url pointing to .octopus, which will be fetched
+   * - `Uint8Array` - contents of octopus file
    */
-  url?: string;
+  design?: string | Uint8Array;
   onLoad?: (editor: Editor) => void;
 };
 
@@ -94,12 +98,10 @@ export function createEditor(options: CreateEditorOptions = {}): Editor {
   return editor;
 }
 
-const canvasSymbol = Symbol();
-const engineSymbol = Symbol();
 /**
  * @internal
  */
-class EditorImplementation implements Editor {
+export class EditorImplementation implements Editor {
   #currentPage: null | PageNode = null;
   [engineSymbol]: Engine | null = null;
   [canvasSymbol]: any;
@@ -111,12 +113,20 @@ class EditorImplementation implements Editor {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
     this.loaded = initEngine(canvas).then(async (engine) => {
-      if (options.url) {
-        const response = await env.fetch(options.url);
-        loadFile(new Uint8Array(await response.arrayBuffer()), engine);
+      if (options.design) {
+        let data: Uint8Array;
+        if (typeof options.design === "string") {
+          const response = await env.fetch(options.design);
+          data = new Uint8Array(await response.arrayBuffer());
+        } else {
+          data = options.design;
+        }
+        this[engineSymbol] = engine;
+        loadFile(data, engine, this);
+      } else {
+        this[engineSymbol] = engine;
       }
 
-      this[engineSymbol] = engine;
       // Make sure that we have at least one artboard.
       // We should remove this once multi-artboard support is implemented
       if (!(this.currentPage as PageNodeImpl).__artboard) {
