@@ -6,6 +6,7 @@ module.exports = {
       "./tsconfig.json",
       "packages/*/tsconfig.*",
       "packages/docs/*/tsconfig.json",
+      "packages/docs/external/*/tsconfig.json",
     ],
   },
   rules: {

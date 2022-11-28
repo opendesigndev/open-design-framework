@@ -1,0 +1,5 @@
+{
+  "name": "@opendesign/octopus-fig",
+  "type": "module",
+  "types": "./index.ts"
+}
