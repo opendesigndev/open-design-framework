@@ -13,7 +13,7 @@ export type { DesignNode } from "./src/nodes/design.js";
 export type { LayerNode } from "./src/nodes/layer.js";
 export type { BaseNode, Node, NodeFilter } from "./src/nodes/node.js";
 export type { PageNode } from "./src/nodes/page.js";
-export { isOctopusFile } from "./src/octopus-file/detect.js";
+export { isOptimizedOctopusFile } from "./src/octopus-file/detect.js";
 export { importFile } from "./src/octopus-file/importer.js";
 /**
  * Underlying Open Design Engine version used in this version of the framework.

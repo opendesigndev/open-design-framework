@@ -1,5 +1,5 @@
 import { EditorCanvas, useEditor } from "@opendesign/react";
-import { importFile, isOctopusFile } from "@opendesign/universal";
+import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
 import { Suspense, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -8,7 +8,7 @@ async function convert(file: Blob) {
   // Load example file. Please note that it is hand-modified file so that we do
   // not have large files in the repo.
   const data = new Uint8Array(await file.arrayBuffer());
-  if (isOctopusFile(data.buffer)) return data;
+  if (isOptimizedOctopusFile(data.buffer)) return data;
   return importFile(data);
 }
 

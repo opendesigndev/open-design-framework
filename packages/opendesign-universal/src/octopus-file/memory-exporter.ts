@@ -54,7 +54,15 @@ export class MemoryExporter {
     this._completed = detachPromiseControls();
     const file = new fflate.ZipPassThrough(headerFile);
     this._zip.add(this._handleFile(file));
-    file.push(fflate.strToU8(headerContent), true);
+    const headerContentU8 = fflate.strToU8(headerContent);
+    file.push(headerContentU8, true);
+
+    // modify so that flag is 0 and we have proper length at the start
+    const view = new DataView(this._chunks[0].buffer);
+    view.setUint16(6, 0);
+    view.setUint32(14, file.crc, true);
+    view.setUint32(18, headerContentU8.byteLength, true);
+    view.setUint32(22, headerContentU8.byteLength, true);
   }
 
   private _handleFile(file: fflate.ZipInputFile) {

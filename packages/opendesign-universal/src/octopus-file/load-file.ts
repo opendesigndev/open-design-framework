@@ -5,14 +5,15 @@ import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { ArtboardNodeImpl } from "../nodes/artboard.js";
 import type { PageNodeImpl } from "../nodes/page.js";
-import { isOctopusFile } from "./detect.js";
+import { isOptimizedOctopusFile } from "./detect.js";
 
 export function loadFile(
   file: Uint8Array,
   engine: Engine,
   editor: EditorImplementation
 ) {
-  if (!isOctopusFile(file.buffer)) throw new Error("File must be octopus file");
+  if (!isOptimizedOctopusFile(file.buffer))
+    throw new Error("File must be octopus file");
   const files = fflate.unzipSync(file);
   const manifest: Manifest["schemas"]["OctopusManifest"] = JSON.parse(
     fflate.strFromU8(files["octopus-manifest.json"])
