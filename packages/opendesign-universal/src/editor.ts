@@ -20,6 +20,15 @@ export type CreateEditorOptions = {
    * - `Uint8Array` - contents of octopus file
    */
   design?: string | Uint8Array;
+  /**
+   * Specifies component to be loaded - if design has more components, then this
+   * limits loaded components to only this.
+   *
+   * _Currently,_ if this is not specified, only a first component is loaded. In
+   * the future, we plan to add multi-component support and then we will load
+   * first page.
+   */
+  componentId?: string;
   onLoad?: (editor: Editor) => void;
 };
 
@@ -122,7 +131,7 @@ export class EditorImplementation implements Editor {
           data = options.design;
         }
         this[engineSymbol] = engine;
-        loadFile(data, engine, this);
+        loadFile(data, engine, this, options.componentId);
       } else {
         this[engineSymbol] = engine;
       }
