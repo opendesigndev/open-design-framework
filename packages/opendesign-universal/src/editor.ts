@@ -131,7 +131,8 @@ export class EditorImplementation implements Editor {
           data = options.design;
         }
         this[engineSymbol] = engine;
-        loadFile(data, engine, this, options.componentId);
+        const loaded = loadFile(data, engine, this, options.componentId);
+        await loaded.loadImages();
       } else {
         this[engineSymbol] = engine;
       }

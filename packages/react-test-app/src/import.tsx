@@ -81,15 +81,19 @@ export function Import() {
     );
   }
   return (
-    <div className="w-full h-full" {...getRootProps()}>
+    <div className="w-full h-full flex flex-col" {...getRootProps()}>
       <input {...getInputProps()} />
-      <ComponentSelect
-        manifest={data[2]}
-        onChange={(evt) => {
-          setParams({ id: evt.currentTarget.value });
-        }}
-      />
-      <Content data={data[1]} key={data[0] + id} componentId={id} />
+      <div className="align-left">
+        <ComponentSelect
+          manifest={data[2]}
+          onChange={(evt) => {
+            setParams({ id: evt.currentTarget.value });
+          }}
+        />
+      </div>
+      <div className="grow">
+        <Content data={data[1]} key={data[0] + id} componentId={id} />
+      </div>
     </div>
   );
 }

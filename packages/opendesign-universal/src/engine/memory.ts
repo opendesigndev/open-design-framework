@@ -19,6 +19,17 @@ export function automaticScope<T>(cb: (Finalizer: Scope) => T): T {
   }
 }
 
+export async function automaticScopeAsync<T>(
+  cb: (Finalizer: Scope) => Promise<T>
+): Promise<T> {
+  const registry = detachedScope();
+  try {
+    return await cb(registry.scope);
+  } finally {
+    registry.destroy();
+  }
+}
+
 export function detachedScope() {
   const finalizeables: ScopeArgs<any[]>[] = [];
   const scope: Scope = (...args) => {

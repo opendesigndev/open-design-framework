@@ -1,8 +1,12 @@
 import type { Manifest as ManifestTs } from "@opendesign/manifest-ts";
 import * as fflate from "fflate";
 
+import { env } from "#env";
+
 import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
+import { createBitmapRef } from "../engine/engine.js";
+import { automaticScope, createStringRef } from "../engine/memory.js";
 import { ArtboardNodeImpl } from "../nodes/artboard.js";
 import type { PageNodeImpl } from "../nodes/page.js";
 import { isOptimizedOctopusFile } from "./detect.js";
@@ -65,6 +69,38 @@ export function loadFile(
     component
   );
   (editor.currentPage as PageNodeImpl).__artboard = artboard;
+
+  return {
+    loadImages: async () => {
+      for (const ref of componentManifest.assets?.images || []) {
+        if (ref.location.type === "EXTERNAL")
+          throw new Error("External images are not supported yet");
+        const path = ref.location.path;
+        const imageFile = files.get(path);
+        if (!imageFile) throw new Error("Missing image");
+        const data = await env.parseImage(readFile(imageFile));
+
+        automaticScope((scope) => {
+          const ptr = scope(
+            engine.ode._malloc(data.data.byteLength),
+            engine.ode._free
+          );
+          const bitmap = createBitmapRef(engine.ode, scope);
+
+          bitmap.pixels = ptr;
+          bitmap.format = 0b1111; // RGBA
+          engine.ode.HEAP8.set(data.data, ptr);
+          bitmap.width = data.width;
+          bitmap.height = data.height;
+          engine.ode.designLoadImagePixels(
+            engine.designImageBase,
+            createStringRef(engine.ode, scope, path),
+            bitmap
+          );
+        });
+      }
+    },
+  };
 }
 
 function readZipFiles(file: Uint8Array) {

@@ -17,6 +17,7 @@ module.exports = {
     "@typescript-eslint/consistent-type-exports": "warn",
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
+    "no-loop-func": 0,
   },
   ignorePatterns: ["packages/*/dist/**/*"],
   root: true,

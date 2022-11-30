@@ -39,6 +39,25 @@ consider it a bug, so please notify us if you notice something.
 - globalThis ([caniuse](https://caniuse.com/mdn-javascript_builtins_globalthis))
   - easily polyfilled
   - better supported than crypto.randomUUID, but worse support than WebGL 2.0
+- AbortSignal.prototype.throwIfAborted ([caniuse](https://caniuse.com/mdn-api_abortsignal_throwifaborted), [mdn](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/throwIfAborted))
+  - easily polyfilled
+
+    ```js
+    if (!('throwIfAborted' in AbortSignal.prototype)) {
+      AbortSignal.prototype.throwIfAborted = function () {
+        if (this.aborted) {
+          const err = new Error('')
+          err.name = 'AbortError'
+          throw err
+        }
+      }
+    }
+    ```
+
+  - Chrome 100 - 29 Mar 2022
+  - Safari 15.4 - 14 Mar 2022
+  - Firefox 97 - 9 Feb 2022
+  - nodejs >= 17.3.0
 
 ## Node.js
 

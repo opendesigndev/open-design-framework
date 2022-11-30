@@ -136,6 +136,8 @@ export const createComponentFromOctopus = createObject(
   ]
 );
 
+export const createBitmapRef = createObject("BitmapRef");
+
 export async function initEngine(canvas: any /* HTMLCanvasElement */) {
   const ode = await createEngineWasm();
   const { scope, destroy: finish } = detachedScope();
