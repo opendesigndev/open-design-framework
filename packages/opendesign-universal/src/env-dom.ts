@@ -7,8 +7,8 @@ export const env: Env = {
     return document.createElement("canvas");
   },
   fetch: fetch.bind(globalThis),
-  parseImage: (data, signal) =>
-    automaticScopeAsync(async (scope) => {
+  parseImage(data, signal) {
+    return automaticScopeAsync(async (scope) => {
       const url = scope(
         URL.createObjectURL(new Blob([data])),
         URL.revokeObjectURL
@@ -24,12 +24,18 @@ export const env: Env = {
       });
       signal?.throwIfAborted();
 
+      const bitmap = await createImageBitmap(image);
+
+      performance.mark("drawImage-start");
       const canvas = document.createElement("canvas");
       canvas.width = image.naturalWidth;
       canvas.height = image.naturalHeight;
       const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-      ctx.drawImage(image, 0, 0);
+      ctx.drawImage(bitmap, 0, 0);
+      performance.mark("drawImage-end");
+      performance.measure("drawImage", "drawImage-start", "drawImage-end");
 
       return ctx.getImageData(0, 0, canvas.width, canvas.height);
-    }),
+    });
+  },
 };

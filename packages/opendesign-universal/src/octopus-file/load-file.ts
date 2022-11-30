@@ -71,20 +71,24 @@ export function loadFile(
   (editor.currentPage as PageNodeImpl).__artboard = artboard;
 
   return {
-    loadImages: async () => {
-      for (const ref of componentManifest.assets?.images || []) {
-        if (ref.location.type === "EXTERNAL")
-          throw new Error("External images are not supported yet");
-        const path = ref.location.path;
-        const imageFile = files.get(path);
-        if (!imageFile) throw new Error("Missing image");
-        const data = await env.parseImage(readFile(imageFile));
-
-        automaticScope((scope) => {
-          const ptr = scope(
-            engine.ode._malloc(data.data.byteLength),
-            engine.ode._free
-          );
+    async loadImages() {
+      const images = await Promise.all(
+        componentManifest.assets?.images?.map(async (ref) => {
+          if (ref.location.type === "EXTERNAL")
+            throw new Error("External images are not supported yet");
+          const path = ref.location.path;
+          const imageFile = files.get(path);
+          if (!imageFile) throw new Error("Missing image");
+          return { data: await env.parseImage(readFile(imageFile)), path };
+        }) || []
+      );
+      const maxBytes = images.reduce(
+        (prev, image) => prev + image.data.data.byteLength,
+        0
+      );
+      automaticScope((scope) => {
+        const ptr = scope(engine.ode._malloc(maxBytes), engine.ode._free);
+        for (const { data, path } of images) {
           const bitmap = createBitmapRef(engine.ode, scope);
 
           bitmap.pixels = ptr;
@@ -92,13 +96,15 @@ export function loadFile(
           engine.ode.HEAP8.set(data.data, ptr);
           bitmap.width = data.width;
           bitmap.height = data.height;
-          engine.ode.designLoadImagePixels(
-            engine.designImageBase,
-            createStringRef(engine.ode, scope, path),
-            bitmap
-          );
-        });
-      }
+          automaticScope((scope) => {
+            engine.ode.designLoadImagePixels(
+              engine.designImageBase,
+              createStringRef(engine.ode, scope, path),
+              bitmap
+            );
+          });
+        }
+      });
     },
   };
 }

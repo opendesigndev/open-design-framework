@@ -86,6 +86,7 @@ export function Import() {
       <div className="align-left">
         <ComponentSelect
           manifest={data[2]}
+          value={id}
           onChange={(evt) => {
             setParams({ id: evt.currentTarget.value });
           }}
@@ -100,20 +101,17 @@ export function Import() {
 
 function ComponentSelect({
   manifest,
+  value,
   onChange,
 }: {
   manifest: Manifest;
+  value?: string;
   onChange?: (evt: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
   const components = new Map<string, Manifest["components"][0]>();
   for (const c of manifest.components) components.set(c.id, c);
   return (
-    <select
-      name="component"
-      defaultValue={manifest.components[0].id}
-      className="p-4"
-      onChange={onChange}
-    >
+    <select name="component" className="p-4" onChange={onChange} value={value}>
       {manifest.pages.map((page) =>
         page.children.map((ref) => {
           const component = components.get(ref.id);

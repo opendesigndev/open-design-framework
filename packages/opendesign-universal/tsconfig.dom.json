@@ -1,6 +1,6 @@
 {
   "extends": "../config/tsconfig.json",
   "compilerOptions": { "outDir": "dist", "lib": ["ES2022", "DOM"] },
-  "include": ["src/env-dom.ts", "src/env.d.ts", "src/dom.ts"],
+  "include": ["src/env.d.ts", "src/env-dom.ts", "src/dom.ts"],
   "references": [{ "path": "./tsconfig.json" }]
 }
