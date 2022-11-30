@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
-  "packageManager": "yarn@3.2.4+sha256.ca1a380d840c676152fbf8635a82d838113fe77e1665466699a4e106df4930d2",
+  "packageManager": "yarn@3.3.0+sha256.bbfc6cc3362afbcb0ce39ee8f36fb2b62ce9834b20d6aeee5c1f481269b52238",
   "workspaces": [
     "packages/*"
   ],
@@ -14,11 +14,11 @@
     "eslint": "eslint --cache"
   },
   "devDependencies": {
-    "eslint": "^8.24.0",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^8.0.0",
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.3"
   },
   "engines": {
     "corepack": ">=0.12.0"
