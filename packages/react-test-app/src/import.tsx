@@ -8,8 +8,6 @@ import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
 async function convert(file: Blob) {
-  // Load example file. Please note that it is hand-modified file so that we do
-  // not have large files in the repo.
   const data = new Uint8Array(await file.arrayBuffer());
   if (isOptimizedOctopusFile(data.buffer)) return data;
   return importFile(data);
@@ -140,7 +138,10 @@ function Content({
   data: Uint8Array;
   componentId: string;
 }) {
-  const editor = useEditor({ design: data, componentId });
+  const editor = useEditor({
+    design: data,
+    componentId,
+  });
   return (
     <>
       <Suspense>

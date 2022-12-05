@@ -91,7 +91,9 @@ export function loadFile(
           const bitmap = createBitmapRef(engine.ode, scope);
 
           bitmap.pixels = ptr;
-          bitmap.format = 0b1111; // RGBA
+          // TODO: make sure that typegen can document constants
+          // @ts-expect-error
+          bitmap.format = engine.ode.PIXEL_FORMAT_RGBA;
           engine.ode.HEAP8.set(data.data, ptr);
           bitmap.width = data.width;
           bitmap.height = data.height;
