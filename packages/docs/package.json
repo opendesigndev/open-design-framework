@@ -11,8 +11,6 @@
     "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
-    "opendesign-octopus-fig": "npm:@opendesign/octopus-fig@3.0.0-rc.22",
-    "opendesign-octopus-xd": "npm:@opendesign/octopus-xd@3.0.0-rc.19",
     "typedoc": "^0.23.21",
     "typedoc-plugin-mdn-links": "^2.0.0",
     "typedoc-plugin-missing-exports": "^1.0.0",

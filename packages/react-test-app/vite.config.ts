@@ -34,7 +34,7 @@ const alias = Object.fromEntries(
 );
 
 export default defineConfig({
-  optimizeDeps: { exclude: [...localDeps, "@opendesign/engine"] },
+  optimizeDeps: { exclude: [...localDeps] },
   resolve: { alias },
   server: {
     fs: {

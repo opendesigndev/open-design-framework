@@ -7,7 +7,10 @@ import type {
   StringRef,
 } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
+import { fetch, warn } from "@opendesign/env";
 
+import { engineVersion } from "../../index.js";
+import { detachPromiseControls } from "../octopus-file/utils.js";
 import {
   automaticScope,
   createObject,
@@ -138,8 +141,45 @@ export const createComponentFromOctopus = createObject(
 
 export const createBitmapRef = createObject("BitmapRef");
 
-export async function initEngine(canvas: any /* HTMLCanvasElement */) {
-  const ode = await createEngineWasm();
+export async function initEngine(
+  canvas: any /* HTMLCanvasElement */,
+  wasmLocation: string | undefined
+) {
+  const controls = detachPromiseControls<never>();
+  // @ts-expect-error
+  const odePromise = createEngineWasm({
+    // I used instantiateWasm instead of locateFile to be able to respond to
+    // 404 on local requests.
+    instantiateWasm(info: any, receiveInstance: (instance: any) => void) {
+      const unpkg =
+        "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm";
+      const local = () =>
+        // @ts-expect-error
+        new URL("@opendesign/engine/ode.wasm", import.meta.url).href;
+      (async () => {
+        if (!wasmLocation) {
+          try {
+            return await instantiateWasm(local(), info);
+          } catch (e) {
+            warn(
+              "Failed to load wasm from local server. See wasmLocation option docs for more info."
+            );
+            warn(e);
+            return instantiateWasm(unpkg, info);
+          }
+        } else if (wasmLocation === "unpkg") {
+          return instantiateWasm(unpkg, info);
+        } else if (wasmLocation === "local") {
+          return instantiateWasm(local(), info);
+        } else {
+          return instantiateWasm(wasmLocation, info);
+        }
+      })().then(receiveInstance, controls.reject);
+      return {};
+    },
+  });
+
+  const ode = await Promise.race([odePromise, controls.promise]);
   const { scope, destroy: finish } = detachedScope();
 
   try {
@@ -170,3 +210,12 @@ export async function initEngine(canvas: any /* HTMLCanvasElement */) {
   }
 }
 export type Engine = Awaited<ReturnType<typeof initEngine>>;
+
+async function instantiateWasm(path: string, info: any) {
+  const response = await fetch(path, { credentials: "same-origin" });
+  const result = await (globalThis as any).WebAssembly.instantiateStreaming(
+    response,
+    info
+  );
+  return result.instance;
+}

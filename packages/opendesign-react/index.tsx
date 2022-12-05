@@ -3,7 +3,6 @@ import { createEditor } from "@opendesign/universal";
 import { mount } from "@opendesign/universal/dom";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { todo } from "../opendesign-universal/src/internals.js";
 import { useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
@@ -133,4 +132,12 @@ export function useReplaceStaticAnimation_unstable(animation: string) {
       editor.currentPage.findArtboard()?.unstable_setStaticAnimation(animation);
     }
   });
+}
+
+/**
+ * similar to rust's todo! macro or java's and C#'s NotImplemented Exception
+ * just throws an error
+ */
+function todo(what?: string): never {
+  throw new Error("TODO" + (what ? ": " + what : ""));
 }

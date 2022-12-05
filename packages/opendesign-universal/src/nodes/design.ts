@@ -1,5 +1,3 @@
-import { env } from "#env";
-
 import { todo } from "../internals.js";
 import type { ArtboardNode } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";

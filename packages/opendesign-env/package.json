@@ -1,0 +1,35 @@
+{
+  "name": "@opendesign/env",
+  "description": "",
+  "version": "0.0.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "github:opendesigndev/open-design-framework",
+    "directory": "packages/opendesign-env"
+  },
+  "author": "Open Design Contributors",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": {
+      "types": "./env.d.ts",
+      "node": "./env-node.js",
+      "default": "./env.js"
+    }
+  },
+  "scripts": {
+    "build": "yarn run -T tsc"
+  },
+  "files": [
+    "env-node.js",
+    "env.js",
+    "env.d.ts"
+  ],
+  "peerDependencies": {
+    "react": "^18.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.25",
+    "react": "^18.2.0"
+  }
+}

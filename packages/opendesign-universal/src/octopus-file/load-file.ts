@@ -1,7 +1,6 @@
+import * as env from "@opendesign/env";
 import type { Manifest as ManifestTs } from "@opendesign/manifest-ts";
 import * as fflate from "fflate";
-
-import { env } from "#env";
 
 import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";

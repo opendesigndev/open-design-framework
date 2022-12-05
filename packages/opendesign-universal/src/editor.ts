@@ -1,8 +1,8 @@
-import { env } from "#env";
+import * as env from "@opendesign/env";
 
 import type { Engine } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
-import { createInternals, queueMicrotask } from "./internals.js";
+import { queueMicrotask } from "./internals.js";
 import { todo } from "./internals.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
@@ -30,9 +30,37 @@ export type CreateEditorOptions = {
    */
   componentId?: string;
   onLoad?: (editor: Editor) => void;
+  /**
+   * Specifies where to find Engine's wasm file. Since there is no good, interoperable,
+   * cross-bundler way to load asset from an npm package, we unfortunately have to
+   * leave it up to you.
+   *
+   * There are a few ways we can load the wasm:
+   *  - locally using new URL(..., import.meta.url) pattern
+   *  - from unpkg
+   *  - from any url you specify
+   *
+   * The default behavior is to first try local, then if that fails use unpkg.
+   *
+   * If you specify this as an url, it will instead load from the url you provided.
+   * There are two more special values: local and unpkg. Specify `'local'` if you
+   * know local works and do not want us fetching from unpkg in case of a failure.
+   * Specify `'unpkg'` in case you know local does not work and want us to directly
+   * fetch from unpkg.com.
+   *
+   * Considerations if you are specifying a location directly:
+   *  - Make sure that you update the wasm file when you update engine.
+   *  - If at any point we start using multiple wasm files (for eg. code-splitting
+   *    or for importers), this option will change too. This will not be
+   *    considered a semver-major change, but we will try to issue a reasonable
+   *    error if that happens, since it will require changing the signature of
+   *    this option.
+   *  - In vite (and probably some other bundlers) you can use
+   *    `new URL('@opendesign/engine/ode.wasm', import.meta.url).href` as a value
+   *    for this option.
+   */
+  wasmLocation?: "unpkg" | "local" | string;
 };
-
-export const editorInternals = createInternals<Editor, { canvas: any }>();
 
 export type EditorViewport = {
   readonly x: number;
@@ -121,31 +149,35 @@ export class EditorImplementation implements Editor {
   constructor(options: CreateEditorOptions) {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
-    this.loaded = initEngine(canvas).then(async (engine) => {
-      if (options.design) {
-        let data: Uint8Array;
-        if (typeof options.design === "string") {
-          const response = await env.fetch(options.design);
-          data = new Uint8Array(await response.arrayBuffer());
+    this.loaded = initEngine(canvas, options.wasmLocation).then(
+      async (engine) => {
+        if (options.design) {
+          let data: Uint8Array;
+          if (typeof options.design === "string") {
+            const response = await env.fetch(options.design, {
+              credentials: "same-origin",
+            });
+            data = new Uint8Array(await response.arrayBuffer());
+          } else {
+            data = options.design;
+          }
+          this[engineSymbol] = engine;
+          const loaded = loadFile(data, engine, this, options.componentId);
+          await loaded.loadImages();
         } else {
-          data = options.design;
+          this[engineSymbol] = engine;
         }
-        this[engineSymbol] = engine;
-        const loaded = loadFile(data, engine, this, options.componentId);
-        await loaded.loadImages();
-      } else {
-        this[engineSymbol] = engine;
-      }
 
-      // Make sure that we have at least one artboard.
-      // We should remove this once multi-artboard support is implemented
-      if (!(this.currentPage as PageNodeImpl).__artboard) {
-        this.currentPage.createArtboard();
+        // Make sure that we have at least one artboard.
+        // We should remove this once multi-artboard support is implemented
+        if (!(this.currentPage as PageNodeImpl).__artboard) {
+          this.currentPage.createArtboard();
+        }
+        queueMicrotask(() => {
+          options.onLoad?.(this);
+        });
       }
-      queueMicrotask(() => {
-        options.onLoad?.(this);
-      });
-    });
+    );
   }
 
   get viewport() {
