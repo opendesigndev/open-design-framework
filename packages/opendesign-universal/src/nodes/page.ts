@@ -38,6 +38,7 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
   findArtboard(
     filter?: NodeFilter<ArtboardNode> | undefined
   ): ArtboardNode | null {
-    todo();
+    if (filter) todo();
+    return this.__artboard ?? null;
   }
 }

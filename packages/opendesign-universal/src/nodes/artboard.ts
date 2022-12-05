@@ -2,7 +2,11 @@ import type { ComponentHandle } from "@opendesign/engine";
 
 import type { Engine } from "../engine/engine.js";
 import { createComponentFromOctopus } from "../engine/engine.js";
-import { detachedScope } from "../engine/memory.js";
+import {
+  automaticScope,
+  createStringRef,
+  detachedScope,
+} from "../engine/memory.js";
 import { generateUUID, todo } from "../internals.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
@@ -26,6 +30,19 @@ export interface ArtboardNode extends BaseNode {
    * @param value
    */
   setY(value: number): ArtboardNode;
+
+  /**
+   * Replaces all static animations on this Artboard with given animation json.
+   *
+   * Static to denote that it is a equivalent to CSS animation - it is declarative,
+   * static, timeline-based animation. Not meant for things like directly
+   * responding to user interactions (à la react-spring).
+   *
+   * unstable_ prefix to denote that once we add proper typing we will probably
+   * have richer API and that this function will likely start accepting an object.
+   * @param animation
+   */
+  unstable_setStaticAnimation(animation: string): void;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -57,5 +74,12 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   }
   setY(value: number): ArtboardNode {
     todo();
+  }
+
+  unstable_setStaticAnimation(animation: string) {
+    automaticScope((scope) => {
+      const ref = createStringRef(this.#engine.ode, scope, animation);
+      this.#engine.ode.pr1_component_loadAnimation(this.__component, ref);
+    });
   }
 }

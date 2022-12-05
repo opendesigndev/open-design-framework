@@ -1,7 +1,7 @@
 import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
 import { mount } from "@opendesign/universal/dom";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { todo } from "../opendesign-universal/src/internals.js";
 import { useEditorContext } from "./src/context.js";
@@ -122,4 +122,15 @@ export function RelativeMarker(
 export function useHoveredNode(editorOverride?: Editor): Node | null {
   const editor = useEditorContext(editorOverride);
   todo();
+}
+
+export function useReplaceStaticAnimation_unstable(animation: string) {
+  const editor = useEditorContext();
+  const ref = useRef("");
+  useEffect(() => {
+    if (ref.current !== animation) {
+      ref.current = animation;
+      editor.currentPage.findArtboard()?.unstable_setStaticAnimation(animation);
+    }
+  });
 }
