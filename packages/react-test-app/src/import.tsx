@@ -1,9 +1,13 @@
-import { EditorCanvas, useEditor } from "@opendesign/react";
+import {
+  EditorCanvas,
+  importFromClipboard,
+  useEditor,
+} from "@opendesign/react";
 import type { Manifest } from "@opendesign/universal";
 import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
@@ -35,11 +39,34 @@ export function Import() {
     },
     noClick: !!data,
   });
+  useEffect(() => {
+    window.addEventListener("paste", pasteListener as any);
+    window.addEventListener("keypress", listener);
+    return () => {
+      window.removeEventListener("paste", pasteListener as any);
+      document.removeEventListener("keypress", listener);
+    };
+    function pasteListener(event: ClipboardEvent) {
+      console.log(importFromClipboard(event));
+    }
+    function listener(event: KeyboardEvent) {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        !event.shiftKey &&
+        !event.altKey &&
+        event.key === "v"
+      ) {
+        console.log(event);
+        console.log(importFromClipboard());
+      }
+    }
+  });
   const [params, setParams] = useSearchParams();
   if (!data) {
     return (
       <div className="w-full h-full" {...getRootProps()}>
         <input {...getInputProps()} />
+        <PasteButton />
         {isDragActive ? (
           <p>Drop the file here ...</p>
         ) : (
@@ -81,6 +108,7 @@ export function Import() {
   return (
     <div className="w-full h-full flex flex-col" {...getRootProps()}>
       <input {...getInputProps()} />
+      <PasteButton />
       <div className="align-left">
         <ComponentSelect
           manifest={data[2]}
@@ -94,6 +122,25 @@ export function Import() {
         <Content data={data[1]} key={data[0] + id} componentId={id} />
       </div>
     </div>
+  );
+}
+
+function PasteButton() {
+  // Firefox does not support reading from clipboard other than ctrl-v
+  if (!navigator.clipboard.readText) return null;
+  return (
+    <button
+      type="button"
+      className="justify-center rounded-lg text-sm font-semibold py-2.5 px-4
+      bg-slate-900
+      text-white hover:bg-slate-700"
+      onClick={(evt) => {
+        evt.stopPropagation();
+        importFromClipboard();
+      }}
+    >
+      Paste
+    </button>
   );
 }
 

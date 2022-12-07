@@ -1,16 +1,17 @@
 import * as fflate from "fflate";
 
 import { generateUUID } from "../internals.js";
+import type { DetachedPromiseControls } from "../utils.js";
+import { detachPromiseControls } from "../utils.js";
 import { headerContent, headerFile } from "./detect.js";
-import type { DetachedPromiseControls } from "./utils.js";
-import { detachPromiseControls, mergeUint8Arrays } from "./utils.js";
+import { mergeUint8Arrays } from "./octopus-file-utils.js";
 
 // TODO: import from octopus
 type ArtboardConversionResult = any;
 type DesignConversionResult = any;
 type SourceArtboard = unknown;
 
-export class MemoryExporter {
+export class MemoryFileExporter {
   private _zip: fflate.Zip;
   private _chunks: Uint8Array[] = [];
   private _completed: DetachedPromiseControls<Uint8Array>;
@@ -101,14 +102,14 @@ export class MemoryExporter {
 
   exportImage(name: string, data: Uint8Array): Promise<string> {
     return this._save(
-      MemoryExporter.IMAGES_DIR_NAME + "/" + name.split("/").slice(-1)[0],
+      MemoryFileExporter.IMAGES_DIR_NAME + "/" + name.split("/").slice(-1)[0],
       data
     );
   }
 
   async exportManifest(manifest: DesignConversionResult): Promise<string> {
     return this._save(
-      MemoryExporter.OCTOPUS_MANIFEST_NAME,
+      MemoryFileExporter.OCTOPUS_MANIFEST_NAME,
       this._stringify(manifest.manifest)
     );
   }

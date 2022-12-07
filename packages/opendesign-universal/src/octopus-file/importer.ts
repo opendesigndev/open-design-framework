@@ -1,6 +1,6 @@
 import { createConverter, XDFileReader } from "@opendesign/octopus-xd";
 
-import { MemoryExporter } from "./memory-exporter.js";
+import { MemoryFileExporter } from "./memory-file-exporter.js";
 
 export async function importFile(data: Uint8Array) {
   const reader = new XDFileReader({ file: data });
@@ -9,7 +9,7 @@ export async function importFile(data: Uint8Array) {
     throw Error("Creating SourceDesign Failed");
   }
   const converter = createConverter({ sourceDesign });
-  const exporter = new MemoryExporter();
+  const exporter = new MemoryFileExporter();
   await converter.convertDesign({ exporter });
   const dir = await exporter.completed();
   await reader.cleanup();

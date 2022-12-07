@@ -1,9 +1,12 @@
+import { createConverter, SourcePluginReader } from "@opendesign/octopus-fig";
+
 import type { Editor } from "./editor.js";
 import { editorGetEngine } from "./editor.js";
 import { editorGetCanvas } from "./editor.js";
 import { createPR1Renderer } from "./engine/engine.js";
 import { detachedScope } from "./engine/memory.js";
 import type { PageNodeImpl } from "./nodes/page.js";
+import { MemoryExporter } from "./paste/memory-exporter.js";
 
 /**
  * Attaches editor into provided div. Only available in DOM environments.
@@ -180,4 +183,44 @@ function scopedListen<Map = HTMLElementEventMap>(target: {
     target.addEventListener(event, listener);
     scope(() => void target.removeEventListener(event, listener));
   };
+}
+
+/**
+ * Reads data from clipboard paste event and converts them to partial octopus file.
+ *
+ * TODO: we might want a different API which will directly insert the data into
+ * Editor, because we do not want incomplete octopuses floating around.
+ *
+ * @returns
+ */
+export function importFromClipboard(input?: ClipboardEvent | string) {
+  // NOTE: do not convert this to async function due to differences in user activation criteria
+  const dataMaybePromise =
+    typeof input === "string"
+      ? input
+      : input
+      ? input.clipboardData?.getData("text/plain")
+      : navigator.clipboard.readText();
+
+  return Promise.resolve(dataMaybePromise).then(async (data) => {
+    if (!data) return null;
+    const parsedData = tryJsonParse(data);
+    if (!parsedData || parsedData.type !== "OPEN_DESIGN_FIGMA_PLUGIN_SOURCE")
+      return null;
+    const reader = new SourcePluginReader(parsedData);
+    const converter = createConverter();
+    const exporter = new MemoryExporter();
+
+    await converter.convertDesign({ designEmitter: reader.parse(), exporter });
+    const result = await exporter.completed();
+    console.log(result);
+  });
+}
+
+function tryJsonParse(text: string) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }

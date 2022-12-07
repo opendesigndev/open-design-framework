@@ -9,7 +9,7 @@ import { automaticScope, createStringRef } from "../engine/memory.js";
 import { ArtboardNodeImpl } from "../nodes/artboard.js";
 import type { PageNodeImpl } from "../nodes/page.js";
 import { isOptimizedOctopusFile } from "./detect.js";
-import { mergeUint8Arrays } from "./utils.js";
+import { mergeUint8Arrays } from "./octopus-file-utils.js";
 
 type UnzipFile = fflate.UnzipFile & {
   chunks?: Uint8Array[];

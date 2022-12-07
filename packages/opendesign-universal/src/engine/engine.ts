@@ -10,7 +10,7 @@ import createEngineWasm from "@opendesign/engine";
 import { fetch, warn } from "@opendesign/env";
 
 import { engineVersion } from "../../index.js";
-import { detachPromiseControls } from "../octopus-file/utils.js";
+import { detachPromiseControls } from "../utils.js";
 import {
   automaticScope,
   createObject,

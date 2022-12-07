@@ -141,3 +141,6 @@ export function useReplaceStaticAnimation_unstable(animation: string) {
 function todo(what?: string): never {
   throw new Error("TODO" + (what ? ": " + what : ""));
 }
+
+// TODO: we might want a different API here
+export { importFromClipboard } from "@opendesign/universal/dom";
