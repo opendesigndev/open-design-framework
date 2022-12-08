@@ -7,6 +7,7 @@ import type { Manifest } from "@opendesign/universal";
 import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
+import type { PropsWithChildren } from "react";
 import React, { Suspense, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
@@ -21,7 +22,7 @@ export function Import() {
   const [data, setData] = useState<
     null | readonly [number, Uint8Array, Manifest]
   >(null);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop: (files) => {
       const file = files[0];
       if (!file) return;
@@ -37,7 +38,7 @@ export function Import() {
           console.error(err);
         });
     },
-    noClick: !!data,
+    noClick: true,
   });
   useEffect(() => {
     window.addEventListener("paste", pasteListener as any);
@@ -64,14 +65,20 @@ export function Import() {
   const [params, setParams] = useSearchParams();
   if (!data) {
     return (
-      <div className="w-full h-full" {...getRootProps()}>
+      <div className="w-full h-full p-4" {...getRootProps()}>
         <input {...getInputProps()} />
-        <PasteButton />
+        <h1 className="text-2xl font-bold mb-2">
+          Open Design Framework playground
+        </h1>
         {isDragActive ? (
           <p>Drop the file here ...</p>
         ) : (
-          <p>Drag 'n' drop a design here, or click to select file</p>
+          <div>
+            <p>Drag 'n' drop a design anywhere</p>
+            <Button onClick={open}>Or click here to select file</Button>
+          </div>
         )}
+        <PasteButton />
       </div>
     );
   }
@@ -82,7 +89,7 @@ export function Import() {
     for (const c of data[2].components) components.set(c.id, c);
     return (
       <form
-        className="flex flex-col max-w-lg gap-2 m-4"
+        className="flex flex-col max-w-lg gap-2 p-4"
         onSubmit={(evt) => {
           evt.preventDefault();
           const data = new FormData(evt.currentTarget);
@@ -94,14 +101,7 @@ export function Import() {
           Select artboard:
           <ComponentSelect manifest={data[2]} />
         </label>
-        <button
-          className="
-            justify-center rounded-lg text-sm font-semibold py-2.5 px-4
-            bg-slate-900
-            text-white hover:bg-slate-700"
-        >
-          Select
-        </button>
+        <Button type="submit">Select</Button>
       </form>
     );
   }
@@ -129,17 +129,34 @@ function PasteButton() {
   // Firefox does not support reading from clipboard other than ctrl-v
   if (!navigator.clipboard.readText) return null;
   return (
-    <button
-      type="button"
-      className="justify-center rounded-lg text-sm font-semibold py-2.5 px-4
-      bg-slate-900
-      text-white hover:bg-slate-700"
+    <Button
       onClick={(evt) => {
         evt.stopPropagation();
         importFromClipboard();
       }}
     >
-      Paste
+      Paste from Figma
+    </Button>
+  );
+}
+
+function Button({
+  children,
+  onClick,
+  type = "button",
+}: PropsWithChildren<{
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  type?: "button" | "submit";
+}>) {
+  return (
+    <button
+      type={type}
+      className="justify-center rounded-lg text-sm font-semibold py-2.5 px-4
+      bg-slate-900
+      text-white hover:bg-slate-700"
+      onClick={onClick}
+    >
+      {children}
     </button>
   );
 }
@@ -194,17 +211,11 @@ function Content({
       <Suspense>
         <EditorCanvas editor={editor} />
       </Suspense>
-      <button
-        className="absolute top-4 right-4
-            justify-center rounded-lg text-sm font-semibold py-2.5 px-4
-            bg-slate-900
-            text-white hover:bg-slate-700"
-        onClick={() => {
-          saveAs(new Blob([data]), "file.octopus");
-        }}
-      >
-        Download .octopus
-      </button>
+      <div className="absolute top-4 right-4">
+        <Button onClick={() => void saveAs(new Blob([data]), "file.octopus")}>
+          Download .octopus
+        </Button>
+      </div>
     </>
   );
 }
