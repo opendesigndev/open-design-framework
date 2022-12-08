@@ -1,17 +1,19 @@
+import type { Manifest } from "@opendesign/manifest-ts";
+
 import type { DetachedPromiseControls } from "../utils.js";
 import { detachPromiseControls } from "../utils.js";
+import type { ImportedClipboardData } from "./import-from-clipboard-data.js";
 
 // TODO: import from octopus
 type ComponentConversionResult = any;
-type DesignConversionResult = any;
 
 export class MemoryExporter {
-  private _completed: DetachedPromiseControls<{
-    manifest?: DesignConversionResult;
-    components: Map<string, string>;
-    images: Map<string, Uint8Array>;
-  }> = detachPromiseControls();
-  private _manifest: DesignConversionResult;
+  private _completed: DetachedPromiseControls<
+    ImportedClipboardData & {
+      manifest?: Manifest["schemas"]["OctopusManifest"];
+    }
+  > = detachPromiseControls();
+  private _manifest?: Manifest["schemas"]["OctopusManifest"];
   private _components = new Map<string, string>();
   private _images = new Map<string, Uint8Array>();
 
@@ -27,8 +29,8 @@ export class MemoryExporter {
     const manifest = this._manifest;
     this._completed.resolve({
       manifest,
-      components: this._components,
-      images: this._images,
+      _components: this._components,
+      _images: this._images,
     });
   }
 
@@ -47,7 +49,9 @@ export class MemoryExporter {
     return path;
   }
 
-  async exportManifest(manifest: DesignConversionResult): Promise<void> {
+  async exportManifest(
+    manifest: Manifest["schemas"]["OctopusManifest"]
+  ): Promise<void> {
     this._manifest = manifest;
   }
 }

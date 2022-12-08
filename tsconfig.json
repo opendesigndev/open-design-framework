@@ -3,8 +3,7 @@
     { "path": "packages/react-test-app" },
     { "path": "packages/opendesign-universal/tsconfig.dom.json" },
     { "path": "packages/docs/dom" },
-    { "path": "packages/docs/external/engine" },
-    { "path": "packages/docs/external/octopus-xd" }
+    { "path": "packages/docs/external/engine" }
   ],
   "include": []
 }

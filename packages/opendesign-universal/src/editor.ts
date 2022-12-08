@@ -24,11 +24,11 @@ export type CreateEditorOptions = {
    * Specifies component to be loaded - if design has more components, then this
    * limits loaded components to only this.
    *
-   * _Currently,_ if this is not specified, only a first component is loaded. In
-   * the future, we plan to add multi-component support and then we will load
-   * first page.
+   * _Currently,_ if this is not specified (or `null`), only a first component
+   * is loaded. In the future, we plan to add multi-component support and then
+   * we will load first page.
    */
-  componentId?: string;
+  componentId?: string | null;
   onLoad?: (editor: Editor) => void;
   /**
    * Specifies where to find Engine's wasm file. Since there is no good, interoperable,
@@ -162,7 +162,12 @@ export class EditorImplementation implements Editor {
             data = options.design;
           }
           this[engineSymbol] = engine;
-          const loaded = loadFile(data, engine, this, options.componentId);
+          const loaded = loadFile(
+            data,
+            engine,
+            this,
+            options.componentId ?? undefined,
+          );
           await loaded.loadImages();
         } else {
           this[engineSymbol] = engine;
@@ -176,7 +181,7 @@ export class EditorImplementation implements Editor {
         queueMicrotask(() => {
           options.onLoad?.(this);
         });
-      }
+      },
     );
   }
 

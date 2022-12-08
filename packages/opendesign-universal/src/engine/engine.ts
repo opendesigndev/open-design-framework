@@ -3,6 +3,7 @@ import type {
   DesignHandle,
   DesignImageBaseHandle,
   EngineHandle,
+  PR1_AnimationRendererHandle,
   RendererContextHandle,
   StringRef,
 } from "@opendesign/engine";
@@ -68,7 +69,7 @@ const createRendererContext = createObject(
         return ode.createRendererContext(engine, rendererContext, selector);
       }),
     ode.destroyRendererContext,
-  ]
+  ],
 );
 
 export const createPR1Renderer = createObject(
@@ -77,25 +78,25 @@ export const createPR1Renderer = createObject(
     ode,
     ctx: RendererContextHandle,
     component: ComponentHandle,
-    imageBase: DesignImageBaseHandle
+    imageBase: DesignImageBaseHandle,
   ) => [
     (renderer) => {
       return ode.pr1_createAnimationRenderer(
         ctx,
         component,
         renderer,
-        imageBase
+        imageBase,
       );
     },
     ode.pr1_destroyAnimationRenderer,
-  ]
+  ],
 );
 const createDesign = createObject(
   "DesignHandle",
   (ode, engine: EngineHandle) => [
     (design) => ode.createDesign(engine, design),
     ode.destroyDesign,
-  ]
+  ],
 );
 
 const createDesignImageBase = createObject(
@@ -104,7 +105,7 @@ const createDesignImageBase = createObject(
     (imageBase) =>
       ode.createDesignImageBase(rendererContext, design, imageBase),
     ode.destroyDesignImageBase,
-  ]
+  ],
 );
 
 const createPR1FrameView = createObject("PR1_FrameView");
@@ -117,7 +118,7 @@ const createComponentMetadata = createObject(
       metadata.id = id;
       metadata.position = [0, 0] as any;
     },
-  ]
+  ],
 );
 
 export const createComponentFromOctopus = createObject(
@@ -133,17 +134,17 @@ export const createComponentFromOctopus = createObject(
           design,
           handle,
           metadata,
-          octopusRef
+          octopusRef,
         );
       }),
-  ]
+  ],
 );
 
 export const createBitmapRef = createObject("BitmapRef");
 
 export async function initEngine(
   canvas: any /* HTMLCanvasElement */,
-  wasmLocation: string | undefined
+  wasmLocation: string | undefined,
 ) {
   const controls = detachPromiseControls<never>();
   // @ts-expect-error
@@ -162,7 +163,7 @@ export async function initEngine(
             return await instantiateWasm(local(), info);
           } catch (e) {
             warn(
-              "Failed to load wasm from local server. See wasmLocation option docs for more info."
+              "Failed to load wasm from local server. See wasmLocation option docs for more info.",
             );
             warn(e);
             return instantiateWasm(unpkg, info);
@@ -193,6 +194,8 @@ export async function initEngine(
     frameView.height = canvas.height;
     frameView.scale = 1;
 
+    const renderers = new Set<PR1_AnimationRendererHandle>();
+
     return {
       ode,
       engine,
@@ -200,6 +203,10 @@ export async function initEngine(
       design,
       designImageBase: imageBase,
       frameView,
+      renderers,
+      redraw() {
+        for (const r of renderers) ode.pr1_animation_drawFrame(r, frameView, 0);
+      },
       destroy() {
         finish();
       },
@@ -215,7 +222,7 @@ async function instantiateWasm(path: string, info: any) {
   const response = await fetch(path, { credentials: "same-origin" });
   const result = await (globalThis as any).WebAssembly.instantiateStreaming(
     response,
-    info
+    info,
   );
   return result.instance;
 }

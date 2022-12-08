@@ -5,6 +5,7 @@ import * as fflate from "fflate";
 import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { createBitmapRef } from "../engine/engine.js";
+import { loadImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import { ArtboardNodeImpl } from "../nodes/artboard.js";
 import type { PageNodeImpl } from "../nodes/page.js";
@@ -26,7 +27,7 @@ export function readManifest(file: Uint8Array) {
   const manifestFile = files.get("octopus-manifest.json");
   if (!manifestFile) throw new Error("Invalid octopus file - missing manifest");
   const manifest: Manifest = JSON.parse(
-    fflate.strFromU8(readFile(manifestFile))
+    fflate.strFromU8(readFile(manifestFile)),
   );
   return manifest;
 }
@@ -35,7 +36,7 @@ export function loadFile(
   file: Uint8Array,
   engine: Engine,
   editor: EditorImplementation,
-  componentId?: string
+  componentId?: string,
 ) {
   if (!isOptimizedOctopusFile(file.buffer))
     throw new Error("File must be octopus file");
@@ -44,7 +45,7 @@ export function loadFile(
   const manifestFile = files.get("octopus-manifest.json");
   if (!manifestFile) throw new Error("Invalid octopus file - missing manifest");
   const manifest: Manifest = JSON.parse(
-    fflate.strFromU8(readFile(manifestFile))
+    fflate.strFromU8(readFile(manifestFile)),
   );
 
   const componentManifest = componentId
@@ -65,47 +66,23 @@ export function loadFile(
   const artboard = new ArtboardNodeImpl(
     engine,
     componentManifest.id,
-    component
+    component,
   );
   (editor.currentPage as PageNodeImpl).__artboard = artboard;
 
   return {
     async loadImages() {
-      const images = await Promise.all(
-        componentManifest.assets?.images?.map(async (ref) => {
+      return loadImages(
+        engine,
+        componentManifest.assets?.images?.map((ref) => {
           if (ref.location.type === "EXTERNAL")
             throw new Error("External images are not supported yet");
           const path = ref.location.path;
           const imageFile = files.get(path);
           if (!imageFile) throw new Error("Missing image");
-          return { data: await env.parseImage(readFile(imageFile)), path };
-        }) || []
+          return { data: readFile(imageFile), path };
+        }) || [],
       );
-      const maxBytes = images.reduce(
-        (prev, image) => prev + image.data.data.byteLength,
-        0
-      );
-      automaticScope((scope) => {
-        const ptr = scope(engine.ode._malloc(maxBytes), engine.ode._free);
-        for (const { data, path } of images) {
-          const bitmap = createBitmapRef(engine.ode, scope);
-
-          bitmap.pixels = ptr;
-          // TODO: make sure that typegen can document constants
-          // @ts-expect-error
-          bitmap.format = engine.ode.PIXEL_FORMAT_RGBA;
-          engine.ode.HEAP8.set(data.data, ptr);
-          bitmap.width = data.width;
-          bitmap.height = data.height;
-          automaticScope((scope) => {
-            engine.ode.designLoadImagePixels(
-              engine.designImageBase,
-              createStringRef(engine.ode, scope, path),
-              bitmap
-            );
-          });
-        }
-      });
     },
   };
 }
@@ -143,7 +120,7 @@ function onData(
   this: UnzipFile,
   err: fflate.FlateError | null,
   data: Uint8Array,
-  final: boolean
+  final: boolean,
 ) {
   if (err) {
     if (this.reject) this.reject(err);

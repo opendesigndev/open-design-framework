@@ -3,7 +3,7 @@ import {
   importFromClipboard,
   useEditor,
 } from "@opendesign/react";
-import type { Manifest } from "@opendesign/universal";
+import type { ImportedClipboardData, Manifest } from "@opendesign/universal";
 import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
@@ -20,7 +20,9 @@ async function convert(file: Blob) {
 
 export function Import() {
   const [data, setData] = useState<
-    null | readonly [number, Uint8Array, Manifest]
+    | null
+    | { type: "file"; fileKey: number; data: Uint8Array; manifest: Manifest }
+    | { type: "paste"; data: ImportedClipboardData }
   >(null);
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop: (files) => {
@@ -28,39 +30,18 @@ export function Import() {
       if (!file) return;
       convert(file)
         .then((data) =>
-          setData((prev) =>
-            prev
-              ? [prev[0] + 1, data, readManifest(data)]
-              : [0, data, readManifest(data)]
-          )
+          setData((prev) => ({
+            type: "file",
+            fileKey: (prev && prev.type === "file" ? prev.fileKey : 0) + 1,
+            data,
+            manifest: readManifest(data),
+          })),
         )
         .catch((err) => {
           console.error(err);
         });
     },
     noClick: true,
-  });
-  useEffect(() => {
-    window.addEventListener("paste", pasteListener as any);
-    window.addEventListener("keypress", listener);
-    return () => {
-      window.removeEventListener("paste", pasteListener as any);
-      document.removeEventListener("keypress", listener);
-    };
-    function pasteListener(event: ClipboardEvent) {
-      console.log(importFromClipboard(event));
-    }
-    function listener(event: KeyboardEvent) {
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        !event.shiftKey &&
-        !event.altKey &&
-        event.key === "v"
-      ) {
-        console.log(event);
-        console.log(importFromClipboard());
-      }
-    }
   });
   const [params, setParams] = useSearchParams();
   if (!data) {
@@ -78,15 +59,22 @@ export function Import() {
             <Button onClick={open}>Or click here to select file</Button>
           </div>
         )}
-        <PasteButton />
+        <PasteButton
+          onPaste={(data) => {
+            setData({ type: "paste", data });
+          }}
+        />
       </div>
     );
   }
   const id = params.get("id");
-  if (!id || !data[2].components.some((c) => c.id === id)) {
-    console.log(data[2].components.map((c) => c.id));
+  if (
+    data.type === "file" &&
+    (!id || !data.manifest.components.some((c) => c.id === id))
+  ) {
+    console.log(data.manifest.components.map((c) => c.id));
     const components = new Map<string, Manifest["components"][0]>();
-    for (const c of data[2].components) components.set(c.id, c);
+    for (const c of data.manifest.components) components.set(c.id, c);
     return (
       <form
         className="flex flex-col max-w-lg gap-2 p-4"
@@ -99,7 +87,7 @@ export function Import() {
       >
         <label className="flex flex-col">
           Select artboard:
-          <ComponentSelect manifest={data[2]} />
+          <ComponentSelect manifest={data.manifest} />
         </label>
         <Button type="submit">Select</Button>
       </form>
@@ -108,31 +96,52 @@ export function Import() {
   return (
     <div className="w-full h-full flex flex-col" {...getRootProps()}>
       <input {...getInputProps()} />
-      <PasteButton />
-      <div className="align-left">
-        <ComponentSelect
-          manifest={data[2]}
-          value={id}
-          onChange={(evt) => {
-            setParams({ id: evt.currentTarget.value });
-          }}
-        />
-      </div>
-      <div className="grow">
-        <Content data={data[1]} key={data[0] + id} componentId={id} />
-      </div>
+
+      {data.type === "file" && id ? (
+        <div className="align-left">
+          <ComponentSelect
+            manifest={data.manifest}
+            value={id}
+            onChange={(evt) => {
+              setParams({ id: evt.currentTarget.value });
+            }}
+          />
+        </div>
+      ) : null}
+      <Content
+        data={data}
+        key={data.type === "file" ? data.fileKey : 0}
+        componentId={id}
+      />
     </div>
   );
 }
 
-function PasteButton() {
+function PasteButton({
+  onPaste,
+}: {
+  onPaste: (data: ImportedClipboardData) => void;
+}) {
+  useEffect(() => {
+    window.addEventListener("paste", pasteListener as any);
+    return () => void window.removeEventListener("paste", pasteListener as any);
+    function pasteListener(event: ClipboardEvent) {
+      importFromClipboard(event).then((data) => {
+        if (data) onPaste(data);
+      });
+    }
+  });
+
   // Firefox does not support reading from clipboard other than ctrl-v
-  if (!navigator.clipboard.readText) return null;
+  if (!navigator.clipboard.readText)
+    return <div>You can also paste from Figma</div>;
+
   return (
     <Button
-      onClick={(evt) => {
-        evt.stopPropagation();
-        importFromClipboard();
+      onClick={() => {
+        importFromClipboard().then((data) => {
+          if (data) onPaste(data);
+        });
       }}
     >
       Paste from Figma
@@ -184,7 +193,7 @@ function ComponentSelect({
               {page.name} / {components.get(component.id)?.name ?? ""}
             </option>
           );
-        })
+        }),
       )}
       {Array.from(components.values(), (component) => (
         <option key={component.id} value={component.id}>
@@ -199,22 +208,48 @@ function Content({
   data,
   componentId,
 }: {
-  data: Uint8Array;
-  componentId: string;
+  data:
+    | { type: "file"; data: Uint8Array }
+    | { type: "paste"; data: ImportedClipboardData };
+  componentId: string | null;
 }) {
   const editor = useEditor({
-    design: data,
+    design: data.type === "file" ? data.data : undefined,
     componentId,
+    onLoad(editor) {
+      setTimeout(() => {
+        if (data.type === "paste") {
+          editor.currentPage.paste(data.data).then(
+            () => void console.log("Success"),
+            (err) => void console.error(err),
+          );
+        }
+      }, 100);
+    },
   });
   return (
     <>
-      <Suspense>
-        <EditorCanvas editor={editor} />
-      </Suspense>
-      <div className="absolute top-4 right-4">
-        <Button onClick={() => void saveAs(new Blob([data]), "file.octopus")}>
-          Download .octopus
-        </Button>
+      <PasteButton
+        onPaste={(data) =>
+          void editor.currentPage.paste(data).then(
+            () => void console.log("Success"),
+            (err) => void console.error(err),
+          )
+        }
+      />
+      <div className="grow">
+        <Suspense>
+          <EditorCanvas editor={editor} />
+        </Suspense>
+        {data.type === "file" ? (
+          <div className="absolute top-4 right-4">
+            <Button
+              onClick={() => void saveAs(new Blob([data.data]), "file.octopus")}
+            >
+              Download .octopus
+            </Button>
+          </div>
+        ) : null}
       </div>
     </>
   );

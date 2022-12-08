@@ -17,6 +17,8 @@ export { isOptimizedOctopusFile } from "./src/octopus-file/detect.js";
 export { importFile } from "./src/octopus-file/importer.js";
 export type { Manifest } from "./src/octopus-file/load-file.js";
 export { readManifest } from "./src/octopus-file/load-file.js";
+export type { ImportedClipboardData } from "./src/paste/import-from-clipboard-data.js";
+export { importFromClipboardData } from "./src/paste/import-from-clipboard-data.js";
 /**
  * Underlying Open Design Engine version used in this version of the framework.
  * Mostly useful for debugging.

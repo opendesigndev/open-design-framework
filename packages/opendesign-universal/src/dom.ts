@@ -1,5 +1,5 @@
-import { createConverter, SourcePluginReader } from "@opendesign/octopus-fig";
-
+import type { ImportedClipboardData } from "../index.js";
+import { importFromClipboardData } from "../index.js";
 import type { Editor } from "./editor.js";
 import { editorGetEngine } from "./editor.js";
 import { editorGetCanvas } from "./editor.js";
@@ -45,8 +45,12 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     scope,
     engine.rendererContext,
     (editor.currentPage as PageNodeImpl).__artboard?.__component!,
-    engine.designImageBase
+    engine.designImageBase,
   );
+  engine.renderers.add(renderer);
+  scope(() => {
+    engine.renderers.delete(renderer);
+  });
   onResize();
 
   // Resize gets fired on zoom, which changes devicePixelRatio
@@ -168,16 +172,16 @@ function parseScrollDelta(event: WheelEvent) {
 function scopedListen<Map = HTMLElementEventMap>(target: {
   addEventListener<K extends keyof Map>(
     k: K,
-    listener: (event: Map[K]) => any
+    listener: (event: Map[K]) => any,
   ): any;
   removeEventListener<K extends keyof Map>(
     k: K,
-    listener: (event: Map[K]) => any
+    listener: (event: Map[K]) => any,
   ): any;
 }): <Key extends keyof Map>(
   scope: (cleanup: () => void) => void,
   event: Key,
-  listener: (event: Map[Key]) => void
+  listener: (event: Map[Key]) => void,
 ) => void {
   return (scope, event, listener) => {
     target.addEventListener(event, listener);
@@ -187,13 +191,13 @@ function scopedListen<Map = HTMLElementEventMap>(target: {
 
 /**
  * Reads data from clipboard paste event and converts them to partial octopus file.
+ * Do not rely on structure of returned data, but import it into Editor instead.
  *
- * TODO: we might want a different API which will directly insert the data into
- * Editor, because we do not want incomplete octopuses floating around.
- *
- * @returns
+ * @returns opaque object which can be imported into editor or null if import failed
  */
-export function importFromClipboard(input?: ClipboardEvent | string) {
+export function importFromClipboard(
+  input?: ClipboardEvent | string,
+): Promise<ImportedClipboardData | null> {
   // NOTE: do not convert this to async function due to differences in user activation criteria
   const dataMaybePromise =
     typeof input === "string"
@@ -202,25 +206,5 @@ export function importFromClipboard(input?: ClipboardEvent | string) {
       ? input.clipboardData?.getData("text/plain")
       : navigator.clipboard.readText();
 
-  return Promise.resolve(dataMaybePromise).then(async (data) => {
-    if (!data) return null;
-    const parsedData = tryJsonParse(data);
-    if (!parsedData || parsedData.type !== "OPEN_DESIGN_FIGMA_PLUGIN_SOURCE")
-      return null;
-    const reader = new SourcePluginReader(parsedData);
-    const converter = createConverter();
-    const exporter = new MemoryExporter();
-
-    await converter.convertDesign({ designEmitter: reader.parse(), exporter });
-    const result = await exporter.completed();
-    console.log(result);
-  });
-}
-
-function tryJsonParse(text: string) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
+  return Promise.resolve(dataMaybePromise).then(importFromClipboardData);
 }
