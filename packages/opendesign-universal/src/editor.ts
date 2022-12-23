@@ -69,6 +69,16 @@ export type EditorViewport = {
   readonly height: number;
 };
 
+export type EditorEvents = {
+  /**
+   * Mirrors [HTMLMediaElement timeupdate event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event).
+   *
+   */
+  timeupdate: { currentTime: number };
+  play: {};
+  pause: {};
+};
+
 /**
  * Editor is the main object users interact with. It corresponds to one design
  * and up to one viewport (zero or one).
@@ -113,6 +123,47 @@ export interface Editor {
    * Resolves when editor is loaded (engine + design).
    */
   readonly loaded: Promise<void>;
+
+  /**
+   * Is false while editor is loading, true once Engine AND initial design is
+   * loaded. Does not become false later - even if editor is loading something.
+   */
+  readonly loading: boolean;
+
+  /**
+   * Sets the current time of animation.
+   *
+   * @param time
+   */
+  setTime(time: number): void;
+  /**
+   * Starts playing the animation. If offset is specified, then starts playing
+   * from it. Otherwise it continues from where it was last time.
+   *
+   * @param offset
+   */
+  play(offset?: number): void;
+  /**
+   * Stops the animation.
+   */
+  pause(): void;
+  /**
+   * Acts like a play/pause button in video players - if playing then it pauses,
+   * otherwise it start playing.
+   */
+  togglePlaying(): void;
+
+  /**
+   * Similar to addEventListener but returns function which removes the event
+   * listener.
+   *
+   * @param event
+   * @param listener
+   */
+  listen<T extends keyof EditorEvents>(
+    event: T,
+    listener: (event: EditorEvents[T]) => void,
+  ): () => void;
 }
 
 /**
@@ -140,10 +191,12 @@ export function createEditor(options: CreateEditorOptions = {}): Editor {
  */
 export class EditorImplementation implements Editor {
   #currentPage: null | PageNode = null;
+  #events = new Map<keyof EditorEvents, Set<(event: any) => void>>();
   [engineSymbol]: Engine | null = null;
   [canvasSymbol]: any;
 
   design = new DesignImplementation();
+  loading = true;
   loaded: Promise<void>;
 
   constructor(options: CreateEditorOptions) {
@@ -181,6 +234,7 @@ export class EditorImplementation implements Editor {
         queueMicrotask(() => {
           options.onLoad?.(this);
         });
+        this.loading = false;
       },
     );
   }
@@ -210,6 +264,93 @@ export class EditorImplementation implements Editor {
   get selected() {
     return todo();
   }
+
+  #raf?: ReturnType<typeof env.requestAnimationFrame>;
+  #startTime: number = 0;
+
+  setTime(time: number) {
+    this.#startTime = performance.now() - time;
+
+    // if paused, rerender immediately
+    if (!this.#raf) {
+      const engine = editorGetEngine(this);
+      for (const renderer of engine.renderers) {
+        renderer.time = time;
+      }
+      engine.redraw();
+      this.#dispatch("timeupdate", { currentTime: time });
+    }
+  }
+
+  play(offset?: number) {
+    if (offset) {
+      this.#startTime = performance.now() - offset;
+    } else {
+      const engine = editorGetEngine(this);
+      const renderer = Array.from(engine.renderers.values())[0];
+      this.#startTime = performance.now() - (renderer?.time ?? 0);
+    }
+    if (this.#raf) {
+      return;
+    }
+    this.#dispatch("play", {});
+    this.#raf = env.requestAnimationFrame(this.#rafCallback);
+  }
+
+  #rafCallback = (currentTime: number) => {
+    this.#raf = env.requestAnimationFrame(this.#rafCallback);
+
+    const engine = editorGetEngine(this);
+    const time = currentTime - this.#startTime;
+    for (const renderer of engine.renderers) {
+      renderer.time = time;
+    }
+    this.#dispatch("timeupdate", { currentTime: time });
+    engine.redraw();
+  };
+
+  pause() {
+    if (this.#raf) {
+      // cancel further updates
+      env.cancelAnimationFrame(this.#raf);
+      this.#raf = undefined;
+      this.#dispatch("pause", {});
+    }
+  }
+
+  togglePlaying() {
+    if (this.#raf) this.pause();
+    else this.play();
+  }
+
+  #dispatch<T extends keyof EditorEvents>(type: T, data: EditorEvents[T]) {
+    const listeners = this.#events.get(type);
+    if (listeners) {
+      for (const listener of listeners.values()) {
+        listener(data);
+      }
+    }
+  }
+
+  listen<T extends keyof EditorEvents>(
+    type: T,
+    listener: (event: EditorEvents[T]) => void,
+  ): () => void {
+    // create a copy so that you can use same listener twice. IDK why you would
+    // want it, but :shrug:
+    const cb = (data: any) => void listener(data);
+    let set = this.#events.get(type);
+    if (!set) {
+      set = new Set();
+      this.#events.set(type, set);
+    }
+    set.add(cb);
+    return () => {
+      // typescript can't analyze this properly but if you read previous lines
+      // you can see that this cant be undefined
+      set!.delete(cb);
+    };
+  }
 }
 
 /**
@@ -218,13 +359,16 @@ export class EditorImplementation implements Editor {
 export function editorGetCanvas(editor: Editor) {
   return (editor as EditorImplementation)[canvasSymbol];
 }
+
 /**
  * @internal
  */
 export function editorGetEngine(editor: Editor): Engine {
   const engine = (editor as EditorImplementation)[engineSymbol];
   if (!engine) {
-    throw new Error("You must wait until editor has finished loading");
+    const error = new Error("You must wait until editor has finished loading");
+    (error as any).code = "LOADING";
+    throw error;
   }
   return engine;
 }

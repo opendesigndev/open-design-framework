@@ -41,3 +41,9 @@ export async function parseImage(data, signal) {
   }
 }
 export const warn = console.warn.bind(console);
+
+export const requestAnimationFrame =
+  globalThis.requestAnimationFrame.bind(globalThis);
+
+export const cancelAnimationFrame =
+  globalThis.cancelAnimationFrame.bind(globalThis);

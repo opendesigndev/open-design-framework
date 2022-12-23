@@ -16,7 +16,12 @@ export interface ArtboardNode extends BaseNode {
   /**
    * Returns artboard's position within page. Use setX and setY to change this.
    */
-  offset: { x: number; y: number };
+  readonly offset: { x: number; y: number };
+
+  /**
+   * Returns artboard's size.
+   */
+  readonly dimensions: { width: number; height: number };
 
   /**
    * Sets artboard's position on horizontal axis (how far from left side it is).
@@ -43,6 +48,13 @@ export interface ArtboardNode extends BaseNode {
    * @param animation
    */
   unstable_setStaticAnimation(animation: string): void;
+
+  /**
+   * returns octopus json representing the file. Unstable because
+   * 1) it does not reflect changes
+   * 2) we will add more tailored APIs to read various information about the artboard
+   */
+  unstable_readOctopus(): string;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -53,16 +65,19 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   __component: ComponentHandle;
   // TODO: make private
   __rootLayerId: string;
+  #octopus: string;
+
   constructor(engine: Engine, id: string = generateUUID(), octopus?: string) {
     super();
     this.#engine = engine;
     if (!octopus) {
       this.__rootLayerId = generateUUID();
+      this.dimensions = { width: 1920, height: 1080 };
       octopus = JSON.stringify({
         version: "3.0.0-odf",
         id: id,
         type: "ARTBOARD",
-        dimensions: { width: 1920, height: 1080 },
+        dimensions: this.dimensions,
         content: {
           id: this.__rootLayerId,
           type: "GROUP",
@@ -76,8 +91,11 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         },
       });
     } else {
-      this.__rootLayerId = JSON.parse(octopus).content.id;
+      const parsed = JSON.parse(octopus);
+      this.__rootLayerId = parsed.content.id;
+      this.dimensions = parsed.dimensions;
     }
+    this.#octopus = octopus;
     this.__component = createComponentFromOctopus(
       engine.ode,
       this.#scope.scope,
@@ -90,6 +108,8 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   type = "ARTBOARD" as const;
   offset: { x: number; y: number } = { x: 0, y: 0 };
+  dimensions = { width: 0, height: 0 };
+
   setX(value: number): ArtboardNode {
     todo();
   }
@@ -102,5 +122,9 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       const ref = createStringRef(this.#engine.ode, scope, animation);
       this.#engine.ode.pr1_component_loadAnimation(this.__component, ref);
     });
+  }
+
+  unstable_readOctopus(): string {
+    return this.#octopus;
   }
 }

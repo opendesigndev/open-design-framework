@@ -4,6 +4,7 @@ import type {
   DesignImageBaseHandle,
   EngineHandle,
   PR1_AnimationRendererHandle,
+  PR1_FrameView,
   RendererContextHandle,
   StringRef,
 } from "@opendesign/engine";
@@ -108,7 +109,7 @@ const createDesignImageBase = createObject(
   ],
 );
 
-const createPR1FrameView = createObject("PR1_FrameView");
+export const createPR1FrameView = createObject("PR1_FrameView");
 
 const createComponentMetadata = createObject(
   "ComponentMetadata",
@@ -142,6 +143,12 @@ export const createComponentFromOctopus = createObject(
 
 export const createBitmapRef = createObject("BitmapRef");
 
+export type Renderer = {
+  handle: PR1_AnimationRendererHandle;
+  frameView: PR1_FrameView;
+  time: number;
+};
+
 export async function initEngine(
   canvas: any /* HTMLCanvasElement */,
   wasmLocation: string | undefined,
@@ -155,7 +162,6 @@ export async function initEngine(
       const unpkg =
         "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm";
       const local = () =>
-        // @ts-expect-error
         new URL("@opendesign/engine/ode.wasm", import.meta.url).href;
       (async () => {
         if (!wasmLocation) {
@@ -189,12 +195,7 @@ export async function initEngine(
     const design = createDesign(ode, scope, engine);
     const imageBase = createDesignImageBase(ode, scope, rendererCtx, design);
 
-    const frameView = createPR1FrameView(ode, scope);
-    frameView.width = canvas.width;
-    frameView.height = canvas.height;
-    frameView.scale = 1;
-
-    const renderers = new Set<PR1_AnimationRendererHandle>();
+    const renderers = new Set<Renderer>();
 
     return {
       ode,
@@ -202,10 +203,11 @@ export async function initEngine(
       rendererContext: rendererCtx,
       design,
       designImageBase: imageBase,
-      frameView,
       renderers,
       redraw() {
-        for (const r of renderers) ode.pr1_animation_drawFrame(r, frameView, 0);
+        for (const r of renderers) {
+          ode.pr1_animation_drawFrame(r.handle, r.frameView, r.time / 1000);
+        }
       },
       destroy() {
         finish();

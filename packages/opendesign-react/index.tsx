@@ -7,8 +7,6 @@ import { useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
-const loadingSet = new WeakSet<Editor>();
-
 /**
  * Creates Editor object to be used. This is the main entrypoint for react apps.
  * Use {@link @opendesign/react!EditorCanvas} component to display the content.
@@ -21,12 +19,9 @@ export function useEditor(options?: CreateEditorOptions | string) {
   if (error) throw error;
   const [editor] = useState(() => {
     const ed = createEditor(
-      typeof options === "object" ? options : { design: options }
+      typeof options === "object" ? options : { design: options },
     );
-    loadingSet.add(ed);
-    ed.loaded
-      .catch((loadError) => void setError(loadError))
-      .then(() => void loadingSet.delete(ed));
+    ed.loaded.catch((loadError) => void setError(loadError));
     return ed;
   });
   return editor;
@@ -65,7 +60,7 @@ export type EditorCanvasProps = {
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   const { editor, ...rest } = props;
-  if (loadingSet.has(editor)) {
+  if (editor.loading) {
     throw editor.loaded;
   }
 
@@ -108,7 +103,7 @@ export function RelativeMarker(
         children: React.ReactNode;
         x: number;
         y: number;
-      }
+      },
 ): JSX.Element {
   todo();
 }
@@ -140,6 +135,15 @@ export function useReplaceStaticAnimation_unstable(animation: string) {
  */
 function todo(what?: string): never {
   throw new Error("TODO" + (what ? ": " + what : ""));
+}
+
+/**
+ * Use this function to wait until the editor is fully loaded.
+ */
+export function useWaitForEditorLoaded(editorOverride?: Editor): Editor {
+  const editor = useEditorContext(editorOverride);
+  if (editor.loading) throw editor.loaded;
+  return editor;
 }
 
 // TODO: we might want a different API here

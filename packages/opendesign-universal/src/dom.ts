@@ -3,10 +3,10 @@ import { importFromClipboardData } from "../index.js";
 import type { Editor } from "./editor.js";
 import { editorGetEngine } from "./editor.js";
 import { editorGetCanvas } from "./editor.js";
-import { createPR1Renderer } from "./engine/engine.js";
+import type { Renderer } from "./engine/engine.js";
+import { createPR1FrameView, createPR1Renderer } from "./engine/engine.js";
 import { detachedScope } from "./engine/memory.js";
 import type { PageNodeImpl } from "./nodes/page.js";
-import { MemoryExporter } from "./paste/memory-exporter.js";
 
 /**
  * Attaches editor into provided div. Only available in DOM environments.
@@ -40,13 +40,23 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   let frameRequested = false;
   let offset: [number, number] = [0, 0];
 
-  const renderer = createPR1Renderer(
+  const rendererHandle = createPR1Renderer(
     engine.ode,
     scope,
     engine.rendererContext,
     (editor.currentPage as PageNodeImpl).__artboard?.__component!,
     engine.designImageBase,
   );
+
+  const frameView = createPR1FrameView(engine.ode, scope);
+  frameView.width = canvas.width;
+  frameView.height = canvas.height;
+  frameView.scale = 1;
+  const renderer: Renderer = {
+    handle: rendererHandle,
+    frameView,
+    time: 0,
+  };
   engine.renderers.add(renderer);
   scope(() => {
     engine.renderers.delete(renderer);
@@ -70,7 +80,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   function draw() {
     frameRequested = false;
     // TODO: maybe debounce, or memoize
-    engine.ode.pr1_animation_drawFrame(renderer, engine.frameView, 0);
+    engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
   }
 
   function requestFrame() {
@@ -83,7 +93,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     event.preventDefault();
     const scrollDelta = parseScrollDelta(event);
     if (event.ctrlKey) {
-      const prevScale = engine.frameView.scale;
+      const prevScale = renderer.frameView.scale;
       const change = Math.pow(1.1, -scrollDelta / 96);
       const scale = prevScale * change;
       let [x, y] = parsePosition(event);
@@ -92,16 +102,16 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
         x - (1 / change) * (x - offset[0]),
         y - (1 / change) * (y - offset[1]),
       ];
-      engine.frameView.offset = offset as any;
-      engine.frameView.scale = scale;
+      renderer.frameView.offset = offset as any;
+      renderer.frameView.scale = scale;
       requestFrame();
     } else if (event.shiftKey) {
-      offset[0] += scrollDelta / engine.frameView.scale;
-      engine.frameView.offset = offset as any;
+      offset[0] += scrollDelta / renderer.frameView.scale;
+      renderer.frameView.offset = offset as any;
       requestFrame();
     } else {
-      offset[1] += scrollDelta / engine.frameView.scale;
-      engine.frameView.offset = offset as any;
+      offset[1] += scrollDelta / renderer.frameView.scale;
+      renderer.frameView.offset = offset as any;
       requestFrame();
     }
   }
@@ -117,13 +127,13 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     canvas.height = newHeight;
     canvas.style.transform = `scale(${1 / window.devicePixelRatio})`;
 
-    engine.frameView.width = canvas.width;
-    engine.frameView.height = canvas.height;
+    renderer.frameView.width = canvas.width;
+    renderer.frameView.height = canvas.height;
     requestFrame();
   }
 
   function parsePosition(event: WheelEvent | MouseEvent) {
-    const scale = engine.frameView.scale;
+    const scale = renderer.frameView.scale;
     return [
       ((event.clientX - div.clientLeft) * window.devicePixelRatio) / scale +
         offset[0],

@@ -13,7 +13,10 @@
   "typedoc": {
     "entryPoint": "index.tsx"
   },
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./universal": "./dist/universal.js"
+  },
   "scripts": {
     "build": "yarn run -T tsc"
   },
