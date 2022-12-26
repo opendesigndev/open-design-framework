@@ -13,3 +13,4 @@ export declare function warn(...args: any[]): void;
 
 export function requestAnimationFrame(callback: (time: number) => void): number;
 export function cancelAnimationFrame(handle: number): void;
+export function performanceNow(): number;

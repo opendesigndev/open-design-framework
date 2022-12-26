@@ -269,7 +269,7 @@ export class EditorImplementation implements Editor {
   #startTime: number = 0;
 
   setTime(time: number) {
-    this.#startTime = performance.now() - time;
+    this.#startTime = env.performanceNow() - time;
 
     // if paused, rerender immediately
     if (!this.#raf) {
@@ -284,11 +284,11 @@ export class EditorImplementation implements Editor {
 
   play(offset?: number) {
     if (offset) {
-      this.#startTime = performance.now() - offset;
+      this.#startTime = env.performanceNow() - offset;
     } else {
       const engine = editorGetEngine(this);
       const renderer = Array.from(engine.renderers.values())[0];
-      this.#startTime = performance.now() - (renderer?.time ?? 0);
+      this.#startTime = env.performanceNow() - (renderer?.time ?? 0);
     }
     if (this.#raf) {
       return;

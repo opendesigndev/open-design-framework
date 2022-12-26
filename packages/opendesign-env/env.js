@@ -47,3 +47,5 @@ export const requestAnimationFrame =
 
 export const cancelAnimationFrame =
   globalThis.cancelAnimationFrame.bind(globalThis);
+
+export const performanceNow = performance.now.bind(performance);
