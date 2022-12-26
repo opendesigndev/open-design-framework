@@ -3,16 +3,16 @@ import type {
   DesignHandle,
   DesignImageBaseHandle,
   EngineHandle,
+  ODENative,
   PR1_AnimationRendererHandle,
   PR1_FrameView,
   RendererContextHandle,
   StringRef,
 } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
-import { fetch, warn } from "@opendesign/env";
+import { warn } from "@opendesign/env";
 
 import { engineVersion } from "../../index.js";
-import { detachPromiseControls } from "../utils.js";
 import {
   automaticScope,
   createObject,
@@ -153,40 +153,31 @@ export async function initEngine(
   canvas: any /* HTMLCanvasElement */,
   wasmLocation: string | undefined,
 ) {
-  const controls = detachPromiseControls<never>();
-  // @ts-expect-error
-  const odePromise = createEngineWasm({
-    // I used instantiateWasm instead of locateFile to be able to respond to
-    // 404 on local requests.
-    instantiateWasm(info: any, receiveInstance: (instance: any) => void) {
-      const unpkg =
-        "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm";
-      const local = () =>
-        new URL("@opendesign/engine/ode.wasm", import.meta.url).href;
-      (async () => {
-        if (!wasmLocation) {
-          try {
-            return await instantiateWasm(local(), info);
-          } catch (e) {
-            warn(
-              "Failed to load wasm from local server. See wasmLocation option docs for more info.",
-            );
-            warn(e);
-            return instantiateWasm(unpkg, info);
-          }
-        } else if (wasmLocation === "unpkg") {
-          return instantiateWasm(unpkg, info);
-        } else if (wasmLocation === "local") {
-          return instantiateWasm(local(), info);
-        } else {
-          return instantiateWasm(wasmLocation, info);
-        }
-      })().then(receiveInstance, controls.reject);
-      return {};
-    },
-  });
+  // we'll want to change how this works to avoid expected errors
+  // simplest way is to restore older revision from git, but change engine to
+  // export value of new URL('ode.wasm', import.meta.url) and use that.
+  let ode: ODENative;
+  if (!wasmLocation) {
+    try {
+      ode = await createEngineWrap();
+    } catch (e) {
+      warn(
+        "Failed to load wasm from local server. See wasmLocation option docs for more info.",
+      );
+      ode = await createEngineWrap(
+        "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm",
+      );
+    }
+  } else if (wasmLocation === "unpkg") {
+    ode = await createEngineWrap(
+      "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm",
+    );
+  } else if (wasmLocation === "local") {
+    ode = await createEngineWrap();
+  } else {
+    ode = await createEngineWrap(wasmLocation);
+  }
 
-  const ode = await Promise.race([odePromise, controls.promise]);
   const { scope, destroy: finish } = detachedScope();
 
   try {
@@ -220,11 +211,8 @@ export async function initEngine(
 }
 export type Engine = Awaited<ReturnType<typeof initEngine>>;
 
-async function instantiateWasm(path: string, info: any) {
-  const response = await fetch(path, { credentials: "same-origin" });
-  const result = await (globalThis as any).WebAssembly.instantiateStreaming(
-    response,
-    info,
-  );
-  return result.instance;
+function createEngineWrap(file?: string): Promise<ODENative> {
+  // TODO: add types for function argument to engine
+  // @ts-expect-error
+  return createEngineWasm(file ? { locateFile: () => file } : {});
 }
