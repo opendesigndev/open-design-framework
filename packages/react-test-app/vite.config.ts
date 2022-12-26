@@ -1,5 +1,8 @@
+// @ts-ignore
 import fs from "node:fs";
+// @ts-ignore
 import { createRequire } from "node:module";
+// @ts-ignore
 import path from "node:path";
 
 import react from "@vitejs/plugin-react";
