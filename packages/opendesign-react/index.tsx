@@ -72,7 +72,7 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
     c.style.inset = "0";
     c.style.margin = "0";
     c.style.padding = "0";
-    mount(editor, c);
+    return mount(editor, c);
   }, [editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");
   return <div ref={canvas} />;
