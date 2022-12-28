@@ -1,3 +1,5 @@
+import { performanceNow } from "@opendesign/env";
+
 import type { ImportedClipboardData } from "../index.js";
 import { importFromClipboardData } from "../index.js";
 import type { Editor } from "./editor.js";
@@ -31,7 +33,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   const canvas: HTMLCanvasElement = editorGetCanvas(editor);
   const engine = editorGetEngine(editor);
 
-  const { scope, destroy } = detachedScope();
+  const { scope, signal, destroy } = detachedScope();
   div.appendChild(canvas);
   scope(() => void canvas.parentElement?.removeChild(canvas));
   div.style.boxSizing = "border-box";
@@ -52,7 +54,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   const frameView = createPR1FrameView(engine.ode, scope);
   frameView.width = canvas.width;
   frameView.height = canvas.height;
-  frameView.scale = 1;
+  frameView.scale = 0; // NOTE: this forces first draw
   const renderer: Renderer = {
     handle: rendererHandle,
     frameView,
@@ -76,11 +78,57 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     console.log(parsePosition(event));
   });
 
+  let space = 0;
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key === " ") space = performanceNow();
+    },
+    { signal },
+  );
+  window.addEventListener(
+    "keyup",
+    (event) => {
+      if (event.key === " ") space = 0;
+      if (event.key === "0") {
+        offset = [0, 0];
+        scale = 1;
+        requestFrame();
+      }
+    },
+    { signal },
+  );
+
+  div.addEventListener(
+    "pointermove",
+    (event) => {
+      if (event.buttons === 4 || performanceNow() - space < 1000)
+        div.setPointerCapture(event.pointerId);
+      if (!div.hasPointerCapture(event.pointerId)) return;
+      offset[0] -= event.movementX / scale;
+      offset[1] -= event.movementY / scale;
+      requestFrame();
+    },
+    { signal },
+  );
+  div.addEventListener(
+    "pointerup",
+    (event) => void div.releasePointerCapture(event.pointerId),
+    { signal },
+  );
+
   return destroy;
 
   function draw() {
     frameRequested = false;
-    // TODO: maybe debounce, or memoize
+    if (
+      offset[0] === (renderer.frameView.offset as any)[0] &&
+      offset[1] === (renderer.frameView.offset as any)[1] &&
+      renderer.frameView.scale === scale
+    ) {
+      return;
+    }
+
     renderer.frameView.offset = offset as any;
     renderer.frameView.scale = scale;
     engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
@@ -98,6 +146,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     const scrollDelta = parseScrollDelta(event);
     if (event.ctrlKey) {
       const change = Math.pow(1.1, -scrollDelta[1] / 20);
+      if (scale * change > 5) return;
       scale *= change;
       let [x, y] = parsePosition(event);
 
@@ -105,21 +154,16 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
         x - (1 / change) * (x - offset[0]),
         y - (1 / change) * (y - offset[1]),
       ];
-      renderer.frameView.offset = offset as any;
-      renderer.frameView.scale = scale;
       requestFrame();
     } else if (event.shiftKey) {
       offset[0] += scrollDelta[1] / renderer.frameView.scale;
-      renderer.frameView.offset = offset as any;
       requestFrame();
     } else if (event.altKey) {
       offset[1] += scrollDelta[1] / renderer.frameView.scale;
-      renderer.frameView.offset = offset as any;
       requestFrame();
     } else {
       offset[0] += scrollDelta[0] / renderer.frameView.scale;
       offset[1] += scrollDelta[1] / renderer.frameView.scale;
-      renderer.frameView.offset = offset as any;
       requestFrame();
     }
   }
@@ -142,10 +186,11 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
 
   function parsePosition(event: WheelEvent | MouseEvent) {
     const scale = renderer.frameView.scale;
+
     return [
-      ((event.clientX - div.clientLeft) * window.devicePixelRatio) / scale +
+      ((event.clientX - div.offsetLeft) * window.devicePixelRatio) / scale +
         offset[0],
-      ((event.clientY - div.clientTop) * window.devicePixelRatio) / scale +
+      ((event.clientY - div.offsetTop) * window.devicePixelRatio) / scale +
         offset[1],
     ] as const;
   }
@@ -194,6 +239,7 @@ function scopedListen<Map = HTMLElementEventMap>(target: {
   addEventListener<K extends keyof Map>(
     k: K,
     listener: (event: Map[K]) => any,
+    options?: { capture?: boolean; passive?: boolean },
   ): any;
   removeEventListener<K extends keyof Map>(
     k: K,
@@ -203,7 +249,7 @@ function scopedListen<Map = HTMLElementEventMap>(target: {
   scope: (cleanup: () => void) => void,
   event: Key,
   listener: (event: Map[Key]) => void,
-  options?: { capture: boolean; passive?: boolean },
+  options?: { capture?: boolean; passive?: boolean },
 ) => void {
   return (scope, event, listener, options) => {
     target.addEventListener(event, listener, options);

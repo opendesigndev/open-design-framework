@@ -42,6 +42,7 @@ export function Import() {
         });
     },
     noClick: true,
+    noKeyboard: true,
   });
   const [params, setParams] = useSearchParams();
   if (!data) {
