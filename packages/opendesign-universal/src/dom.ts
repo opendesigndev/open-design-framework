@@ -39,6 +39,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   canvas.style.transformOrigin = "top left";
   let frameRequested = false;
   let offset: [number, number] = [0, 0];
+  let scale = 1;
 
   const rendererHandle = createPR1Renderer(
     engine.ode,
@@ -70,7 +71,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   observer.observe(div);
   scope(observer, disconnect);
 
-  scopedListen(div)(scope, "wheel", onWheel);
+  scopedListen(div)(scope, "wheel", onWheel, { passive: false });
   scopedListen(div)(scope, "click", (event) => {
     console.log(parsePosition(event));
   });
@@ -80,6 +81,8 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   function draw() {
     frameRequested = false;
     // TODO: maybe debounce, or memoize
+    renderer.frameView.offset = offset as any;
+    renderer.frameView.scale = scale;
     engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
   }
 
@@ -91,11 +94,11 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
 
   function onWheel(event: WheelEvent) {
     event.preventDefault();
+    event.stopImmediatePropagation();
     const scrollDelta = parseScrollDelta(event);
     if (event.ctrlKey) {
-      const prevScale = renderer.frameView.scale;
-      const change = Math.pow(1.1, -scrollDelta / 96);
-      const scale = prevScale * change;
+      const change = Math.pow(1.1, -scrollDelta[1] / 20);
+      scale *= change;
       let [x, y] = parsePosition(event);
 
       offset = [
@@ -106,11 +109,16 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
       renderer.frameView.scale = scale;
       requestFrame();
     } else if (event.shiftKey) {
-      offset[0] += scrollDelta / renderer.frameView.scale;
+      offset[0] += scrollDelta[1] / renderer.frameView.scale;
+      renderer.frameView.offset = offset as any;
+      requestFrame();
+    } else if (event.altKey) {
+      offset[1] += scrollDelta[1] / renderer.frameView.scale;
       renderer.frameView.offset = offset as any;
       requestFrame();
     } else {
-      offset[1] += scrollDelta / renderer.frameView.scale;
+      offset[0] += scrollDelta[0] / renderer.frameView.scale;
+      offset[1] += scrollDelta[1] / renderer.frameView.scale;
       renderer.frameView.offset = offset as any;
       requestFrame();
     }
@@ -159,10 +167,13 @@ let getScrollLineHeight = () => {
   return value;
 };
 
-function parseScrollDelta(event: WheelEvent) {
+function parseScrollDelta(event: WheelEvent): [number, number] {
   return event.deltaMode === 0
-    ? event.deltaY
-    : event.deltaY * (getScrollLineHeight() || 16);
+    ? [event.deltaX, event.deltaY]
+    : [
+        event.deltaX * (getScrollLineHeight() || 16),
+        event.deltaY * (getScrollLineHeight() || 16),
+      ];
 }
 
 /**
@@ -192,9 +203,10 @@ function scopedListen<Map = HTMLElementEventMap>(target: {
   scope: (cleanup: () => void) => void,
   event: Key,
   listener: (event: Map[Key]) => void,
+  options?: { capture: boolean; passive?: boolean },
 ) => void {
-  return (scope, event, listener) => {
-    target.addEventListener(event, listener);
+  return (scope, event, listener, options) => {
+    target.addEventListener(event, listener, options);
     scope(() => void target.removeEventListener(event, listener));
   };
 }
