@@ -23,12 +23,22 @@ export function EditorProvider(props: {
  * or you must pass in the editor object. Argument takes precedence over context.
  */
 export function useEditorContext(editorOverride?: Editor): Editor {
-  const contextValue = useContext(context);
-  const value = editorOverride || contextValue;
+  const value = useEditorContextOptional(editorOverride);
   if (!value) {
     throw new Error(
-      "You must either pass in Editor or render this in a subtree of EditorProvider or EditorCanvas"
+      "You must either pass in Editor or render this in a subtree of EditorProvider or EditorCanvas",
     );
   }
   return value;
+}
+
+/**
+ * Similar to useEditorContext, but does not throw on missing editor.
+ *
+ * @internal
+ */
+export function useEditorContextOptional(
+  editorOverride?: Editor,
+): Editor | null {
+  return useContext(context) ?? editorOverride ?? null;
 }

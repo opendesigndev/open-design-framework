@@ -146,5 +146,4 @@ export function useWaitForEditorLoaded(editorOverride?: Editor): Editor {
   return editor;
 }
 
-// TODO: we might want a different API here
-export { importFromClipboard } from "@opendesign/universal/dom";
+export { type PasteEvent, usePaste } from "./src/paste.js";

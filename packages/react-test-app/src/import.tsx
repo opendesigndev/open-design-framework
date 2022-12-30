@@ -1,8 +1,6 @@
-import {
-  EditorCanvas,
-  importFromClipboard,
-  useEditor,
-} from "@opendesign/react";
+import type { PasteEvent } from "@opendesign/react";
+import { EditorProvider } from "@opendesign/react";
+import { EditorCanvas, useEditor, usePaste } from "@opendesign/react";
 import type { ImportedClipboardData, Manifest } from "@opendesign/universal";
 import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
@@ -61,8 +59,10 @@ export function Import() {
           </div>
         )}
         <PasteButton
-          onPaste={(data) => {
-            setData({ type: "paste", data });
+          onPaste={(event) => {
+            if (typeof event.data !== "string" && event.data) {
+              setData({ type: "paste", data: event.data });
+            }
           }}
         />
       </div>
@@ -118,36 +118,13 @@ export function Import() {
   );
 }
 
-function PasteButton({
-  onPaste,
-}: {
-  onPaste: (data: ImportedClipboardData) => void;
-}) {
-  useEffect(() => {
-    window.addEventListener("paste", pasteListener as any);
-    return () => void window.removeEventListener("paste", pasteListener as any);
-    function pasteListener(event: ClipboardEvent) {
-      importFromClipboard(event).then((data) => {
-        if (data) onPaste(data);
-      });
-    }
-  });
+function PasteButton({ onPaste }: { onPaste?: (data: PasteEvent) => void }) {
+  const triggerPaste = usePaste(onPaste);
 
   // Firefox does not support reading from clipboard other than ctrl-v
-  if (!navigator.clipboard.readText)
-    return <div>You can also paste from Figma</div>;
+  if (!triggerPaste) return <div>You can also paste from Figma</div>;
 
-  return (
-    <Button
-      onClick={() => {
-        importFromClipboard().then((data) => {
-          if (data) onPaste(data);
-        });
-      }}
-    >
-      Paste from Figma
-    </Button>
-  );
+  return <Button onClick={triggerPaste}>Paste from Figma</Button>;
 }
 
 function Button({
@@ -230,28 +207,25 @@ function Content({
   });
   return (
     <>
-      <PasteButton
-        onPaste={(data) =>
-          void editor.currentPage.paste(data).then(
-            () => void console.log("Success"),
-            (err) => void console.error(err),
-          )
-        }
-      />
-      <div className="grow">
-        <Suspense>
-          <EditorCanvas editor={editor} />
-        </Suspense>
-        {data.type === "file" ? (
-          <div className="absolute top-4 right-4">
-            <Button
-              onClick={() => void saveAs(new Blob([data.data]), "file.octopus")}
-            >
-              Download .octopus
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      <EditorProvider editor={editor}>
+        <PasteButton />
+        <div className="grow">
+          <Suspense>
+            <EditorCanvas editor={editor} />
+          </Suspense>
+          {data.type === "file" ? (
+            <div className="absolute top-4 right-4">
+              <Button
+                onClick={() =>
+                  void saveAs(new Blob([data.data]), "file.octopus")
+                }
+              >
+                Download .octopus
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </EditorProvider>
     </>
   );
 }
