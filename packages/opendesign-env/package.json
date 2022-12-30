@@ -17,9 +17,6 @@
       "default": "./env.js"
     }
   },
-  "scripts": {
-    "build": "yarn run -T tsc"
-  },
   "files": [
     "env-node.js",
     "env.js",

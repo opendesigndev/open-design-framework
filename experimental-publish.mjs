@@ -30,6 +30,12 @@ if (pkgs.length < 1)
   throw new Error("You must provide a package as a first argument");
 console.log("I'll do release", version, "of:", pkgs.join(", "));
 
+// Build the project
+run(["yarn", "tsc", "-b"], {
+  stdio: ["ignore", "inherit", "inherit"],
+  cwd: dir,
+});
+
 // Modify package.json to set a version and depend on correct version
 for (const pkg of pkgs) {
   const jsonPath = path.join(dir, "packages", pkgDirs.get(pkg), "package.json");
