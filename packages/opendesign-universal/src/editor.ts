@@ -4,6 +4,7 @@ import type { Engine } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
 import { queueMicrotask } from "./internals.js";
 import { todo } from "./internals.js";
+import { performance } from "./lib.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
 import type { Node } from "./nodes/node.js";
@@ -269,7 +270,7 @@ export class EditorImplementation implements Editor {
   #startTime: number = 0;
 
   setTime(time: number) {
-    this.#startTime = env.performanceNow() - time;
+    this.#startTime = performance.now() - time;
 
     // if paused, rerender immediately
     if (!this.#raf) {
@@ -284,11 +285,11 @@ export class EditorImplementation implements Editor {
 
   play(offset?: number) {
     if (offset) {
-      this.#startTime = env.performanceNow() - offset;
+      this.#startTime = performance.now() - offset;
     } else {
       const engine = editorGetEngine(this);
       const renderer = Array.from(engine.renderers.values())[0];
-      this.#startTime = env.performanceNow() - (renderer?.time ?? 0);
+      this.#startTime = performance.now() - (renderer?.time ?? 0);
     }
     if (this.#raf) {
       return;

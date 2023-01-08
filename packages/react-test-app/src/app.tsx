@@ -10,6 +10,7 @@ import {
 
 import { Manual } from "./0-manual.js";
 import { Minimal } from "./0-minimal.js";
+import { MinimalImport } from "./0-minimal-import.js";
 import { Nested } from "./1-nested.js";
 import { RouteError } from "./error-boundary.js";
 import { Import } from "./import.js";
@@ -19,11 +20,12 @@ const router = createBrowserRouter(
     <Route path="/" errorElement={<RouteError />}>
       <Route element={<Index />} index />
       <Route element={<Minimal />} path="/minimal" />
+      <Route element={<MinimalImport />} path="/minimal-import" />
       <Route element={<Manual />} path="/manual" />
       <Route element={<Nested />} path="/nested" />
       <Route element={<Import />} path="/import" />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export function App() {
@@ -38,6 +40,7 @@ function Index() {
       <Link to="/manual">manual</Link>
       <Link to="/nested">nested</Link>
       <Link to="/import">import</Link>
+      <Link to="/minimal-import">minimal import</Link>
     </div>
   );
 }

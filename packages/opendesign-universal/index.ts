@@ -7,6 +7,7 @@ export type {
   Editor,
   EditorViewport,
 } from "./src/editor.js";
+export type { EditorEvents } from "./src/editor.js";
 export { createEditor } from "./src/editor.js";
 export type { ArtboardNode } from "./src/nodes/artboard.js";
 export type { DesignNode } from "./src/nodes/design.js";

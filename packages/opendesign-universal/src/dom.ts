@@ -1,5 +1,3 @@
-import { performanceNow } from "@opendesign/env";
-
 import type { ImportedClipboardData } from "../index.js";
 import { importFromClipboardData } from "../index.js";
 import type { Editor } from "./editor.js";
@@ -82,7 +80,7 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   window.addEventListener(
     "keydown",
     (event) => {
-      if (event.key === " ") space = performanceNow();
+      if (event.key === " ") space = performance.now();
     },
     { signal },
   );
@@ -101,8 +99,8 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
 
   div.addEventListener(
     "pointermove",
-    (event) => {
-      if (event.buttons === 4 || performanceNow() - space < 1000)
+    (event: PointerEvent) => {
+      if (event.buttons === 4 || performance.now() - space < 1000)
         div.setPointerCapture(event.pointerId);
       if (!div.hasPointerCapture(event.pointerId)) return;
       offset[0] -= event.movementX / scale;

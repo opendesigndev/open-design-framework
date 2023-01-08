@@ -1,6 +1,9 @@
 import type * as ODE from "@opendesign/engine";
 import type { ODENative } from "@opendesign/engine";
 
+import type { AbortSignal } from "../lib.js";
+import { AbortController } from "../lib.js";
+
 type Destroyer<Args extends readonly unknown[]> = (...args: Args) => unknown;
 type ScopeArgs<Args extends readonly unknown[] = unknown[]> = [
   ...Args,
@@ -30,7 +33,11 @@ export async function automaticScopeAsync<T>(
   }
 }
 
-export function detachedScope() {
+export function detachedScope(): {
+  scope: Scope;
+  signal: AbortSignal;
+  destroy: () => void;
+} {
   const finalizeables: ScopeArgs<any[]>[] = [];
   const scope: Scope = (...args) => {
     finalizeables.push(args as any);
