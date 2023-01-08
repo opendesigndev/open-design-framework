@@ -5,11 +5,14 @@
     "../opendesign-react",
     "../opendesign-universal",
     "./dom",
-    "./engine"
+    "./external/*"
   ],
   "plugin": [
     "typedoc-plugin-resolve-crossmodule-references",
     "typedoc-plugin-mdn-links"
   ],
-  "out": "dist"
+  "out": "dist",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "includes": ".."
 }

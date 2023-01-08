@@ -1,7 +1,7 @@
 {
   "name": "@opendesign/universal",
   "description": "Works in both node.js and browser.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "repository": {
     "type": "git",
@@ -14,7 +14,13 @@
     "entryPoint": "index.ts"
   },
   "dependencies": {
-    "@opendesign/engine": "0.0.0-68484ba9943d0b97d8884aa8f26708e96887e95f"
+    "@opendesign/engine": "0.0.0-c5f8a1d690a7d35540d339d6d37edf50a438c690",
+    "@opendesign/env": "workspace:*",
+    "@opendesign/manifest-ts": "^3.0.0-alpha.40",
+    "@opendesign/octopus-fig": "0.0.0-experimental-0dca17001-20221205",
+    "@opendesign/octopus-xd": "3.0.0-rc.19",
+    "buffer": "^6.0.3",
+    "fflate": "^0.7.4"
   },
   "exports": {
     ".": "./dist/index.js",
@@ -26,11 +32,5 @@
   "files": [
     "dist",
     "!dist/*.tsbuildinfo"
-  ],
-  "imports": {
-    "#env": {
-      "node": "./dist/src/env-node.js",
-      "default": "./dist/src/env-dom.js"
-    }
-  }
+  ]
 }

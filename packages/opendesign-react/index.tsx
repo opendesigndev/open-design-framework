@@ -1,14 +1,11 @@
 import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
 import { mount } from "@opendesign/universal/dom";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { todo } from "../opendesign-universal/src/internals.js";
 import { useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
-
-const loadingSet = new WeakSet<Editor>();
 
 /**
  * Creates Editor object to be used. This is the main entrypoint for react apps.
@@ -22,12 +19,9 @@ export function useEditor(options?: CreateEditorOptions | string) {
   if (error) throw error;
   const [editor] = useState(() => {
     const ed = createEditor(
-      typeof options === "object" ? options : { url: options }
+      typeof options === "object" ? options : { design: options },
     );
-    loadingSet.add(ed);
-    ed.loaded
-      .catch((loadError) => void setError(loadError))
-      .then(() => void loadingSet.delete(ed));
+    ed.loaded.catch((loadError) => void setError(loadError));
     return ed;
   });
   return editor;
@@ -66,19 +60,22 @@ export type EditorCanvasProps = {
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   const { editor, ...rest } = props;
-  if (loadingSet.has(editor)) {
+  if (editor.loading) {
     throw editor.loaded;
   }
 
   const canvas = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => mount(editor, canvas.current!), [editor]);
+  useLayoutEffect(() => {
+    const c = canvas.current!;
+    c.style.width = "100%";
+    c.style.height = "100%";
+    c.style.inset = "0";
+    c.style.margin = "0";
+    c.style.padding = "0";
+    return mount(editor, c);
+  }, [editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");
-  return (
-    <div
-      style={{ width: "100%", height: "100%", inset: 0, margin: 0, padding: 0 }}
-      ref={canvas}
-    />
-  );
+  return <div ref={canvas} />;
 }
 
 /**
@@ -106,7 +103,7 @@ export function RelativeMarker(
         children: React.ReactNode;
         x: number;
         y: number;
-      }
+      },
 ): JSX.Element {
   todo();
 }
@@ -120,3 +117,33 @@ export function useHoveredNode(editorOverride?: Editor): Node | null {
   const editor = useEditorContext(editorOverride);
   todo();
 }
+
+export function useReplaceStaticAnimation_unstable(animation: string) {
+  const editor = useEditorContext();
+  const ref = useRef("");
+  useEffect(() => {
+    if (ref.current !== animation) {
+      ref.current = animation;
+      editor.currentPage.findArtboard()?.unstable_setStaticAnimation(animation);
+    }
+  });
+}
+
+/**
+ * similar to rust's todo! macro or java's and C#'s NotImplemented Exception
+ * just throws an error
+ */
+function todo(what?: string): never {
+  throw new Error("TODO" + (what ? ": " + what : ""));
+}
+
+/**
+ * Use this function to wait until the editor is fully loaded.
+ */
+export function useWaitForEditorLoaded(editorOverride?: Editor): Editor {
+  const editor = useEditorContext(editorOverride);
+  if (editor.loading) throw editor.loaded;
+  return editor;
+}
+
+export { type PasteEvent, usePaste } from "./src/paste.js";

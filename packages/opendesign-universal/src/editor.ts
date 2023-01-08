@@ -1,30 +1,83 @@
-import { env } from "#env";
+import * as env from "@opendesign/env";
 
 import type { Engine } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
-import { createInternals, queueMicrotask } from "./internals.js";
+import { queueMicrotask } from "./internals.js";
 import { todo } from "./internals.js";
+import { performance } from "./lib.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
 import type { Node } from "./nodes/node.js";
 import type { PageNode } from "./nodes/page.js";
 import { PageNodeImpl } from "./nodes/page.js";
+import { loadFile } from "./octopus-file/load-file.js";
+import { canvasSymbol, engineSymbol } from "./symbols.js";
 
 export type CreateEditorOptions = {
   /**
-   * No URL means in-memory empty design
+   * No design means in-memory empty design
+   *
+   * - `string` - url pointing to .octopus, which will be fetched
+   * - `Uint8Array` - contents of octopus file
    */
-  url?: string;
+  design?: string | Uint8Array;
+  /**
+   * Specifies component to be loaded - if design has more components, then this
+   * limits loaded components to only this.
+   *
+   * _Currently,_ if this is not specified (or `null`), only a first component
+   * is loaded. In the future, we plan to add multi-component support and then
+   * we will load first page.
+   */
+  componentId?: string | null;
   onLoad?: (editor: Editor) => void;
+  /**
+   * Specifies where to find Engine's wasm file. Since there is no good, interoperable,
+   * cross-bundler way to load asset from an npm package, we unfortunately have to
+   * leave it up to you.
+   *
+   * There are a few ways we can load the wasm:
+   *  - locally using new URL(..., import.meta.url) pattern
+   *  - from unpkg
+   *  - from any url you specify
+   *
+   * The default behavior is to first try local, then if that fails use unpkg.
+   *
+   * If you specify this as an url, it will instead load from the url you provided.
+   * There are two more special values: local and unpkg. Specify `'local'` if you
+   * know local works and do not want us fetching from unpkg in case of a failure.
+   * Specify `'unpkg'` in case you know local does not work and want us to directly
+   * fetch from unpkg.com.
+   *
+   * Considerations if you are specifying a location directly:
+   *  - Make sure that you update the wasm file when you update engine.
+   *  - If at any point we start using multiple wasm files (for eg. code-splitting
+   *    or for importers), this option will change too. This will not be
+   *    considered a semver-major change, but we will try to issue a reasonable
+   *    error if that happens, since it will require changing the signature of
+   *    this option.
+   *  - In vite (and probably some other bundlers) you can use
+   *    `new URL('@opendesign/engine/ode.wasm', import.meta.url).href` as a value
+   *    for this option.
+   */
+  wasmLocation?: "unpkg" | "local" | string;
 };
-
-export const editorInternals = createInternals<Editor, { canvas: any }>();
 
 export type EditorViewport = {
   readonly x: number;
   readonly y: number;
   readonly width: number;
   readonly height: number;
+};
+
+export type EditorEvents = {
+  /**
+   * Mirrors [HTMLMediaElement timeupdate event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event).
+   *
+   */
+  timeupdate: { currentTime: number };
+  play: {};
+  pause: {};
 };
 
 /**
@@ -71,6 +124,47 @@ export interface Editor {
    * Resolves when editor is loaded (engine + design).
    */
   readonly loaded: Promise<void>;
+
+  /**
+   * Is false while editor is loading, true once Engine AND initial design is
+   * loaded. Does not become false later - even if editor is loading something.
+   */
+  readonly loading: boolean;
+
+  /**
+   * Sets the current time of animation.
+   *
+   * @param time
+   */
+  setTime(time: number): void;
+  /**
+   * Starts playing the animation. If offset is specified, then starts playing
+   * from it. Otherwise it continues from where it was last time.
+   *
+   * @param offset
+   */
+  play(offset?: number): void;
+  /**
+   * Stops the animation.
+   */
+  pause(): void;
+  /**
+   * Acts like a play/pause button in video players - if playing then it pauses,
+   * otherwise it start playing.
+   */
+  togglePlaying(): void;
+
+  /**
+   * Similar to addEventListener but returns function which removes the event
+   * listener.
+   *
+   * @param event
+   * @param listener
+   */
+  listen<T extends keyof EditorEvents>(
+    event: T,
+    listener: (event: EditorEvents[T]) => void,
+  ): () => void;
 }
 
 /**
@@ -88,38 +182,62 @@ export interface Editor {
  * @returns Editor
  */
 export function createEditor(options: CreateEditorOptions = {}): Editor {
-  if (options.url) todo("url is not supported yet");
-
   const editor = new EditorImplementation(options);
 
   return editor;
 }
 
-const canvasSymbol = Symbol();
-const engineSymbol = Symbol();
 /**
  * @internal
  */
-class EditorImplementation implements Editor {
+export class EditorImplementation implements Editor {
   #currentPage: null | PageNode = null;
+  #events = new Map<keyof EditorEvents, Set<(event: any) => void>>();
   [engineSymbol]: Engine | null = null;
   [canvasSymbol]: any;
 
   design = new DesignImplementation();
+  loading = true;
   loaded: Promise<void>;
 
   constructor(options: CreateEditorOptions) {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
-    this.loaded = initEngine(canvas).then((engine) => {
-      this[engineSymbol] = engine;
+    this.loaded = initEngine(canvas, options.wasmLocation).then(
+      async (engine) => {
+        if (options.design) {
+          let data: Uint8Array;
+          if (typeof options.design === "string") {
+            const response = await env.fetch(options.design, {
+              credentials: "same-origin",
+            });
+            data = new Uint8Array(await response.arrayBuffer());
+          } else {
+            data = options.design;
+          }
+          this[engineSymbol] = engine;
+          const loaded = loadFile(
+            data,
+            engine,
+            this,
+            options.componentId ?? undefined,
+          );
+          await loaded.loadImages();
+        } else {
+          this[engineSymbol] = engine;
+        }
 
-      if (options.onLoad) {
+        // Make sure that we have at least one artboard.
+        // We should remove this once multi-artboard support is implemented
+        if (!(this.currentPage as PageNodeImpl).__artboard) {
+          this.currentPage.createArtboard();
+        }
         queueMicrotask(() => {
           options.onLoad?.(this);
         });
-      }
-    });
+        this.loading = false;
+      },
+    );
   }
 
   get viewport() {
@@ -147,6 +265,93 @@ class EditorImplementation implements Editor {
   get selected() {
     return todo();
   }
+
+  #raf?: ReturnType<typeof env.requestAnimationFrame>;
+  #startTime: number = 0;
+
+  setTime(time: number) {
+    this.#startTime = performance.now() - time;
+
+    // if paused, rerender immediately
+    if (!this.#raf) {
+      const engine = editorGetEngine(this);
+      for (const renderer of engine.renderers) {
+        renderer.time = time;
+      }
+      engine.redraw();
+      this.#dispatch("timeupdate", { currentTime: time });
+    }
+  }
+
+  play(offset?: number) {
+    if (offset) {
+      this.#startTime = performance.now() - offset;
+    } else {
+      const engine = editorGetEngine(this);
+      const renderer = Array.from(engine.renderers.values())[0];
+      this.#startTime = performance.now() - (renderer?.time ?? 0);
+    }
+    if (this.#raf) {
+      return;
+    }
+    this.#dispatch("play", {});
+    this.#raf = env.requestAnimationFrame(this.#rafCallback);
+  }
+
+  #rafCallback = (currentTime: number) => {
+    this.#raf = env.requestAnimationFrame(this.#rafCallback);
+
+    const engine = editorGetEngine(this);
+    const time = currentTime - this.#startTime;
+    for (const renderer of engine.renderers) {
+      renderer.time = time;
+    }
+    this.#dispatch("timeupdate", { currentTime: time });
+    engine.redraw();
+  };
+
+  pause() {
+    if (this.#raf) {
+      // cancel further updates
+      env.cancelAnimationFrame(this.#raf);
+      this.#raf = undefined;
+      this.#dispatch("pause", {});
+    }
+  }
+
+  togglePlaying() {
+    if (this.#raf) this.pause();
+    else this.play();
+  }
+
+  #dispatch<T extends keyof EditorEvents>(type: T, data: EditorEvents[T]) {
+    const listeners = this.#events.get(type);
+    if (listeners) {
+      for (const listener of listeners.values()) {
+        listener(data);
+      }
+    }
+  }
+
+  listen<T extends keyof EditorEvents>(
+    type: T,
+    listener: (event: EditorEvents[T]) => void,
+  ): () => void {
+    // create a copy so that you can use same listener twice. IDK why you would
+    // want it, but :shrug:
+    const cb = (data: any) => void listener(data);
+    let set = this.#events.get(type);
+    if (!set) {
+      set = new Set();
+      this.#events.set(type, set);
+    }
+    set.add(cb);
+    return () => {
+      // typescript can't analyze this properly but if you read previous lines
+      // you can see that this cant be undefined
+      set!.delete(cb);
+    };
+  }
 }
 
 /**
@@ -155,13 +360,16 @@ class EditorImplementation implements Editor {
 export function editorGetCanvas(editor: Editor) {
   return (editor as EditorImplementation)[canvasSymbol];
 }
+
 /**
  * @internal
  */
 export function editorGetEngine(editor: Editor): Engine {
   const engine = (editor as EditorImplementation)[engineSymbol];
   if (!engine) {
-    throw new Error("You must wait until editor has finished loading");
+    const error = new Error("You must wait until editor has finished loading");
+    (error as any).code = "LOADING";
+    throw error;
   }
   return engine;
 }

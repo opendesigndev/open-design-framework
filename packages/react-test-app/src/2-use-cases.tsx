@@ -49,7 +49,7 @@ function SetArtboardName() {
 
 function CenterArtboardFromDesign() {
   const editor = useEditor({
-    url: "/public/design.octopus",
+    design: "/public/design.octopus",
     onLoad: ({ design }) => {
       design
         // TODO: this is inefficient. Let's add something like findArtboard
@@ -127,7 +127,7 @@ function HoveredLayerOverlay() {
 declare function saveAs(buffer: ArrayBuffer): void;
 function ExportLayerToPng() {
   const editor = useEditor({
-    url: "/public/design.octopus",
+    design: "/public/design.octopus",
   });
 
   return (
@@ -161,7 +161,7 @@ function ExportLayerToPng() {
 
 function ReadingLayers() {
   const editor = useEditor({
-    url: "/public/design.octopus",
+    design: "/public/design.octopus",
     onLoad: (editor) => {
       const { design } = editor;
       // All nodes in a design
@@ -194,7 +194,7 @@ function ReadingLayers() {
 
 function SelectingLayer() {
   const editor = useEditor({
-    url: "/public/design.octopus",
+    design: "/public/design.octopus",
     onLoad: (editor) => {
       editor.select(editor.design.findAll((n) => n.name === "this is fine")[0]);
     },

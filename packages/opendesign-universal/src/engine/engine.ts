@@ -3,11 +3,16 @@ import type {
   DesignHandle,
   DesignImageBaseHandle,
   EngineHandle,
+  ODENative,
+  PR1_AnimationRendererHandle,
+  PR1_FrameView,
   RendererContextHandle,
   StringRef,
 } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
+import { warn } from "@opendesign/env";
 
+import { engineVersion } from "../../index.js";
 import {
   automaticScope,
   createObject,
@@ -65,7 +70,7 @@ const createRendererContext = createObject(
         return ode.createRendererContext(engine, rendererContext, selector);
       }),
     ode.destroyRendererContext,
-  ]
+  ],
 );
 
 export const createPR1Renderer = createObject(
@@ -74,25 +79,25 @@ export const createPR1Renderer = createObject(
     ode,
     ctx: RendererContextHandle,
     component: ComponentHandle,
-    imageBase: DesignImageBaseHandle
+    imageBase: DesignImageBaseHandle,
   ) => [
     (renderer) => {
       return ode.pr1_createAnimationRenderer(
         ctx,
         component,
         renderer,
-        imageBase
+        imageBase,
       );
     },
     ode.pr1_destroyAnimationRenderer,
-  ]
+  ],
 );
 const createDesign = createObject(
   "DesignHandle",
   (ode, engine: EngineHandle) => [
     (design) => ode.createDesign(engine, design),
     ode.destroyDesign,
-  ]
+  ],
 );
 
 const createDesignImageBase = createObject(
@@ -101,10 +106,10 @@ const createDesignImageBase = createObject(
     (imageBase) =>
       ode.createDesignImageBase(rendererContext, design, imageBase),
     ode.destroyDesignImageBase,
-  ]
+  ],
 );
 
-const createPR1FrameView = createObject("PR1_FrameView");
+export const createPR1FrameView = createObject("PR1_FrameView");
 
 const createComponentMetadata = createObject(
   "ComponentMetadata",
@@ -114,7 +119,7 @@ const createComponentMetadata = createObject(
       metadata.id = id;
       metadata.position = [0, 0] as any;
     },
-  ]
+  ],
 );
 
 export const createComponentFromOctopus = createObject(
@@ -130,14 +135,49 @@ export const createComponentFromOctopus = createObject(
           design,
           handle,
           metadata,
-          octopusRef
+          octopusRef,
         );
       }),
-  ]
+  ],
 );
 
-export async function initEngine(canvas: any /* HTMLCanvasElement */) {
-  const ode = await createEngineWasm();
+export const createBitmapRef = createObject("BitmapRef");
+
+export type Renderer = {
+  handle: PR1_AnimationRendererHandle;
+  frameView: PR1_FrameView;
+  time: number;
+};
+
+export async function initEngine(
+  canvas: any /* HTMLCanvasElement */,
+  wasmLocation: string | undefined,
+) {
+  // we'll want to change how this works to avoid expected errors
+  // simplest way is to restore older revision from git, but change engine to
+  // export value of new URL('ode.wasm', import.meta.url) and use that.
+  let ode: ODENative;
+  if (!wasmLocation) {
+    try {
+      ode = await createEngineWrap();
+    } catch (e) {
+      warn(
+        "Failed to load wasm from local server. See wasmLocation option docs for more info.",
+      );
+      ode = await createEngineWrap(
+        "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm",
+      );
+    }
+  } else if (wasmLocation === "unpkg") {
+    ode = await createEngineWrap(
+      "https://unpkg.com/@opendesign/engine@" + engineVersion + "/ode.wasm",
+    );
+  } else if (wasmLocation === "local") {
+    ode = await createEngineWrap();
+  } else {
+    ode = await createEngineWrap(wasmLocation);
+  }
+
   const { scope, destroy: finish } = detachedScope();
 
   try {
@@ -146,10 +186,7 @@ export async function initEngine(canvas: any /* HTMLCanvasElement */) {
     const design = createDesign(ode, scope, engine);
     const imageBase = createDesignImageBase(ode, scope, rendererCtx, design);
 
-    const frameView = createPR1FrameView(ode, scope);
-    frameView.width = canvas.width;
-    frameView.height = canvas.height;
-    frameView.scale = 1;
+    const renderers = new Set<Renderer>();
 
     return {
       ode,
@@ -157,7 +194,12 @@ export async function initEngine(canvas: any /* HTMLCanvasElement */) {
       rendererContext: rendererCtx,
       design,
       designImageBase: imageBase,
-      frameView,
+      renderers,
+      redraw() {
+        for (const r of renderers) {
+          ode.pr1_animation_drawFrame(r.handle, r.frameView, r.time / 1000);
+        }
+      },
       destroy() {
         finish();
       },
@@ -168,3 +210,9 @@ export async function initEngine(canvas: any /* HTMLCanvasElement */) {
   }
 }
 export type Engine = Awaited<ReturnType<typeof initEngine>>;
+
+function createEngineWrap(file?: string): Promise<ODENative> {
+  // TODO: add types for function argument to engine
+  // @ts-expect-error
+  return createEngineWasm(file ? { locateFile: () => file } : {});
+}

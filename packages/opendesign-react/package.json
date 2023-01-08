@@ -1,7 +1,7 @@
 {
   "name": "@opendesign/react",
   "description": "React bindings for @opendesign/universal",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "repository": {
     "type": "git",
@@ -13,7 +13,10 @@
   "typedoc": {
     "entryPoint": "index.tsx"
   },
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./universal": "./dist/universal.js"
+  },
   "scripts": {
     "build": "yarn run -T tsc"
   },
@@ -28,7 +31,7 @@
     "react": "^18.1.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.21",
+    "@types/react": "^18.0.25",
     "react": "^18.2.0"
   }
 }

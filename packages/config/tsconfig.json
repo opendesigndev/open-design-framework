@@ -4,7 +4,8 @@
     "module": "Node16",
     "moduleResolution": "Node16",
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
+    // pending https://gitlab.avcd.cz/opendesign/octopus-specs/-/merge_requests/17
+    "isolatedModules": false,
     "skipLibCheck": true,
     "lib": ["ES2022"],
     "target": "ES2022",

@@ -1,8 +1,8 @@
-// @ts-expect-error
+// @ts-ignore
 import fs from "node:fs";
-// @ts-expect-error
+// @ts-ignore
 import { createRequire } from "node:module";
-// @ts-expect-error
+// @ts-ignore
 import path from "node:path";
 
 import react from "@vitejs/plugin-react";
@@ -27,14 +27,14 @@ const alias = Object.fromEntries(
   localDeps.map((k) => {
     const nox = new URL(
       `../${k.slice(1).replace("/", "-")}/index.ts`,
-      import.meta.url
+      import.meta.url,
     ).pathname;
     return [k, fs.existsSync(nox) ? nox : nox + "x"];
-  })
+  }),
 );
 
 export default defineConfig({
-  optimizeDeps: { exclude: [...localDeps, "@opendesign/engine"] },
+  optimizeDeps: { exclude: [...localDeps] },
   resolve: { alias },
   server: {
     fs: {
@@ -51,7 +51,7 @@ export default defineConfig({
         if (source.startsWith("#")) {
           const path = importer.replace(
             /(\/packages\/[^/]+)\/.*$/,
-            "$1/package.json"
+            "$1/package.json",
           );
           if (!path.endsWith("package.json")) return;
           const pkgjson = JSON.parse(fs.readFileSync(path, "utf-8"));

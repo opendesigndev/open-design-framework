@@ -8,21 +8,10 @@ export function todo(what?: string): never {
 
 export type ToDo = unknown;
 
-export function createInternals<Thing extends object, Data>() {
-  const wm = new WeakMap<Thing, Data>();
-  return {
-    get(target: Thing) {
-      const res = wm.get(target);
-      if (!res) throw new Error("Invalid input");
-      return res;
-    },
-    create(target: Thing, data: Data) {
-      wm.set(target, data);
-      return target;
-    },
-  };
-}
-
 export const queueMicrotask: (cb: () => void) => void =
   (globalThis as any).queueMicrotask ||
   ((cb) => void Promise.resolve().then(cb));
+
+export function generateUUID(): string {
+  return (globalThis as any).crypto.randomUUID();
+}

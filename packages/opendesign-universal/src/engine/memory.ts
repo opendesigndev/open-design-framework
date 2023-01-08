@@ -1,10 +1,13 @@
 import type * as ODE from "@opendesign/engine";
 import type { ODENative } from "@opendesign/engine";
 
+import type { AbortSignal } from "../lib.js";
+import { AbortController } from "../lib.js";
+
 type Destroyer<Args extends readonly unknown[]> = (...args: Args) => unknown;
 type ScopeArgs<Args extends readonly unknown[] = unknown[]> = [
   ...Args,
-  Destroyer<Args>
+  Destroyer<Args>,
 ];
 type Scope = <Args extends readonly unknown[]>(
   ...args: ScopeArgs<Args>
@@ -19,15 +22,33 @@ export function automaticScope<T>(cb: (Finalizer: Scope) => T): T {
   }
 }
 
-export function detachedScope() {
+export async function automaticScopeAsync<T>(
+  cb: (Finalizer: Scope) => Promise<T>,
+): Promise<T> {
+  const registry = detachedScope();
+  try {
+    return await cb(registry.scope);
+  } finally {
+    registry.destroy();
+  }
+}
+
+export function detachedScope(): {
+  scope: Scope;
+  signal: AbortSignal;
+  destroy: () => void;
+} {
   const finalizeables: ScopeArgs<any[]>[] = [];
   const scope: Scope = (...args) => {
     finalizeables.push(args as any);
     return args[0];
   };
+  const controller = new AbortController();
   return {
     scope,
+    signal: controller.signal,
     destroy() {
+      controller.abort();
       for (let i = finalizeables.length - 1; i >= 0; i--) {
         const args = finalizeables[i];
         const [destroyer] = args.splice(-1, 1);
@@ -56,7 +77,7 @@ function deleteStringRef(ref: ODE.StringRef) {
   const entry = stringRefMap.get(ref);
   if (!entry)
     throw new Error(
-      "Can only delete refs created with createStringRef function"
+      "Can only delete refs created with createStringRef function",
     );
   const { ode, string } = entry;
   ref.delete();
@@ -125,7 +146,7 @@ export function createStringRef(ode: ODENative, scope: Scope, text: string) {
  */
 export function createObject<
   Name extends KeysOfType<ODENative, new () => { delete(): void }>,
-  Args extends readonly any[] = []
+  Args extends readonly any[] = [],
 >(
   name: Name,
   descriptor?: (
@@ -133,8 +154,8 @@ export function createObject<
     ...args: Args
   ) => [
     init?: (handle: InstanceType<ODENative[Name]>) => void | number,
-    finish?: (handle: InstanceType<ODENative[Name]>) => void | number
-  ]
+    finish?: (handle: InstanceType<ODENative[Name]>) => void | number,
+  ],
 ) {
   /**
    * This is a function to create Engine object. Pass in loaded Engine, scope
@@ -150,7 +171,7 @@ export function createObject<
     const [init, finish] = descriptor?.(ode, ...args) ?? [];
     const handle: InstanceType<ODENative[Name]> = scope(
       new Cls(),
-      deleter
+      deleter,
     ) as any;
     check(name, init?.(handle));
     if (finish) scope(handle, (_) => check(name, finish(handle)));
