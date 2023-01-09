@@ -22,7 +22,7 @@ function fixDeps(deps) {
   if (!deps) return;
   for (const key of Object.keys(deps)) {
     if (deps[key] === "workspace:*") {
-      deps[key] = "link:../" + key.replace("@", "").replace("/", "-");
+      deps[key] = "portal:../" + key.replace("@", "").replace("/", "-");
     }
   }
 }
