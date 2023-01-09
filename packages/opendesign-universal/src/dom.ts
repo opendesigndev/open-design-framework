@@ -49,6 +49,8 @@ export function mount(
   let frameRequested = false;
   let offset: [number, number] = [0, 0];
   let scale = 1;
+  let width = 0;
+  let height = 0;
 
   const rendererHandle = createPR1Renderer(
     engine.ode,
@@ -137,11 +139,15 @@ export function mount(
     if (
       offset[0] === (renderer.frameView.offset as any)[0] &&
       offset[1] === (renderer.frameView.offset as any)[1] &&
-      renderer.frameView.scale === scale
+      renderer.frameView.scale === scale &&
+      renderer.frameView.width === width &&
+      renderer.frameView.height === height
     ) {
       return;
     }
 
+    renderer.frameView.width = width;
+    renderer.frameView.height = height;
     renderer.frameView.offset = offset as any;
     renderer.frameView.scale = scale;
     engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
@@ -192,9 +198,10 @@ export function mount(
     canvas.height = newHeight;
     canvas.style.transform = `scale(${1 / window.devicePixelRatio})`;
 
-    renderer.frameView.width = canvas.width;
-    renderer.frameView.height = canvas.height;
-    requestFrame();
+    width = canvas.width;
+    height = canvas.height;
+    // NOTE: this is explicitly not requestFrame, because that one causes flickering
+    draw();
   }
 
   function parsePosition(event: WheelEvent | MouseEvent) {
