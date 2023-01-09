@@ -58,7 +58,7 @@ export type PasteEvent = {
  * const editor = useEditorContext();
  * usePaste(event => {
  *   event.preventDefault();
- *   editor.currentPage.paste(data).then(
+ *   editor.currentPage.paste(event.data).then(
  *     () => console.log('Success'),
  *     (err) => console.error(err),
  *   );

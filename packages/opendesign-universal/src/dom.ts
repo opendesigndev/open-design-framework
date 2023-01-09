@@ -12,6 +12,21 @@ export type MountOptions = {
   disableGestures?: boolean;
 };
 
+export type MountResult = {
+  /**
+   * Unmounts the canvas from div and finalizes any resources connected to it.
+   */
+  destroy: () => void;
+
+  /**
+   * Extracts position from event and converts it to page coordinates. Useful
+   * for implementing your own click/drag/... event handlers.
+   */
+  extractEventPosition(
+    event: WheelEvent | MouseEvent | PointerEvent,
+  ): readonly [number, number];
+};
+
 /**
  * Attaches editor into provided div. Only available in DOM environments.
  *
@@ -36,7 +51,7 @@ export function mount(
   editor: Editor,
   div: HTMLDivElement,
   options?: MountOptions,
-): () => void {
+): MountResult {
   const canvas: HTMLCanvasElement = editorGetCanvas(editor);
   const engine = editorGetEngine(editor);
 
@@ -108,7 +123,7 @@ export function mount(
     div.addEventListener(
       "click",
       (event) => {
-        console.log(parsePosition(event));
+        console.log(extractEventPosition(event));
       },
       { signal },
     );
@@ -132,7 +147,7 @@ export function mount(
     );
   }
 
-  return destroy;
+  return { destroy, extractEventPosition };
 
   function draw() {
     frameRequested = false;
@@ -167,7 +182,7 @@ export function mount(
       const change = Math.pow(1.1, -scrollDelta[1] / 20);
       if (scale * change > 5) return;
       scale *= change;
-      let [x, y] = parsePosition(event);
+      let [x, y] = extractEventPosition(event);
 
       offset = [
         x - (1 / change) * (x - offset[0]),
@@ -204,7 +219,7 @@ export function mount(
     draw();
   }
 
-  function parsePosition(event: WheelEvent | MouseEvent) {
+  function extractEventPosition(event: WheelEvent | MouseEvent | PointerEvent) {
     const scale = renderer.frameView.scale;
 
     return [

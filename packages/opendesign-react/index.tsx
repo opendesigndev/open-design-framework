@@ -1,6 +1,6 @@
 import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
-import type { MountOptions } from "@opendesign/universal/dom";
+import type { MountOptions, MountResult } from "@opendesign/universal/dom";
 import { mount } from "@opendesign/universal/dom";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -28,7 +28,7 @@ export function useEditor(options?: CreateEditorOptions | string) {
   return editor;
 }
 
-export type EditorCanvasProps = {
+export interface EditorCanvasProps extends MountOptions {
   editor: Editor;
   children?: React.ReactNode;
   onNodeHover?: (event: { target: Node | null }) => void;
@@ -36,7 +36,8 @@ export type EditorCanvasProps = {
   onZoom?: (event: { zoom: number }) => void;
   onPan?: (event: {}) => void;
   onClick?: (event: { target: Node | null }) => void;
-} & MountOptions;
+  onPointerMove?: (event: { position: readonly [number, number] }) => void;
+}
 
 /**
  * React component which displays the design on canvas `<canvas>`. May suspend.
@@ -60,12 +61,13 @@ export type EditorCanvasProps = {
  * @returns
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
-  const { editor, disableGestures, ...rest } = props;
+  const { editor, disableGestures, onPointerMove, ...rest } = props;
   if (editor.loading) {
     throw editor.loaded;
   }
 
   const canvas = useRef<HTMLDivElement>(null);
+  const resultRef = useRef<MountResult | null>(null);
   useLayoutEffect(() => {
     const c = canvas.current!;
     c.style.width = "100%";
@@ -73,10 +75,26 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
     c.style.inset = "0";
     c.style.margin = "0";
     c.style.padding = "0";
-    return mount(editor, c, { disableGestures });
+    const result = mount(editor, c, { disableGestures });
+    resultRef.current = result;
+    return () => {
+      result.destroy();
+      resultRef.current = null;
+    };
   }, [disableGestures, editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");
-  return <div ref={canvas} />;
+  return (
+    <div
+      onPointerMove={(event) => {
+        const position = resultRef.current?.extractEventPosition(
+          event.nativeEvent,
+        );
+        if (!position) return;
+        onPointerMove?.({ position });
+      }}
+      ref={canvas}
+    />
+  );
 }
 
 /**

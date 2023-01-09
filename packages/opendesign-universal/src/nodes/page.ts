@@ -1,6 +1,4 @@
 import type { Engine } from "../engine/engine.js";
-import { loadImages } from "../engine/load-images.js";
-import { automaticScope, createStringRef } from "../engine/memory.js";
 import { todo } from "../internals.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { ArtboardNode } from "./artboard.js";
@@ -57,32 +55,9 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
     return this.__artboard ?? null;
   }
 
-  paste(data: ImportedClipboardData): Promise<void> {
+  paste(data: ImportedClipboardData) {
     const artboard = this.__artboard;
     if (!artboard) throw new Error("TODO: Handle missing artboard");
-    automaticScope((scope) => {
-      const octopus = JSON.parse(data._components.values().next().value);
-
-      const res = this.#engine.ode.component_addLayer(
-        artboard.__component,
-        createStringRef(this.#engine.ode, scope, artboard.__rootLayerId), // parent
-        createStringRef(this.#engine.ode, scope, ""), // before, empty means append
-        createStringRef(
-          this.#engine.ode,
-          scope,
-          JSON.stringify(octopus.content),
-        ), // octopus
-      );
-
-      if (res) throw new Error("component_addLayer failed with error " + res);
-    });
-    this.#engine.redraw();
-
-    return loadImages(
-      this.#engine,
-      Array.from(data._images.entries(), ([path, data]) => ({ path, data })),
-    ).then(() => {
-      this.#engine.redraw();
-    });
+    return artboard.paste(data);
   }
 }
