@@ -8,6 +8,9 @@ import {
   detachedScope,
 } from "../engine/memory.js";
 import { generateUUID, todo } from "../internals.js";
+import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import type { LayerNode } from "./layer.js";
+import { LayerNodeImpl } from "./layer.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
@@ -55,6 +58,18 @@ export interface ArtboardNode extends BaseNode {
    * 2) we will add more tailored APIs to read various information about the artboard
    */
   unstable_readOctopus(): string;
+
+  /**
+   * Adds data which was previously read from clipboard into the root layer of this artboard.
+   *
+   * @param data
+   */
+  paste(data: ImportedClipboardData): Promise<void>;
+
+  /**
+   * Returns node representing root layer of this artboard.
+   */
+  getRootLayer(): LayerNode;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -126,5 +141,19 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   unstable_readOctopus(): string {
     return this.#octopus;
+  }
+
+  paste(data: ImportedClipboardData): Promise<void> {
+    return this.getRootLayer().paste(data);
+  }
+
+  getRootLayer(): LayerNode {
+    // TODO: actually fetch from engine
+    return new LayerNodeImpl(
+      "GROUP",
+      this.__component,
+      this.__rootLayerId,
+      this.#engine,
+    );
   }
 }
