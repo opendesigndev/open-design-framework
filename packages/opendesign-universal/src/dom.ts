@@ -8,6 +8,10 @@ import { createPR1FrameView, createPR1Renderer } from "./engine/engine.js";
 import { detachedScope } from "./engine/memory.js";
 import type { PageNodeImpl } from "./nodes/page.js";
 
+export type MountOptions = {
+  disableGestures?: boolean;
+};
+
 /**
  * Attaches editor into provided div. Only available in DOM environments.
  *
@@ -25,9 +29,14 @@ import type { PageNodeImpl } from "./nodes/page.js";
  *
  * @param editor
  * @param div
+ * @param options
  * @returns
  */
-export function mount(editor: Editor, div: HTMLDivElement): () => void {
+export function mount(
+  editor: Editor,
+  div: HTMLDivElement,
+  options?: MountOptions,
+): () => void {
   const canvas: HTMLCanvasElement = editorGetCanvas(editor);
   const engine = editorGetEngine(editor);
 
@@ -40,6 +49,8 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   let frameRequested = false;
   let offset: [number, number] = [0, 0];
   let scale = 1;
+  let width = 0;
+  let height = 0;
 
   const rendererHandle = createPR1Renderer(
     engine.ode,
@@ -65,16 +76,11 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
   onResize();
 
   // Resize gets fired on zoom, which changes devicePixelRatio
-  scopedListen<WindowEventMap>(window)(scope, "resize", onResize);
+  window.addEventListener("resize", onResize, { signal });
   // This will get called any other time
   const observer = new ResizeObserver(onResize);
   observer.observe(div);
   scope(observer, disconnect);
-
-  scopedListen(div)(scope, "wheel", onWheel, { passive: false });
-  scopedListen(div)(scope, "click", (event) => {
-    console.log(parsePosition(event));
-  });
 
   let space = 0;
   window.addEventListener(
@@ -97,23 +103,34 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     { signal },
   );
 
-  div.addEventListener(
-    "pointermove",
-    (event: PointerEvent) => {
-      if (event.buttons === 4 || performance.now() - space < 1000)
-        div.setPointerCapture(event.pointerId);
-      if (!div.hasPointerCapture(event.pointerId)) return;
-      offset[0] -= event.movementX / scale;
-      offset[1] -= event.movementY / scale;
-      requestFrame();
-    },
-    { signal },
-  );
-  div.addEventListener(
-    "pointerup",
-    (event) => void div.releasePointerCapture(event.pointerId),
-    { signal },
-  );
+  if (!options?.disableGestures) {
+    div.addEventListener("wheel", onWheel, { passive: false, signal });
+    div.addEventListener(
+      "click",
+      (event) => {
+        console.log(parsePosition(event));
+      },
+      { signal },
+    );
+
+    div.addEventListener(
+      "pointermove",
+      (event: PointerEvent) => {
+        if (event.buttons === 4 || performance.now() - space < 1000)
+          div.setPointerCapture(event.pointerId);
+        if (!div.hasPointerCapture(event.pointerId)) return;
+        offset[0] -= event.movementX / scale;
+        offset[1] -= event.movementY / scale;
+        requestFrame();
+      },
+      { signal },
+    );
+    div.addEventListener(
+      "pointerup",
+      (event) => void div.releasePointerCapture(event.pointerId),
+      { signal },
+    );
+  }
 
   return destroy;
 
@@ -122,11 +139,15 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     if (
       offset[0] === (renderer.frameView.offset as any)[0] &&
       offset[1] === (renderer.frameView.offset as any)[1] &&
-      renderer.frameView.scale === scale
+      renderer.frameView.scale === scale &&
+      renderer.frameView.width === width &&
+      renderer.frameView.height === height
     ) {
       return;
     }
 
+    renderer.frameView.width = width;
+    renderer.frameView.height = height;
     renderer.frameView.offset = offset as any;
     renderer.frameView.scale = scale;
     engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
@@ -177,9 +198,10 @@ export function mount(editor: Editor, div: HTMLDivElement): () => void {
     canvas.height = newHeight;
     canvas.style.transform = `scale(${1 / window.devicePixelRatio})`;
 
-    renderer.frameView.width = canvas.width;
-    renderer.frameView.height = canvas.height;
-    requestFrame();
+    width = canvas.width;
+    height = canvas.height;
+    // NOTE: this is explicitly not requestFrame, because that one causes flickering
+    draw();
   }
 
   function parsePosition(event: WheelEvent | MouseEvent) {
@@ -217,42 +239,6 @@ function parseScrollDelta(event: WheelEvent): [number, number] {
         event.deltaX * (getScrollLineHeight() || 16),
         event.deltaY * (getScrollLineHeight() || 16),
       ];
-}
-
-/**
- * type-safe add/remove event listener integration with scope abstraction.
- *
- * ```ts
- * // example:
- * scopedListen(div)(scope, "wheel", onWheel);
- * // which is equivalent to
- * div.addEventListener("wheel", onWheel)
- * scope(() => void div.removeEventListener("wheel", onWheel))
- *
- * // if target is not HTMLElement then you have to specify EventMap
- * scopedListen<WindowEventMap>(window)(scope, "resize", (event) => { /*...*\/ });
- * ```
- */
-function scopedListen<Map = HTMLElementEventMap>(target: {
-  addEventListener<K extends keyof Map>(
-    k: K,
-    listener: (event: Map[K]) => any,
-    options?: { capture?: boolean; passive?: boolean },
-  ): any;
-  removeEventListener<K extends keyof Map>(
-    k: K,
-    listener: (event: Map[K]) => any,
-  ): any;
-}): <Key extends keyof Map>(
-  scope: (cleanup: () => void) => void,
-  event: Key,
-  listener: (event: Map[Key]) => void,
-  options?: { capture?: boolean; passive?: boolean },
-) => void {
-  return (scope, event, listener, options) => {
-    target.addEventListener(event, listener, options);
-    scope(() => void target.removeEventListener(event, listener));
-  };
 }
 
 /**
