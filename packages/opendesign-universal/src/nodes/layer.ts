@@ -43,16 +43,15 @@ export class LayerNodeImpl extends BaseNodeImpl {
     this.#engine = engine;
   }
 
-  paste(data: ImportedClipboardData): Promise<void> {
+  async paste(data: ImportedClipboardData): Promise<void> {
     const octopus = JSON.parse(data._components.values().next().value);
     this.createLayer(octopus.content);
 
-    return loadImages(
+    await loadImages(
       this.#engine,
       Array.from(data._images.entries(), ([path, data]) => ({ path, data })),
-    ).then(() => {
-      this.#engine.redraw();
-    });
+    );
+    this.#engine.redraw();
   }
 
   createLayer(octopus: Octopus["Layer"]) {
