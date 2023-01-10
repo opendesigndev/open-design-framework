@@ -1,7 +1,11 @@
 import type { PasteEvent } from "@opendesign/react";
 import { EditorProvider } from "@opendesign/react";
 import { EditorCanvas, useEditor, usePaste } from "@opendesign/react";
-import type { ImportedClipboardData, Manifest } from "@opendesign/universal";
+import type {
+  Editor,
+  ImportedClipboardData,
+  Manifest,
+} from "@opendesign/universal";
 import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
@@ -182,6 +186,21 @@ function ComponentSelect({
   );
 }
 
+function performPaste(
+  editor: Editor,
+  data: ImportedClipboardData | string | null,
+) {
+  if (data && typeof data !== "string") {
+    editor.currentPage.paste(data).then(
+      () => console.log("success"),
+      (error) => {
+        console.error(error);
+        alert(error);
+      },
+    );
+  }
+}
+
 function Content({
   data,
   componentId,
@@ -197,10 +216,7 @@ function Content({
     onLoad(editor) {
       setTimeout(() => {
         if (data.type === "paste") {
-          editor.currentPage.paste(data.data).then(
-            () => void console.log("Success"),
-            (err) => void console.error(err),
-          );
+          performPaste(editor, data.data);
         }
       }, 100);
     },
@@ -208,7 +224,12 @@ function Content({
   return (
     <>
       <EditorProvider editor={editor}>
-        <PasteButton />
+        <PasteButton
+          onPaste={(evt) => {
+            evt.preventDefault();
+            performPaste(editor, evt.data);
+          }}
+        />
         <div className="grow">
           <Suspense>
             <EditorCanvas editor={editor} />
