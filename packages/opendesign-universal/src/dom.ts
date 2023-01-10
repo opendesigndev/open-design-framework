@@ -134,8 +134,8 @@ export function mount(
         if (event.buttons === 4 || performance.now() - space < 1000)
           div.setPointerCapture(event.pointerId);
         if (!div.hasPointerCapture(event.pointerId)) return;
-        offset[0] -= event.movementX / scale;
-        offset[1] -= event.movementY / scale;
+        offset[0] -= (event.movementX / scale) * window.devicePixelRatio;
+        offset[1] -= (event.movementY / scale) * window.devicePixelRatio;
         requestFrame();
       },
       { signal },
@@ -190,14 +190,14 @@ export function mount(
       ];
       requestFrame();
     } else if (event.shiftKey) {
-      offset[0] += scrollDelta[1] / renderer.frameView.scale;
+      offset[0] += (scrollDelta[1] || scrollDelta[0]) / scale;
       requestFrame();
     } else if (event.altKey) {
-      offset[1] += scrollDelta[1] / renderer.frameView.scale;
+      offset[1] += scrollDelta[1] / scale;
       requestFrame();
     } else {
-      offset[0] += scrollDelta[0] / renderer.frameView.scale;
-      offset[1] += scrollDelta[1] / renderer.frameView.scale;
+      offset[0] += scrollDelta[0] / scale;
+      offset[1] += scrollDelta[1] / scale;
       requestFrame();
     }
   }
