@@ -2080,9 +2080,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@opendesign/figma-parser@npm:0.0.0-experimental-74372cb19-20230112":
-  version: 0.0.0-experimental-74372cb19-20230112
-  resolution: "@opendesign/figma-parser@npm:0.0.0-experimental-74372cb19-20230112"
+"@opendesign/figma-parser@npm:3.0.0-rc.15":
+  version: 3.0.0-rc.15
+  resolution: "@opendesign/figma-parser@npm:3.0.0-rc.15"
   dependencies:
     "@types/lodash": ^4.14.178
     "@types/pino": ^6.3.3
@@ -2095,7 +2095,7 @@ __metadata:
     pino: ^6.7.0
     pino-pretty: ^4.3.0
     uuid: ^8.3.2
-  checksum: aca1e1408c68373c77a3e88028148e3cb8e28c21f96fa3d2a6542c27a0cc29d05f8155a5970d633de095b0d1e6b0d9b9edabdcd552ab17c0258b6a447e571bfe
+  checksum: 3318851988b72271ba3f54aaaa2d235bb798031ece943562f9a44bd2b451d462f82e8eee259e7e923414b71f53964bf4beabc49e78f03cc071307cbbb1f1b03f
   languageName: node
   linkType: hard
 
@@ -2127,13 +2127,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/octopus-fig@npm:0.0.0-experimental-74372cb19-20230112":
-  version: 0.0.0-experimental-74372cb19-20230112
-  resolution: "@opendesign/octopus-fig@npm:0.0.0-experimental-74372cb19-20230112"
+"@opendesign/octopus-common@npm:3.0.0-rc.27":
+  version: 3.0.0-rc.27
+  resolution: "@opendesign/octopus-common@npm:3.0.0-rc.27"
   dependencies:
-    "@opendesign/figma-parser": 0.0.0-experimental-74372cb19-20230112
+    "@opendesign/octopus-ts": 3.0.0-alpha.38
+    "@types/lodash": ^4.14.178
+    "@types/uuid": ^8.3.1
+    crc-32: ^1.2.2
+    lodash: ^4.17.21
+    uuid: ^8.3.2
+  checksum: fcbf2f8bea42cc4c7706ef2817184caad08189a1eab959879cd83348a32f7aec614c9bb172658a4f2a28f2499a5164d8880da55bdfbb28518e47fb62912af32c
+  languageName: node
+  linkType: hard
+
+"@opendesign/octopus-fig@npm:3.0.0-rc.23":
+  version: 3.0.0-rc.23
+  resolution: "@opendesign/octopus-fig@npm:3.0.0-rc.23"
+  dependencies:
+    "@opendesign/figma-parser": 3.0.0-rc.15
     "@opendesign/manifest-ts": 3.0.0-alpha.40
-    "@opendesign/octopus-common": 0.0.0-experimental-74372cb19-20230112
+    "@opendesign/octopus-common": 3.0.0-rc.27
     "@opendesign/octopus-ts": 3.0.0-alpha.40
     "@types/lodash": ^4.14.178
     "@types/pino": ^6.3.3
@@ -2146,7 +2160,7 @@ __metadata:
     pino: ^6.7.0
     pino-pretty: ^4.3.0
     uuid: ^8.3.2
-  checksum: 1fdc52aece56cfca5fba19e8e3603ed65b1c1809755ae00321a590068333fbca3d3102bef994c1101f7d6c30e2e413acefb683cb5becf716230cd3ba8052eaf8
+  checksum: ad536600dda97d0d0868a520b41c276c71cc2d56469798d0ed194262f685f863ff2b79a8dac6c3cb308209ca9583de30521416e9009a340e1309bd5d52dd1a55
   languageName: node
   linkType: hard
 
@@ -2207,7 +2221,7 @@ __metadata:
     "@opendesign/engine": 0.0.0-c5f8a1d690a7d35540d339d6d37edf50a438c690
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.0-alpha.40
-    "@opendesign/octopus-fig": 0.0.0-experimental-74372cb19-20230112
+    "@opendesign/octopus-fig": 3.0.0-rc.23
     "@opendesign/octopus-xd": 0.0.0-experimental-74372cb19-20230112
     buffer: ^6.0.3
     fflate: ^0.7.4
