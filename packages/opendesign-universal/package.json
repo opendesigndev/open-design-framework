@@ -1,7 +1,7 @@
 {
   "name": "@opendesign/universal",
   "description": "Works in both node.js and browser.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "repository": {
     "type": "git",
@@ -32,5 +32,8 @@
   "files": [
     "dist",
     "!dist/*.tsbuildinfo"
-  ]
+  ],
+  "publishConfig": {
+    "directory": "_release/package"
+  }
 }

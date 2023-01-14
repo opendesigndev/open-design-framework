@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "eslint": "eslint --cache",
-    "release": "tsc -b tsconfig-published.json && yarn workspaces foreach --no-private --from '@opendesign/*' npm publish --tolerate-republish --access public && yarn changeset tag"
+    "foreachpublic": "yarn workspaces foreach --no-private --from '@opendesign/*'",
+    "release": "tsc -b tsconfig-published.json && yarn foreachpublic exec \"rm -rf _release && yarn pack && mkdir _release && tar zxvf package.tgz --directory _release && rm package.tgz\" && changeset publish"
   },
   "devDependencies": {
     "eslint": "^8.28.0",

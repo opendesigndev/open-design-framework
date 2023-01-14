@@ -1,5 +1,11 @@
 # @opendesign/env
 
+## 0.1.1
+
+### Patch Changes
+
+- fix the release process
+
 ## 0.1.0
 
 ### Minor Changes

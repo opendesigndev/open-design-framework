@@ -1,5 +1,13 @@
 # @opendesign/universal
 
+## 0.2.2
+
+### Patch Changes
+
+- fix the release process
+- Updated dependencies
+  - @opendesign/env@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes
