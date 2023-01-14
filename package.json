@@ -11,7 +11,8 @@
     "packages/*"
   ],
   "scripts": {
-    "eslint": "eslint --cache"
+    "eslint": "eslint --cache",
+    "release": "tsc -b tsconfig-published.json && yarn changeset publish"
   },
   "devDependencies": {
     "eslint": "^8.28.0",

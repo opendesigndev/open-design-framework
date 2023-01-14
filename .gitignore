@@ -34,7 +34,8 @@ node_modules
 
 # Yarn 3
 .yarn/*
-!.yarn/cache
+# we use global cache and this is only populated in CI
+.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases

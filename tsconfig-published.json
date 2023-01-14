@@ -1,0 +1,7 @@
+{
+  "references": [
+    { "path": "packages/opendesign-react/tsconfig.json" },
+    { "path": "packages/opendesign-universal/tsconfig.dom.json" }
+  ],
+  "include": []
+}

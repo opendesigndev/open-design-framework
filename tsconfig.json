@@ -1,7 +1,7 @@
 {
   "references": [
     { "path": "packages/react-test-app" },
-    { "path": "packages/opendesign-universal/tsconfig.dom.json" },
+    { "path": "tsconfig-published.json" },
     { "path": "packages/docs/dom" },
     { "path": "packages/docs/external/engine" }
   ],
