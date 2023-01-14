@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "eslint": "eslint --cache",
-    "release": "tsc -b tsconfig-published.json && yarn changeset publish"
+    "release": "tsc -b tsconfig-published.json && yarn workspaces foreach --no-private --from '@org/*' npm publish --access public && yarn changeset tag"
   },
   "devDependencies": {
     "eslint": "^8.28.0",
