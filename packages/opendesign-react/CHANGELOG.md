@@ -1,5 +1,30 @@
 # @opendesign/react
 
+## 0.2.0
+
+### Minor Changes
+
+- 86cca2a: add option to disable gestures on canvas
+- dd7b75a: Added various features allowing to implement paste at cursor.
+
+  - added onPointerMove event on EditorCanvas component
+  - fixed example in usePaste documentation
+  - universal/dom: added extractEventPosition to return value
+  - added paste method to ArtboardNode
+  - added paste methods to LayerNode
+  - added getRootLayer method to ArtboardNode
+  - added createLayer method to LayerNode taking octopus
+  - the above allows you to customize paste including creating intermediary layer
+    with required offset.
+
+### Patch Changes
+
+- f1ed2f4: fix content disappearing on canvas resize
+- Updated dependencies [f1ed2f4]
+- Updated dependencies [86cca2a]
+- Updated dependencies [dd7b75a]
+  - @opendesign/universal@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
