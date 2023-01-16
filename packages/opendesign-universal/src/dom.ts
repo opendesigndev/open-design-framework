@@ -264,7 +264,7 @@ function parseScrollDelta(event: WheelEvent): [number, number] {
  */
 export function importFromClipboard(
   input?: ClipboardEvent | string,
-): Promise<ImportedClipboardData | null> {
+): Promise<ImportedClipboardData | string | null> {
   // NOTE: do not convert this to async function due to differences in user activation criteria
   const dataMaybePromise =
     typeof input === "string"
