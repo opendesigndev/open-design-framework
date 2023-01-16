@@ -81,7 +81,7 @@ export function usePaste(
 
   const handlePaste = useCallback(
     (
-      data: ImportedClipboardData | null,
+      data: ImportedClipboardData | string | null,
       event: ClipboardEvent | null = null,
     ) => {
       if (data) {
@@ -92,7 +92,7 @@ export function usePaste(
           preventDefault,
         };
         onPaste?.(pasteEvent);
-        if (!pasteEvent.defaultPrevented) {
+        if (!pasteEvent.defaultPrevented && typeof data !== "string") {
           editor?.currentPage
             .paste(data)
             .catch((err) => void console.error(err));
@@ -106,7 +106,9 @@ export function usePaste(
     window.addEventListener("paste", pasteListener as any);
     return () => void window.removeEventListener("paste", pasteListener as any);
     function pasteListener(event: ClipboardEvent) {
-      importFromClipboard(event).then((data) => handlePaste(data, event));
+      importFromClipboard(event)
+        .then((data) => handlePaste(data, event))
+        .catch((error) => void console.error(error));
     }
   });
   if (!!navigator.clipboard.readText) {
