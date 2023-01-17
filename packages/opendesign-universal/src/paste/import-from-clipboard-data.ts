@@ -17,17 +17,17 @@ export type ImportedClipboardData = {
  */
 export async function importFromClipboardData(
   data: string | undefined,
-): Promise<ImportedClipboardData | string | null> {
+): Promise<ImportedClipboardData | null> {
   if (!data) return null;
   const parsedData = tryJsonParse(data);
-  if (!parsedData) return data;
+  if (!parsedData) return null;
   if (parsedData.type === "ARTBOARD") {
     return {
       _components: new Map([["octopus.json", data]]),
       _images: new Map(),
     };
   }
-  if (parsedData.type !== "OPEN_DESIGN_FIGMA_PLUGIN_SOURCE") return data;
+  if (parsedData.type !== "OPEN_DESIGN_FIGMA_PLUGIN_SOURCE") return null;
   const reader = new SourcePluginReader(parsedData);
   const converter = createConverter();
   const exporter = new MemoryExporter();

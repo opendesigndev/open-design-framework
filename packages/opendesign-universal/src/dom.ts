@@ -273,5 +273,7 @@ export function importFromClipboard(
       ? input.clipboardData?.getData("text/plain")
       : navigator.clipboard.readText();
 
-  return Promise.resolve(dataMaybePromise).then(importFromClipboardData);
+  return Promise.resolve(dataMaybePromise).then((data) =>
+    importFromClipboardData(data).then((imported) => imported ?? data ?? null),
+  );
 }
