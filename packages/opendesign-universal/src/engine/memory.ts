@@ -195,7 +195,7 @@ function check(type: string, v: unknown) {
   }
 }
 
-export type KeysOfType<T, U, B = false> = {
+type KeysOfType<T, U, B = false> = {
   [P in keyof T]: B extends true
     ? T[P] extends U
       ? U extends T[P]
