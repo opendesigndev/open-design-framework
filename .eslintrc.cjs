@@ -1,6 +1,6 @@
 module.exports = {
   extends: ["react-app", "prettier"],
-  plugins: ["simple-import-sort"],
+  plugins: ["simple-import-sort", "prettier"],
   parserOptions: {
     project: [
       "./tsconfig.json",
@@ -10,6 +10,7 @@ module.exports = {
     ],
   },
   rules: {
+    "prettier/prettier": "error",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       { prefer: "type-imports" },
@@ -19,6 +20,6 @@ module.exports = {
     "simple-import-sort/exports": "error",
     "no-loop-func": 0,
   },
-  ignorePatterns: ["packages/*/dist/**/*"],
+  ignorePatterns: ["packages/**/dist/**/*", "**/*.js", "**/*.d.ts"],
   root: true,
 };

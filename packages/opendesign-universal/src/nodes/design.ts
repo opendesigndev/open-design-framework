@@ -35,7 +35,7 @@ export class DesignImplementation extends BaseNodeImpl implements DesignNode {
   }
 
   findArtboard(
-    filter?: NodeFilter<ArtboardNode> | undefined
+    filter?: NodeFilter<ArtboardNode> | undefined,
   ): ArtboardNode | null {
     todo();
   }

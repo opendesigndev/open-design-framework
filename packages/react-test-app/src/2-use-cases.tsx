@@ -142,7 +142,7 @@ function ExportLayerToPng() {
                 // lib: https://www.npmjs.com/package/file-saver
                 // import { saveAs } from 'file-saver'
                 saveAs(buffer);
-              } // error handle omitted
+              }, // error handle omitted
             );
           // I considered return ArrayBuffer instead of Blob, but file-saver
           // takes blob. You can always convert Blob to AB by calling .arrayBuffer()
@@ -169,7 +169,7 @@ function ReadingLayers() {
 
       // layers (not pages nor artboards)
       layers = design.findAll(
-        (node) => node.type !== "PAGE" && node.type !== "ARTBOARD"
+        (node) => node.type !== "PAGE" && node.type !== "ARTBOARD",
       );
 
       // All layers in active page

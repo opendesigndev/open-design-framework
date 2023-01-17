@@ -91,26 +91,26 @@ export class MemoryFileExporter {
 
   exportArtboard(
     _: SourceArtboard,
-    artboard: ArtboardConversionResult
+    artboard: ArtboardConversionResult,
   ): Promise<string | null> {
     if (!artboard.value) return Promise.resolve(null);
     return this._save(
       `octopus-${artboard.id}.json`,
-      this._stringify(artboard.value)
+      this._stringify(artboard.value),
     );
   }
 
   exportImage(name: string, data: Uint8Array): Promise<string> {
     return this._save(
       MemoryFileExporter.IMAGES_DIR_NAME + "/" + name.split("/").slice(-1)[0],
-      data
+      data,
     );
   }
 
   async exportManifest(manifest: DesignConversionResult): Promise<string> {
     return this._save(
       MemoryFileExporter.OCTOPUS_MANIFEST_NAME,
-      this._stringify(manifest.manifest)
+      this._stringify(manifest.manifest),
     );
   }
 }
