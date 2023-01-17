@@ -184,7 +184,7 @@ export function throwOnParseError(
       error = new Error(
         `${code} - ${decoded} (${type.value}) at position ${lines.length}:${
           lines.slice(-1)[0].length + 1
-        } (${position})`,
+        } (byte ${position} out of ${source.length})`,
       );
       (error as any).position = position;
       (error as any).parseError = decoded;

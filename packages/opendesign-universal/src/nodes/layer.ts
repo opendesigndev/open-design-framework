@@ -59,7 +59,7 @@ export class LayerNodeImpl extends BaseNodeImpl {
   createLayer(octopus: Octopus["Layer"]) {
     automaticScope((scope) => {
       const parseError = createParseError(this.#engine.ode, scope);
-      const octopusString = JSON.stringify(octopus);
+      const octopusString = JSON.stringify(cleanupOctopus(octopus));
       const res = this.#engine.ode.component_addLayer(
         this.#component,
         createStringRef(this.#engine.ode, scope, this.#id), // parent
@@ -77,4 +77,34 @@ export class LayerNodeImpl extends BaseNodeImpl {
       this.#engine,
     );
   }
+}
+
+function cleanupOctopus<T>(json: T): T {
+  if (Array.isArray(json)) {
+    let changed = false;
+    let cleaned: any = json.map((l) => {
+      const res = cleanupOctopus(l);
+      if (l !== res) changed = true;
+      return res;
+    });
+    if (!changed) return json;
+    return cleaned;
+  }
+  if (json && typeof json === "object") {
+    let changed = false;
+    const obj = Object.fromEntries(
+      Object.entries(json).map(([k, v]) => {
+        const inner = cleanupOctopus(v);
+        if (k === "meta") {
+          changed = true;
+          return [k, undefined];
+        }
+        if (inner !== v) changed = true;
+        return [k, inner];
+      }),
+    );
+    if (changed) return obj as any;
+    return json;
+  }
+  return json;
 }
