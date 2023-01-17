@@ -35,7 +35,7 @@ export class MemoryExporter {
   }
 
   async exportComponent(
-    artboard: ComponentConversionResult
+    artboard: ComponentConversionResult,
   ): Promise<string | null> {
     if (!artboard.value) return Promise.resolve(null);
     const filename = `octopus-${artboard.id}.json`;
@@ -50,7 +50,7 @@ export class MemoryExporter {
   }
 
   async exportManifest(
-    manifest: Manifest["schemas"]["OctopusManifest"]
+    manifest: Manifest["schemas"]["OctopusManifest"],
   ): Promise<void> {
     this._manifest = manifest;
   }

@@ -7,7 +7,7 @@ export type Node = LayerNode | ArtboardNode | PageNode;
 
 export type NodeFilter<T extends BaseNode = Node> = (
   node: T,
-  reserved: unknown
+  reserved: unknown,
 ) => boolean;
 
 export interface BaseNode {
