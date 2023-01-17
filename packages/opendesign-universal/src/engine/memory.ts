@@ -182,9 +182,20 @@ export function createObject<
 function check(type: string, v: unknown) {
   if (typeof v === "number" && v !== 0)
     throw new Error("ODE call for object " + type + " failed with code " + v);
+  if (
+    typeof v === "object" &&
+    v &&
+    "value" in v &&
+    typeof v.value === "number" &&
+    v.value !== 0
+  ) {
+    throw new Error(
+      "ODE call for object " + type + " failed with code " + v.value,
+    );
+  }
 }
 
-type KeysOfType<T, U, B = false> = {
+export type KeysOfType<T, U, B = false> = {
   [P in keyof T]: B extends true
     ? T[P] extends U
       ? U extends T[P]
