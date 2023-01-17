@@ -125,25 +125,21 @@ const createComponentMetadata = createObject(
   ],
 );
 
-function createEnumDecoder<EnumName extends "Result" | "ParseError_Type", Enum>(
-  enumName: EnumName,
-) {
+function createEnumDecoder<Enum>(enumName: string) {
   let decoder: undefined | Map<Enum, keyof Enum> = undefined;
   return function decodeResult(ode: ODENative, code: Enum) {
     if (!decoder) {
       decoder = new Map();
-      for (const [k, v] of Object.entries(ode[enumName]))
+      for (const [k, v] of Object.entries((ode as any)[enumName]))
         (decoder as any).set(v, k);
     }
     return decoder.get(code) ?? "UNKNOWN_" + ((code as any).value as number);
   };
 }
 
-const decodeResult = createEnumDecoder<"Result", Result>("Result");
-const decodeParseErrorType = createEnumDecoder<
-  "ParseError_Type",
-  ParseError_Type
->("ParseError_Type");
+const decodeResult = createEnumDecoder<Result>("Result");
+const decodeParseErrorType =
+  createEnumDecoder<ParseError_Type>("ParseError_Type");
 
 export const createComponentFromOctopus = createObject(
   "ComponentHandle",
