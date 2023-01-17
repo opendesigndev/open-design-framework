@@ -1,12 +1,9 @@
-import * as env from "@opendesign/env";
 import type { Manifest as ManifestTs } from "@opendesign/manifest-ts";
 import * as fflate from "fflate";
 
 import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
-import { createBitmapRef } from "../engine/engine.js";
 import { loadImages } from "../engine/load-images.js";
-import { automaticScope, createStringRef } from "../engine/memory.js";
 import { ArtboardNodeImpl } from "../nodes/artboard.js";
 import type { PageNodeImpl } from "../nodes/page.js";
 import { isOptimizedOctopusFile } from "./detect.js";

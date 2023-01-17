@@ -1,6 +1,8 @@
 import type { ComponentHandle } from "@opendesign/engine";
 
 import type { Engine } from "../engine/engine.js";
+import { throwOnParseError } from "../engine/engine.js";
+import { createParseError } from "../engine/engine.js";
 import { createComponentFromOctopus } from "../engine/engine.js";
 import {
   automaticScope,
@@ -135,7 +137,13 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   unstable_setStaticAnimation(animation: string) {
     automaticScope((scope) => {
       const ref = createStringRef(this.#engine.ode, scope, animation);
-      this.#engine.ode.pr1_component_loadAnimation(this.__component, ref);
+      const parseError = createParseError(this.#engine.ode, scope);
+      const res = this.#engine.ode.pr1_component_loadAnimation(
+        this.__component,
+        ref,
+        parseError,
+      );
+      throwOnParseError(this.#engine.ode, res, parseError, animation);
     });
   }
 
