@@ -214,11 +214,9 @@ function Content({
     design: data.type === "file" ? data.data : undefined,
     componentId,
     onLoad(editor) {
-      setTimeout(() => {
-        if (data.type === "paste") {
-          performPaste(editor, data.data);
-        }
-      }, 100);
+      if (data.type === "paste") {
+        performPaste(editor, data.data);
+      }
     },
   });
   return (

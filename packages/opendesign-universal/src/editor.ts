@@ -227,14 +227,13 @@ export class EditorImplementation implements Editor {
           this[engineSymbol] = engine;
         }
 
+        options.onLoad?.(this);
+
         // Make sure that we have at least one artboard.
         // We should remove this once multi-artboard support is implemented
         if (!(this.currentPage as PageNodeImpl).__artboard) {
           this.currentPage.createArtboard();
         }
-        queueMicrotask(() => {
-          options.onLoad?.(this);
-        });
         this.loading = false;
       },
     );
