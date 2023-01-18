@@ -2141,9 +2141,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/octopus-fig@npm:3.0.0-rc.23":
-  version: 3.0.0-rc.23
-  resolution: "@opendesign/octopus-fig@npm:3.0.0-rc.23"
+"@opendesign/octopus-fig@npm:3.0.0-rc.24":
+  version: 3.0.0-rc.24
+  resolution: "@opendesign/octopus-fig@npm:3.0.0-rc.24"
   dependencies:
     "@opendesign/figma-parser": 3.0.0-rc.15
     "@opendesign/manifest-ts": 3.0.0-alpha.40
@@ -2160,7 +2160,7 @@ __metadata:
     pino: ^6.7.0
     pino-pretty: ^4.3.0
     uuid: ^8.3.2
-  checksum: ad536600dda97d0d0868a520b41c276c71cc2d56469798d0ed194262f685f863ff2b79a8dac6c3cb308209ca9583de30521416e9009a340e1309bd5d52dd1a55
+  checksum: 2156cd85aa62e420eb3bebb56cfc45ea92a0d4c2904358c704245e1b80ee0d0caabcfdb9bfdd2686fbb379a24ef26f1f134a028fb16bd41b7b47442bfec2f637
   languageName: node
   linkType: hard
 
@@ -2221,7 +2221,7 @@ __metadata:
     "@opendesign/engine": 0.0.0-e239917cef5abef9de532366f9750a982b97574e
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.0-alpha.40
-    "@opendesign/octopus-fig": 3.0.0-rc.23
+    "@opendesign/octopus-fig": 3.0.0-rc.24
     "@opendesign/octopus-xd": 0.0.0-experimental-74372cb19-20230112
     buffer: ^6.0.3
     fflate: ^0.7.4

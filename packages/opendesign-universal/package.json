@@ -17,7 +17,7 @@
     "@opendesign/engine": "0.0.0-e239917cef5abef9de532366f9750a982b97574e",
     "@opendesign/env": "workspace:*",
     "@opendesign/manifest-ts": "^3.0.0-alpha.40",
-    "@opendesign/octopus-fig": "3.0.0-rc.23",
+    "@opendesign/octopus-fig": "3.0.0-rc.24",
     "@opendesign/octopus-xd": "0.0.0-experimental-74372cb19-20230112",
     "buffer": "^6.0.3",
     "fflate": "^0.7.4"
