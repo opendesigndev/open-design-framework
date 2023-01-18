@@ -1,5 +1,6 @@
 import { parseImage } from "@opendesign/env";
 
+import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { Engine } from "./engine.js";
 import { createBitmapRef } from "./engine.js";
 import { automaticScope, createStringRef } from "./memory.js";
@@ -38,4 +39,11 @@ export async function loadImages(
       });
     }
   });
+}
+
+export function loadPastedImages(engine: Engine, data: ImportedClipboardData) {
+  return loadImages(
+    engine,
+    Array.from(data._images.entries(), ([path, data]) => ({ path, data })),
+  );
 }

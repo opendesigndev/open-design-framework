@@ -1,4 +1,5 @@
 import type { Engine } from "../engine/engine.js";
+import { loadPastedImages } from "../engine/load-images.js";
 import { todo } from "../internals.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { ArtboardNode } from "./artboard.js";
@@ -55,9 +56,19 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
     return this.__artboard ?? null;
   }
 
-  paste(data: ImportedClipboardData) {
-    const artboard = this.__artboard;
-    if (!artboard) throw new Error("TODO: Handle missing artboard");
+  async paste(data: ImportedClipboardData) {
+    let artboard = this.__artboard;
+    if (!artboard) {
+      const octopus = data._components.values().next().value;
+      const id = JSON.parse(octopus).id;
+      artboard = new ArtboardNodeImpl(this.#engine, id, octopus);
+      this.__artboard = artboard;
+
+      await loadPastedImages(this.#engine, data);
+
+      this.#engine.redraw();
+      return;
+    }
     return artboard.paste(data);
   }
 }

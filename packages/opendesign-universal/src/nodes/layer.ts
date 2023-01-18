@@ -4,7 +4,7 @@ import type { Octopus } from "@opendesign/octopus-fig/lib/src/typings/octopus.js
 import type { Engine } from "../engine/engine.js";
 import { throwOnParseError } from "../engine/engine.js";
 import { createParseError } from "../engine/engine.js";
-import { loadImages } from "../engine/load-images.js";
+import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { BaseNode } from "./node.js";
@@ -49,10 +49,7 @@ export class LayerNodeImpl extends BaseNodeImpl {
     const octopus = JSON.parse(data._components.values().next().value);
     this.createLayer(octopus.content);
 
-    await loadImages(
-      this.#engine,
-      Array.from(data._images.entries(), ([path, data]) => ({ path, data })),
-    );
+    await loadPastedImages(this.#engine, data);
     this.#engine.redraw();
   }
 

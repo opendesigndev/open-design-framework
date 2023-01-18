@@ -90,23 +90,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     if (!octopus) {
       this.__rootLayerId = generateUUID();
       this.dimensions = { width: 1920, height: 1080 };
-      octopus = JSON.stringify({
-        version: "3.0.0-odf",
-        id: id,
-        type: "ARTBOARD",
-        dimensions: this.dimensions,
-        content: {
-          id: this.__rootLayerId,
-          type: "GROUP",
-          name: "Root",
-          visible: true,
-          opacity: 1,
-          blendMode: "NORMAL",
-          transform: [1, 0, 0, 1, 0, 0],
-          layers: [],
-          effects: [],
-        },
-      });
+      octopus = createEmptyArtboard(id, this.dimensions, this.__rootLayerId);
     } else {
       const parsed = JSON.parse(octopus);
       this.__rootLayerId = parsed.content.id;
@@ -164,4 +148,28 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       this.#engine,
     );
   }
+}
+
+function createEmptyArtboard(
+  id: string,
+  dimensions: { width: number; height: number },
+  rootLayerId: string = generateUUID(),
+) {
+  return JSON.stringify({
+    version: "3.0.0-odf",
+    id: id,
+    type: "ARTBOARD",
+    dimensions: dimensions,
+    content: {
+      id: rootLayerId,
+      type: "GROUP",
+      name: "Root",
+      visible: true,
+      opacity: 1,
+      blendMode: "NORMAL",
+      transform: [1, 0, 0, 1, 0, 0],
+      layers: [],
+      effects: [],
+    },
+  });
 }
