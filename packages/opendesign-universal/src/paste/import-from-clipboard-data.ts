@@ -22,6 +22,7 @@ export async function importFromClipboardData(
   const parsedData = tryJsonParse(data);
   if (!parsedData) return null;
   if (parsedData.type === "ARTBOARD") {
+    // TODO: inspect closer that data is octopus
     return {
       _components: new Map([["octopus.json", data]]),
       _images: new Map(),
