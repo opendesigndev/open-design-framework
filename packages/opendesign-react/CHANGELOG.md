@@ -1,5 +1,22 @@
 # @opendesign/react
 
+## 0.3.0
+
+### Minor Changes
+
+- 79844b8: paste event handling code now passes unknown data along and allows octopus component to be pasted directly
+- 79844b8: when pasting before first arboard is created, paste will become the new artboard instead of creating artboard and pasting there
+
+### Patch Changes
+
+- 79844b8: updated engine and added better error handling for octopus parse errors
+- 79844b8: updated octopus-fig improving figma feature support
+- Updated dependencies [79844b8]
+- Updated dependencies [79844b8]
+- Updated dependencies [79844b8]
+- Updated dependencies [79844b8]
+  - @opendesign/universal@0.3.0
+
 ## 0.2.2
 
 ### Patch Changes
