@@ -218,6 +218,7 @@ function Content({
         performPaste(editor, data.data);
       }
     },
+    unstable_fallbackFont: "/static/inter.ttf",
   });
   return (
     <>
