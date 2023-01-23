@@ -58,8 +58,14 @@ export function loadFile(
     throw new Error("External components are not supported yet");
   const componentFile = files.get(location.path);
   if (!componentFile) throw new Error("Component is missing");
-  const component = fflate.strFromU8(readFile(componentFile));
+  let component = fflate.strFromU8(readFile(componentFile));
   if (!component) throw new Error("Component not found");
+  // breaking change in OCTOPUS_VERSION "3.0.0-alpha.41"
+  // TODO: remove this once all octopus-producing codepaths emit this
+  component = component.replace(
+    /"type": *"ARTBOARD"/,
+    '"type":"OCTOPUS_COMPONENT"',
+  );
   const artboard = new ArtboardNodeImpl(
     engine,
     componentManifest.id,
