@@ -20,6 +20,7 @@ import {
   automaticScope,
   createObject,
   createStringRef,
+  deleter,
   detachedScope,
 } from "./memory.js";
 
@@ -190,9 +191,60 @@ export function throwOnParseError(
   }
 }
 
+export function throwOnError(
+  ode: ODENative,
+  result: Result,
+): asserts result is Result.OK {
+  if ((result as any).value) {
+    const code = `${decodeResult(ode, result)} (${(result as any).value})`;
+    throw new Error(code);
+  }
+}
+
 export const createBitmapRef = createObject("BitmapRef");
 
 export const createParseError = createObject("ParseError");
+
+export function design_loadFontBytes(
+  ode: ODENative,
+  design: DesignHandle,
+  name: string,
+  data: Uint8Array,
+  faceName?: string,
+) {
+  automaticScope((scope) => {
+    const ptr = ode._malloc(data.byteLength);
+    scope(() => ode._free(ptr));
+    const nameRef = createStringRef(ode, scope, name);
+    const faceNameRef = createStringRef(ode, scope, faceName ?? "");
+    ode.HEAPU8.set(data, ptr);
+    const result = ode.design_loadFontBytes(
+      design,
+      nameRef,
+      ptr,
+      data.byteLength,
+      faceNameRef,
+    );
+    throwOnError(ode, result);
+  });
+}
+
+export const createStringList = createObject("StringList");
+
+export function design_listMissingFonts(ode: ODENative, design: DesignHandle) {
+  return automaticScope((scope) => {
+    const fontList = createStringList(ode, scope);
+    const result = ode.design_listMissingFonts(design, fontList);
+    throwOnError(ode, result);
+    scope(() => ode.destroyMissingFontList(fontList));
+    const fonts: string[] = [];
+    for (let i = 0; i < fontList.n; ++i) {
+      const font = scope(fontList.getEntry(i), deleter);
+      fonts.push(font.string());
+    }
+    return fonts;
+  });
+}
 
 export type Renderer = {
   handle: PR1_AnimationRendererHandle;

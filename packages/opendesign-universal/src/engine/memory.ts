@@ -65,7 +65,7 @@ export function detachedScope(): {
  */
 export const leakMemory: Scope = (...args) => args[0];
 
-function deleter(arg: { delete: () => void }) {
+export function deleter(arg: { delete: () => void }) {
   arg.delete();
 }
 

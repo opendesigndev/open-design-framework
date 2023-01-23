@@ -1,8 +1,9 @@
 import * as env from "@opendesign/env";
 
 import type { Engine } from "./engine/engine.js";
+import { design_loadFontBytes } from "./engine/engine.js";
+import { design_listMissingFonts } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
-import { queueMicrotask } from "./internals.js";
 import { todo } from "./internals.js";
 import { performance } from "./lib.js";
 import type { DesignNode } from "./nodes/design.js";
@@ -61,6 +62,14 @@ export type CreateEditorOptions = {
    *    for this option.
    */
   wasmLocation?: "unpkg" | "local" | string;
+  /**
+   * Specifies URL pointing to font file in .ttf format, which will be used to
+   * replace missing fonts. This is so that missing fonts at least show something.
+   *
+   * This will likely be replaced by missing-font event, which will allow greater
+   * control over how and what fonts to load.
+   */
+  unstable_fallbackFont?: string;
 };
 
 export type EditorViewport = {
@@ -165,6 +174,15 @@ export interface Editor {
     event: T,
     listener: (event: EditorEvents[T]) => void,
   ): () => void;
+
+  /**
+   * Sets a font file which will be used for a given postscript name.
+   *
+   * @param name is post-script name (reported in missing font event)
+   * @param data contains the data of the font file
+   * @param faceName specifies face within multi-face font file, otherwise can be left blank
+   */
+  setFont(name: string, data: Uint8Array, faceName?: string): void;
 }
 
 /**
@@ -203,6 +221,12 @@ export class EditorImplementation implements Editor {
   constructor(options: CreateEditorOptions) {
     const canvas = env.createCanvas();
     this[canvasSymbol] = canvas;
+    const fontData = options.unstable_fallbackFont
+      ? env
+          .fetch(options.unstable_fallbackFont)
+          .then((v) => v.arrayBuffer())
+          .then((v) => new Uint8Array(v))
+      : null;
     this.loaded = initEngine(canvas, options.wasmLocation).then(
       async (engine) => {
         if (options.design) {
@@ -234,6 +258,18 @@ export class EditorImplementation implements Editor {
         if (!(this.currentPage as PageNodeImpl).__artboard) {
           this.currentPage.createArtboard();
         }
+
+        if (fontData) {
+          const font = await fontData;
+          const missingFonts = design_listMissingFonts(
+            engine.ode,
+            engine.design,
+          );
+          for (const fontName of missingFonts) {
+            this.setFont(fontName, font);
+          }
+        }
+
         this.loading = false;
       },
     );
@@ -350,6 +386,17 @@ export class EditorImplementation implements Editor {
       // you can see that this cant be undefined
       set!.delete(cb);
     };
+  }
+
+  setFont(postscriptName: string, data: Uint8Array, faceName?: string) {
+    const engine = editorGetEngine(this);
+    design_loadFontBytes(
+      engine.ode,
+      engine.design,
+      postscriptName,
+      data,
+      faceName,
+    );
   }
 }
 
