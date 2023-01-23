@@ -213,19 +213,24 @@ export function design_loadFontBytes(
   faceName?: string,
 ) {
   automaticScope((scope) => {
-    const ptr = ode._malloc(data.byteLength);
-    scope(() => ode._free(ptr));
     const nameRef = createStringRef(ode, scope, name);
     const faceNameRef = createStringRef(ode, scope, faceName ?? "");
-    ode.HEAPU8.set(data, ptr);
-    const result = ode.design_loadFontBytes(
-      design,
-      nameRef,
-      ptr,
-      data.byteLength,
-      faceNameRef,
-    );
-    throwOnError(ode, result);
+    const ptr = ode._malloc(data.byteLength);
+    try {
+      ode.HEAPU8.set(data, ptr);
+      const result = ode.design_loadFontBytes(
+        design,
+        nameRef,
+        ptr,
+        data.byteLength,
+        faceNameRef,
+      );
+      throwOnError(ode, result);
+    } catch (e) {
+      // NOTE: design_loadFontBytes takes ownership of ptr, so we only free when it fails.
+      ode._free(ptr);
+      throw e;
+    }
   });
 }
 
