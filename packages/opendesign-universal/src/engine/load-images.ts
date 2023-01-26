@@ -1,8 +1,8 @@
-import type { BitmapRef } from "@opendesign/engine";
 import { parseImage } from "@opendesign/env";
 
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { Engine } from "./engine.js";
+import { throwOnError } from "./engine.js";
 import { automaticScope, createStringRef } from "./memory.js";
 
 export async function loadImages(
@@ -19,11 +19,13 @@ export async function loadImages(
     0,
   );
   automaticScope((scope) => {
-    const ptr = scope(engine.ode._malloc(maxBytes), engine.ode._free);
+    const ptr = engine.ode._malloc(maxBytes);
+    if (ptr === 0) throw new Error("Failed to allocate memory");
+    scope(ptr, engine.ode._free);
     for (const { data, path } of images) {
       engine.ode.HEAP8.set(data.data, ptr);
       automaticScope((scope) => {
-        engine.ode.designLoadImagePixels(
+        const result = engine.ode.designLoadImagePixels(
           engine.designImageBase,
           createStringRef(engine.ode, scope, path),
           {
@@ -33,6 +35,7 @@ export async function loadImages(
             width: data.width,
           },
         );
+        throwOnError(engine.ode, result);
       });
     }
   });

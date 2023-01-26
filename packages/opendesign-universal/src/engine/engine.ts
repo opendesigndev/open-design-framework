@@ -217,6 +217,7 @@ export function design_loadFontBytes(
     const nameRef = createStringRef(ode, scope, name);
     const faceNameRef = createStringRef(ode, scope, faceName ?? "");
     const ptr = ode._malloc(data.byteLength);
+    if (ptr === 0) throw new Error("Failed to allocate memory");
     try {
       ode.HEAPU8.set(data, ptr);
       const result = ode.design_loadFontBytes(
@@ -307,7 +308,12 @@ export async function initEngine(
       renderers,
       redraw() {
         for (const r of renderers) {
-          ode.pr1_animation_drawFrame(r.handle, r.frameView, r.time / 1000);
+          const result = ode.pr1_animation_drawFrame(
+            r.handle,
+            r.frameView,
+            r.time / 1000,
+          );
+          throwOnError(ode, result);
         }
       },
       destroy() {
