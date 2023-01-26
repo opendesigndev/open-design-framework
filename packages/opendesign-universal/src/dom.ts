@@ -4,6 +4,7 @@ import type { Editor } from "./editor.js";
 import { editorGetEngine } from "./editor.js";
 import { editorGetCanvas } from "./editor.js";
 import type { Renderer } from "./engine/engine.js";
+import { throwOnError } from "./engine/engine.js";
 import { createPR1FrameView, createPR1Renderer } from "./engine/engine.js";
 import { detachedScope } from "./engine/memory.js";
 import type { PageNodeImpl } from "./nodes/page.js";
@@ -165,7 +166,10 @@ export function mount(
     renderer.frameView.height = height;
     renderer.frameView.offset = offset;
     renderer.frameView.scale = scale;
-    engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
+    throwOnError(
+      engine.ode,
+      engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0),
+    );
   }
 
   function requestFrame() {
