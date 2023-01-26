@@ -152,8 +152,8 @@ export function mount(
   function draw() {
     frameRequested = false;
     if (
-      offset[0] === (renderer.frameView.offset as any)[0] &&
-      offset[1] === (renderer.frameView.offset as any)[1] &&
+      offset[0] === renderer.frameView.offset[0] &&
+      offset[1] === renderer.frameView.offset[1] &&
       renderer.frameView.scale === scale &&
       renderer.frameView.width === width &&
       renderer.frameView.height === height
@@ -163,7 +163,7 @@ export function mount(
 
     renderer.frameView.width = width;
     renderer.frameView.height = height;
-    renderer.frameView.offset = offset as any;
+    renderer.frameView.offset = offset;
     renderer.frameView.scale = scale;
     engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
   }
