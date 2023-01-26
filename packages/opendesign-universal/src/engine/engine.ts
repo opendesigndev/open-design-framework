@@ -6,13 +6,17 @@ import type {
   EngineHandle,
   ODE,
   ParseError,
-  ParseError_Type,
   PR1_AnimationRendererHandle,
   PR1_FrameView,
   RendererContextHandle,
 } from "@opendesign/engine";
 import type { Result } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
+import type { Result_Map } from "@opendesign/engine/api-base.js";
+import type {
+  LayerType_Map,
+  ParseError_Type_Map,
+} from "@opendesign/engine/logic-api.js";
 import { warn } from "@opendesign/env";
 
 import { engineVersion } from "../../index.js";
@@ -132,9 +136,10 @@ function createEnumDecoder<EnumMap extends { [key: string]: number }>(
   };
 }
 
-const decodeResult = createEnumDecoder("Result");
-const decodeParseErrorType =
-  createEnumDecoder<ParseError_Type>("ParseError_Type");
+export const decodeResult = createEnumDecoder<Result_Map>("Result");
+export const decodeParseErrorType =
+  createEnumDecoder<ParseError_Type_Map>("ParseError_Type");
+export const decodeLayerType = createEnumDecoder<LayerType_Map>("LayerType");
 
 export const createComponentFromOctopus = createObject(
   "ComponentHandle",
