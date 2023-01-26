@@ -1,5 +1,4 @@
-import type * as ODE from "@opendesign/engine";
-import type { ODENative } from "@opendesign/engine";
+import type { ODE, Result, String, StringRef } from "@opendesign/engine";
 
 import type { AbortSignal } from "../lib.js";
 import { AbortController } from "../lib.js";
@@ -69,11 +68,8 @@ export function deleter(arg: { delete: () => void }) {
   arg.delete();
 }
 
-const stringRefMap = new WeakMap<
-  ODE.StringRef,
-  { string: ODE.String; ode: ODENative }
->();
-function deleteStringRef(ref: ODE.StringRef) {
+const stringRefMap = new WeakMap<StringRef, { string: String; ode: ODE }>();
+function deleteStringRef(ref: StringRef) {
   const entry = stringRefMap.get(ref);
   if (!entry)
     throw new Error(
@@ -85,7 +81,7 @@ function deleteStringRef(ref: ODE.StringRef) {
   string.delete();
 }
 
-export function createStringRef(ode: ODENative, scope: Scope, text: string) {
+export function createStringRef(ode: ODE, scope: Scope, text: string) {
   const string = new ode.String(text);
   const ref = string.ref();
 
@@ -145,16 +141,16 @@ export function createStringRef(ode: ODENative, scope: Scope, text: string) {
  * @returns
  */
 export function createObject<
-  Name extends KeysOfType<ODENative, new () => { delete(): void }>,
+  Name extends KeysOfType<ODE, new () => { delete(): void }>,
   Args extends readonly any[] = [],
 >(
   name: Name,
   descriptor?: (
-    ode: ODENative,
+    ode: ODE,
     ...args: Args
   ) => [
-    init?: (handle: InstanceType<ODENative[Name]>) => void | number,
-    finish?: (handle: InstanceType<ODENative[Name]>) => void | number,
+    init?: (handle: InstanceType<ODE[Name]>) => void | Result,
+    finish?: (handle: InstanceType<ODE[Name]>) => void | Result,
   ],
 ) {
   /**
@@ -162,17 +158,10 @@ export function createObject<
    * and remaining type arguments. You will receive a handle which you can use
    * until you exit the specified scope.
    */
-  return function createObjectImpl(
-    ode: ODENative,
-    scope: Scope,
-    ...args: Args
-  ) {
+  return function createObjectImpl(ode: ODE, scope: Scope, ...args: Args) {
     const Cls = ode[name];
     const [init, finish] = descriptor?.(ode, ...args) ?? [];
-    const handle: InstanceType<ODENative[Name]> = scope(
-      new Cls(),
-      deleter,
-    ) as any;
+    const handle: InstanceType<ODE[Name]> = scope(new Cls(), deleter) as any;
     check(name, init?.(handle));
     if (finish) scope(handle, (_) => check(name, finish(handle)));
     return handle;

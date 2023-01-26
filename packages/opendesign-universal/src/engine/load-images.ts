@@ -1,8 +1,8 @@
+import type { BitmapRef } from "@opendesign/engine";
 import { parseImage } from "@opendesign/env";
 
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { Engine } from "./engine.js";
-import { createBitmapRef } from "./engine.js";
 import { automaticScope, createStringRef } from "./memory.js";
 
 export async function loadImages(
@@ -21,20 +21,17 @@ export async function loadImages(
   automaticScope((scope) => {
     const ptr = scope(engine.ode._malloc(maxBytes), engine.ode._free);
     for (const { data, path } of images) {
-      const bitmap = createBitmapRef(engine.ode, scope);
-
-      bitmap.pixels = ptr;
-      // TODO: make sure that typegen can document constants
-      // @ts-expect-error
-      bitmap.format = engine.ode.PIXEL_FORMAT_RGBA;
       engine.ode.HEAP8.set(data.data, ptr);
-      bitmap.width = data.width;
-      bitmap.height = data.height;
       automaticScope((scope) => {
         engine.ode.designLoadImagePixels(
           engine.designImageBase,
           createStringRef(engine.ode, scope, path),
-          bitmap,
+          {
+            pixels: ptr,
+            format: engine.ode.PIXEL_FORMAT_RGBA,
+            height: data.height,
+            width: data.width,
+          },
         );
       });
     }
