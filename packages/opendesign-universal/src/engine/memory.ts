@@ -2,6 +2,7 @@ import type { ODE, Result, String, StringRef } from "@opendesign/engine";
 
 import type { AbortSignal } from "../lib.js";
 import { AbortController } from "../lib.js";
+import type { KeysOfType } from "./engine-utils.js";
 
 type Destroyer<Args extends readonly unknown[]> = (...args: Args) => unknown;
 type ScopeArgs<Args extends readonly unknown[] = unknown[]> = [
@@ -12,7 +13,59 @@ type Scope = <Args extends readonly unknown[]>(
   ...args: ScopeArgs<Args>
 ) => Args[0];
 
-export function automaticScope<T>(cb: (Finalizer: Scope) => T): T {
+/**
+ * Helps with making sure that resources are deleted. It immediately invokes
+ * its argument, does cleanup and returns whatever the function returned.
+ *
+ * It passes scope to the callback.
+ *
+ * ## scope(...) function
+ *
+ * When you call this function, you are making sure that it's last argument will
+ * be called when you exit the scope.
+ *
+ * The signature is `scope(result?, ...args, deleter)`
+ *
+ * deleter will receive `(result, ...args)` as its arguments and will be called
+ * when it's time to clean up.
+ *
+ * the scope function will return `result` (first argument).
+ *
+ * cleanup functions should be called in reverse of the order in which they are called
+ *
+ * ## Example
+ *
+ * ```
+ * let a = scope(1, 2, (...args) => console.log(a, b))
+ * // a will be 1, and it will log 1,2
+ *
+ * scope(() => console.log('finished'))
+ * // it will log finished once it's time to clean up
+ *
+ * ## Example
+ *
+ * ```typescript
+ * // The following will log 1 2 3
+ * const result = automaticScope((scope) => {
+ *   console.log(1)
+ *   scope(() => console.log(2))
+ *   return 3
+ * })
+ * console.log(result)
+ *
+ * // The following will log 1 2 and the error will propagate up
+ * const result = automaticScope((scope) => {
+ *   console.log(1)
+ *   scope(() => console.log(2))
+ *   throw new Error('fail')
+ * })
+ * console.log(result)
+ * ```
+ *
+ * @param cb
+ * @returns
+ */
+export function automaticScope<T>(cb: (scope: Scope) => T): T {
   const registry = detachedScope();
   try {
     return cb(registry.scope);
@@ -21,6 +74,12 @@ export function automaticScope<T>(cb: (Finalizer: Scope) => T): T {
   }
 }
 
+/**
+ * Similar to {@link automaticScope}, but it awaits the result first.
+ *
+ * @param cb
+ * @returns
+ */
 export async function automaticScopeAsync<T>(
   cb: (Finalizer: Scope) => Promise<T>,
 ): Promise<T> {
@@ -32,6 +91,10 @@ export async function automaticScopeAsync<T>(
   }
 }
 
+/**
+ * Creates scope which you can manually destroy. Also returns AbortSignal with
+ * the same lifetime as the scope.
+ */
 export function detachedScope(): {
   scope: Scope;
   signal: AbortSignal;
@@ -64,6 +127,21 @@ export function detachedScope(): {
  */
 export const leakMemory: Scope = (...args) => args[0];
 
+/**
+ * Calls delete member function on arg.
+ *
+ * ## Example
+ *
+ * ```typescript
+ * // changing
+ * const thing = getAThing()
+ * // to this
+ * const thing = scope(getAThing(), deleter)
+ * // will make sure that thing gets properly deleted
+ * ```
+ *
+ * @param arg
+ */
 export function deleter(arg: { delete: () => void }) {
   arg.delete();
 }
@@ -168,9 +246,7 @@ export function createObject<
   };
 }
 
-function check(type: string, v: unknown) {
-  if (typeof v === "number" && v !== 0)
-    throw new Error("ODE call for object " + type + " failed with code " + v);
+function check(type: string, v: void | Result) {
   if (
     typeof v === "object" &&
     v &&
@@ -183,15 +259,3 @@ function check(type: string, v: unknown) {
     );
   }
 }
-
-type KeysOfType<T, U, B = false> = {
-  [P in keyof T]: B extends true
-    ? T[P] extends U
-      ? U extends T[P]
-        ? P
-        : never
-      : never
-    : T[P] extends U
-    ? P
-    : never;
-}[keyof T];

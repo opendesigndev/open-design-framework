@@ -16,6 +16,7 @@ import createEngineWasm from "@opendesign/engine";
 import { warn } from "@opendesign/env";
 
 import { engineVersion } from "../../index.js";
+import type { KeysOfType } from "./engine-utils.js";
 import {
   automaticScope,
   createObject,
@@ -115,19 +116,23 @@ const createDesignImageBase = createObject(
 
 export const createPR1FrameView = createObject("PR1_FrameView");
 
-function createEnumDecoder<Enum>(enumName: string) {
-  let decoder: undefined | Map<Enum, keyof Enum> = undefined;
-  return function decodeResult(ode: ODE, code: Enum) {
+function createEnumDecoder<EnumMap extends { [key: string]: number }>(
+  enumName: KeysOfType<ODE, { [keys in string]: { value: number } }>,
+) {
+  let decoder: undefined | Map<number, keyof EnumMap> = undefined;
+  return function decodeResult(
+    ode: ODE,
+    code: { value: EnumMap[keyof EnumMap] },
+  ): keyof EnumMap | `UNKNOWN_${number}` {
     if (!decoder) {
       decoder = new Map();
-      for (const [k, v] of Object.entries((ode as any)[enumName]))
-        (decoder as any).set(v, k);
+      for (const [k, v] of Object.entries(ode[enumName])) decoder.set(v, k);
     }
-    return decoder.get(code) ?? "UNKNOWN_" + ((code as any).value as number);
+    return decoder.get(code.value) ?? "UNKNOWN_" + (code.value as number);
   };
 }
 
-const decodeResult = createEnumDecoder<Result>("Result");
+const decodeResult = createEnumDecoder("Result");
 const decodeParseErrorType =
   createEnumDecoder<ParseError_Type>("ParseError_Type");
 
@@ -163,7 +168,7 @@ export function throwOnParseError(
   parseError: ParseError,
   source: string,
 ): asserts result is { value: 0 } {
-  if ((result as any).value) {
+  if (result.value) {
     const code = `${decodeResult(ode, result)} (${(result as any).value})`;
     let error = new Error(code);
     const type: any = parseError.type;
@@ -188,12 +193,12 @@ export function throwOnError(
   ode: ODE,
   result: Result,
 ): asserts result is { value: 0 } {
-  if ((result ).value) {
-    const code = `${decodeResult(ode, result)} (${(result ).value})`;
+  if (result.value) {
+    const code = `${decodeResult(ode, result)} (${result.value})`;
     throw new Error(code);
   }
 }
- 
+
 export const createParseError = createObject("ParseError");
 
 export function design_loadFontBytes(
@@ -218,7 +223,8 @@ export function design_loadFontBytes(
       );
       throwOnError(ode, result);
     } catch (e) {
-      // NOTE: design_loadFontBytes takes ownership of ptr, so we only free when it fails.
+      // TODO: design_loadFontBytes is currently somewhat broken, so we only free
+      // on error. Change this once engine-side API is updated.
       ode._free(ptr);
       throw e;
     }
