@@ -254,11 +254,12 @@ export class EditorImplementation implements Editor {
         options.onLoad?.(this);
 
         // Make sure that we have at least one artboard.
-        // We should remove this once multi-artboard support is implemented
+        // TODO: We should remove this once multi-artboard support is implemented
         if (!(this.currentPage as PageNodeImpl).__artboard) {
           this.currentPage.createArtboard();
         }
 
+        // TODO: Replace this with event-based listening for missing fonts
         if (fontData) {
           const font = await fontData;
           const missingFonts = design_listMissingFonts(
