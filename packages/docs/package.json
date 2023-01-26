@@ -8,7 +8,7 @@
     "build": "typedoc"
   },
   "dependencies": {
-    "@opendesign/engine": "0.0.0-5e1371a4515c0199aabf8328145d26d40836039f",
+    "@opendesign/engine": "0.0.0-ad49cef9d34998ec51a3dad32e2bb61ec6a9458b",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "typedoc": "^0.23.21",

@@ -1,5 +1,5 @@
 import type { ComponentHandle } from "@opendesign/engine";
-import type { Octopus } from "@opendesign/octopus-fig/lib/src/typings/octopus.js";
+import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { Engine } from "../engine/engine.js";
 import { throwOnParseError } from "../engine/engine.js";
@@ -23,7 +23,7 @@ export interface LayerNode extends BaseNode {
   /**
    * Creates layer from octopus data
    */
-  createLayer(octopus: Octopus["Layer"]): LayerNode;
+  createLayer(octopus: Octopus["schemas"]["Layer"]): LayerNode;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl {
@@ -53,7 +53,7 @@ export class LayerNodeImpl extends BaseNodeImpl {
     this.#engine.redraw();
   }
 
-  createLayer(octopus: Octopus["Layer"]) {
+  createLayer(octopus: Octopus["schemas"]["Layer"]) {
     automaticScope((scope) => {
       const parseError = createParseError(this.#engine.ode, scope);
       const octopusString = JSON.stringify(octopus);

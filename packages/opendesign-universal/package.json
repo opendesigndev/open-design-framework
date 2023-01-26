@@ -14,10 +14,11 @@
     "entryPoint": "index.ts"
   },
   "dependencies": {
-    "@opendesign/engine": "0.0.0-5e1371a4515c0199aabf8328145d26d40836039f",
+    "@opendesign/engine": "0.0.0-ad49cef9d34998ec51a3dad32e2bb61ec6a9458b",
     "@opendesign/env": "workspace:*",
     "@opendesign/manifest-ts": "^3.0.0-alpha.40",
     "@opendesign/octopus-fig": "3.0.0-rc.24",
+    "@opendesign/octopus-ts": "^3.0.0-alpha.41",
     "@opendesign/octopus-xd": "0.0.0-experimental-74372cb19-20230112",
     "buffer": "^6.0.3",
     "fflate": "^0.7.4"

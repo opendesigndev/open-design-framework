@@ -1,15 +1,15 @@
 import type {
   ComponentHandle,
+  ComponentMetadata,
   DesignHandle,
   DesignImageBaseHandle,
   EngineHandle,
-  ODENative,
+  ODE,
   ParseError,
   ParseError_Type,
   PR1_AnimationRendererHandle,
   PR1_FrameView,
   RendererContextHandle,
-  StringRef,
 } from "@opendesign/engine";
 import type { Result } from "@opendesign/engine";
 import createEngineWasm from "@opendesign/engine";
@@ -115,20 +115,9 @@ const createDesignImageBase = createObject(
 
 export const createPR1FrameView = createObject("PR1_FrameView");
 
-const createComponentMetadata = createObject(
-  "ComponentMetadata",
-  (ode, page: StringRef, id: StringRef) => [
-    (metadata) => {
-      metadata.page = page;
-      metadata.id = id;
-      metadata.position = [0, 0] as any;
-    },
-  ],
-);
-
 function createEnumDecoder<Enum>(enumName: string) {
   let decoder: undefined | Map<Enum, keyof Enum> = undefined;
-  return function decodeResult(ode: ODENative, code: Enum) {
+  return function decodeResult(ode: ODE, code: Enum) {
     if (!decoder) {
       decoder = new Map();
       for (const [k, v] of Object.entries((ode as any)[enumName]))
@@ -150,7 +139,11 @@ export const createComponentFromOctopus = createObject(
         const pageRef = createStringRef(ode, scope, page);
         const idRef = createStringRef(ode, scope, id);
         const octopusRef = createStringRef(ode, scope, octopus);
-        const metadata = createComponentMetadata(ode, scope, pageRef, idRef);
+        const metadata: ComponentMetadata = {
+          id: idRef,
+          page: pageRef,
+          position: [0, 0],
+        };
         const parseError = createParseError(ode, scope);
         const result = ode.design_addComponentFromOctopusString(
           design,
@@ -165,11 +158,11 @@ export const createComponentFromOctopus = createObject(
 );
 
 export function throwOnParseError(
-  ode: ODENative,
+  ode: ODE,
   result: Result,
   parseError: ParseError,
   source: string,
-): asserts result is Result.OK {
+): asserts result is { value: 0 } {
   if ((result as any).value) {
     const code = `${decodeResult(ode, result)} (${(result as any).value})`;
     let error = new Error(code);
@@ -192,21 +185,19 @@ export function throwOnParseError(
 }
 
 export function throwOnError(
-  ode: ODENative,
+  ode: ODE,
   result: Result,
-): asserts result is Result.OK {
-  if ((result as any).value) {
-    const code = `${decodeResult(ode, result)} (${(result as any).value})`;
+): asserts result is { value: 0 } {
+  if ((result ).value) {
+    const code = `${decodeResult(ode, result)} (${(result ).value})`;
     throw new Error(code);
   }
 }
-
-export const createBitmapRef = createObject("BitmapRef");
-
+ 
 export const createParseError = createObject("ParseError");
 
 export function design_loadFontBytes(
-  ode: ODENative,
+  ode: ODE,
   design: DesignHandle,
   name: string,
   data: Uint8Array,
@@ -236,7 +227,7 @@ export function design_loadFontBytes(
 
 export const createStringList = createObject("StringList");
 
-export function design_listMissingFonts(ode: ODENative, design: DesignHandle) {
+export function design_listMissingFonts(ode: ODE, design: DesignHandle) {
   return automaticScope((scope) => {
     const fontList = createStringList(ode, scope);
     const result = ode.design_listMissingFonts(design, fontList);
@@ -264,7 +255,7 @@ export async function initEngine(
   // we'll want to change how this works to avoid expected errors
   // simplest way is to restore older revision from git, but change engine to
   // export value of new URL('ode.wasm', import.meta.url) and use that.
-  let ode: ODENative;
+  let ode: ODE;
   if (!wasmLocation) {
     try {
       ode = await createEngineWrap();
@@ -319,8 +310,6 @@ export async function initEngine(
 }
 export type Engine = Awaited<ReturnType<typeof initEngine>>;
 
-function createEngineWrap(file?: string): Promise<ODENative> {
-  // TODO: add types for function argument to engine
-  // @ts-expect-error
+function createEngineWrap(file?: string): Promise<ODE> {
   return createEngineWasm(file ? { locateFile: () => file } : {});
 }
