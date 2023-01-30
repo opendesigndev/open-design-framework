@@ -1,7 +1,12 @@
 import type { ComponentHandle } from "@opendesign/engine";
 
 import type { Engine } from "../engine/engine.js";
-import { throwOnParseError, createParseError, createComponentFromOctopus, throwOnError } from "../engine/engine.js";
+import {
+  createComponentFromOctopus,
+  createParseError,
+  throwOnError,
+  throwOnParseError,
+} from "../engine/engine.js";
 import {
   automaticScope,
   createObject,
@@ -75,8 +80,10 @@ export interface ArtboardNode extends BaseNode {
 
   /**
    * Returns list of all layers in this artboard.
+   *
+   * @param reverse if true, returns layers in reverse order (from top to bottom), default is false
    */
-  getListOfLayers(): void
+  getListOfLayers(reverse?: boolean): void;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -154,17 +161,55 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     );
   }
 
-  getListOfLayers() {
+  getListOfLayers(reverse = false) {
     return automaticScope((scope) => {
-      const createStringList = createObject('LayerList');
-      debugger
-      const layerList = createStringList(this.#engine.ode, scope)
-      const result = this.#engine.ode.component_listLayers(this.__component, layerList);
+      const createStringList = createObject("LayerList");
+      debugger;
+      const layerList = createStringList(this.#engine.ode, scope);
+      const result = this.#engine.ode.component_listLayers(
+        this.__component,
+        layerList,
+      );
       throwOnError(this.#engine.ode, result);
-      const layers = [];
+      const layers = new Map();
       for (let i = 0; i < layerList.n; i++) {
-        const layer = scope(layerList.getEntry(i), deleter);
-        layers.push(Object.assign({}, layer));
+        const layer = layerList.getEntry(i);
+        // FIXME: scope deleter doesn't work here because ListEntry has no delete method
+        const id = layer.id.string();
+        const parentId = layer.parentId.string();
+        // check if layer exists (boilerplated from child) and update it
+        // otherwise create a new layer with empty children array
+        if (layers.has(id)) {
+          const existingLayer = layers.get(id);
+          existingLayer.parentId = parentId;
+          existingLayer.name = layer.name.string();
+          existingLayer.type = layer.type.constructor.name;
+          layers.set(id, existingLayer);
+        } else {
+          layers.set(id, {
+            id,
+            parentId,
+            name: layer.name.string(),
+            type: layer.type.constructor.name,
+            children: [],
+          });
+        }
+
+        // check if layer has parent
+        if (parentId) {
+          // check if parent exists, if not create a boilerplate
+          if (!layers.has(parentId)) {
+            layers.set(parentId, { id: parentId, children: [] });
+          }
+          // get parent and update children array considering reverse flag
+          const parent = layers.get(parentId);
+          if (reverse) {
+            parent.children.unshift(id);
+          } else {
+            parent.children.push(id);
+          }
+          // layers.set(parentId, parent);
+        }
       }
       return layers;
     });
