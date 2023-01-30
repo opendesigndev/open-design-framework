@@ -201,6 +201,14 @@ function performPaste(
   }
 }
 
+function getListOfLayers(
+  editor: Editor,
+) {
+  debugger
+  const artboard = editor.currentPage.findArtboard()
+  const layers = artboard.getListOfLayers()
+}
+
 function Content({
   data,
   componentId,
@@ -229,6 +237,9 @@ function Content({
             performPaste(editor, evt.data);
           }}
         />
+        <Button onClick={() => getListOfLayers(editor)}>
+          Get list of layers
+        </Button>
         <div className="grow">
           <Suspense>
             <EditorCanvas editor={editor} />
