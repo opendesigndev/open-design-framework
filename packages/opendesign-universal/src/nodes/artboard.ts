@@ -1,12 +1,12 @@
 import type { ComponentHandle } from "@opendesign/engine";
 
 import type { Engine } from "../engine/engine.js";
-import { throwOnParseError } from "../engine/engine.js";
-import { createParseError } from "../engine/engine.js";
-import { createComponentFromOctopus } from "../engine/engine.js";
+import { throwOnParseError, createParseError, createComponentFromOctopus, throwOnError } from "../engine/engine.js";
 import {
   automaticScope,
+  createObject,
   createStringRef,
+  deleter,
   detachedScope,
 } from "../engine/memory.js";
 import { generateUUID, todo } from "../internals.js";
@@ -72,6 +72,11 @@ export interface ArtboardNode extends BaseNode {
    * Returns node representing root layer of this artboard.
    */
   getRootLayer(): LayerNode;
+
+  /**
+   * Returns list of all layers in this artboard.
+   */
+  getListOfLayers(): void
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -147,6 +152,22 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       this.__rootLayerId,
       this.#engine,
     );
+  }
+
+  getListOfLayers() {
+    return automaticScope((scope) => {
+      const createStringList = createObject('LayerList');
+      debugger
+      const layerList = createStringList(this.#engine.ode, scope)
+      const result = this.#engine.ode.component_listLayers(this.__component, layerList);
+      throwOnError(this.#engine.ode, result);
+      const layers = [];
+      for (let i = 0; i < layerList.n; i++) {
+        const layer = scope(layerList.getEntry(i), deleter);
+        layers.push(Object.assign({}, layer));
+      }
+      return layers;
+    });
   }
 }
 
