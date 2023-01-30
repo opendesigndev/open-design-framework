@@ -221,12 +221,12 @@ function Content({
 }) {
   const [isReverse, setIsReverse] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [layers, setLayers] = useState<LayerType>({});
+  const [layers, setLayers] = useState<LayerType>({} as LayerType);
 
   useEffect(() => {
     if (!isLoaded) return;
     const artboard = editor?.currentPage.findArtboard();
-    setLayers(artboard?.getListOfLayers(isReverse));
+    setLayers(artboard?.getListOfLayers(isReverse) as unknown as LayerType);
   }, [isReverse, isLoaded]);
 
   const editor = useEditor({
@@ -266,10 +266,7 @@ function Content({
         />
         <div className="flex flex-row py-2 grow">
           <div className="basis-1/5">
-            <Button
-              onClick={() => setIsReverse(!isReverse)}
-              disabled={!isLoaded}
-            >
+            <Button onClick={() => setIsReverse(!isReverse)}>
               Change order to {!isReverse ? "Reverse" : "Normal"}
             </Button>
             <ol className="nested-list">{renderLayer(layers)}</ol>
