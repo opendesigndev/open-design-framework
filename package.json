@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
-  "packageManager": "yarn@3.3.0+sha256.bbfc6cc3362afbcb0ce39ee8f36fb2b62ce9834b20d6aeee5c1f481269b52238",
+  "packageManager": "yarn@3.3.1+sha256.1d2760eb5c0e525abe9c5306fac5fe0b5628c0955072a0da2f4043524497526a",
   "workspaces": [
     "packages/*"
   ],
