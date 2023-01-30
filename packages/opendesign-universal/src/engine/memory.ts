@@ -2,6 +2,7 @@ import type { ODE, Result, String, StringRef } from "@opendesign/engine";
 
 import type { AbortSignal } from "../lib.js";
 import { AbortController } from "../lib.js";
+import { throwOnError } from "./engine.js";
 import type { KeysOfType } from "./engine-utils.js";
 
 type Destroyer<Args extends readonly unknown[]> = (...args: Args) => unknown;
@@ -309,4 +310,48 @@ function check(type: string, v: void | Result) {
       "ODE call for object " + type + " failed with code " + v.value,
     );
   }
+}
+
+const createMemoryBufferInternal = createObject("MemoryBuffer");
+/**
+ * Creates MemoryBuffer for given length. Call withData to get MemoryBuffer handle
+ * to pass to engine. Note that calling withData multiple times is supported, but
+ * the memory will get overwritten. However, this should be safe if previous
+ * engine call finished before this is done.
+ *
+ * Above means, that it is safe to reuse then same memory buffer across multiple
+ * calls if the next calls after previous one returns.
+ *
+ * @param ode
+ * @param scope
+ * @param initialCapacity
+ * @returns object for working with memory buffer
+ */
+export function createMemoryBuffer(
+  ode: ODE,
+  scope: Scope,
+  initialCapacity: number = 0,
+) {
+  const buffer = createMemoryBufferInternal(ode, scope);
+  scope(() => ode.destroyMemoryBuffer(buffer));
+  if (initialCapacity) {
+    const result = ode.allocateMemoryBuffer(buffer, initialCapacity);
+    throwOnError(ode, result);
+  }
+
+  return {
+    withData: (data: ArrayLike<number>) => {
+      if (data.length !== buffer.length) {
+        if (buffer.length) ode.reallocateMemoryBuffer(buffer, data.length);
+        else ode.allocateMemoryBuffer(buffer, data.length);
+      }
+      const view = new Uint8Array(
+        ode.HEAP16.buffer,
+        buffer.data,
+        buffer.length,
+      );
+      view.set(data);
+      return buffer;
+    },
+  };
 }

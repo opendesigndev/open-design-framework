@@ -14,7 +14,7 @@
     "entryPoint": "index.ts"
   },
   "dependencies": {
-    "@opendesign/engine": "0.0.0-ad49cef9d34998ec51a3dad32e2bb61ec6a9458b",
+    "@opendesign/engine": "0.0.0-14ee8ea44c381d38b080617bfbd813797db76010",
     "@opendesign/env": "workspace:*",
     "@opendesign/manifest-ts": "^3.0.0-alpha.40",
     "@opendesign/octopus-fig": "3.0.0-rc.24",

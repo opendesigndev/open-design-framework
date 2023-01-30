@@ -209,37 +209,6 @@ export function throwOnError(
 
 export const createParseError = createObject("ParseError");
 
-export function design_loadFontBytes(
-  ode: ODE,
-  design: DesignHandle,
-  name: string,
-  data: Uint8Array,
-  faceName?: string,
-) {
-  automaticScope((scope) => {
-    const nameRef = createStringRef(ode, scope, name);
-    const faceNameRef = createStringRef(ode, scope, faceName ?? "");
-    const ptr = ode._malloc(data.byteLength);
-    if (ptr === 0) throw new Error("Failed to allocate memory");
-    try {
-      ode.HEAPU8.set(data, ptr);
-      const result = ode.design_loadFontBytes(
-        design,
-        nameRef,
-        ptr,
-        data.byteLength,
-        faceNameRef,
-      );
-      throwOnError(ode, result);
-    } catch (e) {
-      // TODO: design_loadFontBytes is currently somewhat broken, so we only free
-      // on error. Change this once engine-side API is updated.
-      ode._free(ptr);
-      throw e;
-    }
-  });
-}
-
 export const createStringList = createObject("StringList");
 export const createLayerList = createObject("LayerList");
 
