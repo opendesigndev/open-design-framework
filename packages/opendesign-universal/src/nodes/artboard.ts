@@ -172,6 +172,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       );
       throwOnError(this.#engine.ode, result);
       const layers = new Map();
+      let rootLayer;
       for (let i = 0; i < layerList.n; i++) {
         const layer = layerList.getEntry(i);
         // FIXME: scope deleter doesn't work here because ListEntry has no delete method
@@ -204,14 +205,16 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
           // get parent and update children array considering reverse flag
           const parent = layers.get(parentId);
           if (reverse) {
-            parent.children.unshift(id);
+            parent.children.unshift(layers.get(id));
           } else {
-            parent.children.push(id);
+            parent.children.push(layers.get(id));
           }
           // layers.set(parentId, parent);
+        } else {
+          rootLayer = id;
         }
       }
-      return layers;
+      return layers.get(rootLayer);
     });
   }
 }
