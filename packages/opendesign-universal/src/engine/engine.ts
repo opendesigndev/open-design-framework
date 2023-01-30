@@ -120,8 +120,9 @@ const createDesignImageBase = createObject(
 
 export const createPR1FrameView = createObject("PR1_FrameView");
 
+type EmbindEnumExport = { [keys in string]: { value: number } };
 function createEnumDecoder<EnumMap extends { [key: string]: number }>(
-  enumName: KeysOfType<ODE, { [keys in string]: { value: number } }>,
+  enumName: KeysOfType<ODE, EmbindEnumExport>,
 ) {
   let decoder: undefined | Map<number, keyof EnumMap> = undefined;
   return function decodeResult(
@@ -172,7 +173,7 @@ export function throwOnParseError(
   result: Result,
   parseError: ParseError,
   source: string,
-): asserts result is { value: 0 } {
+): asserts result is { value: Result_Map["OK"] } {
   if (result.value) {
     const code = `${decodeResult(ode, result)} (${(result as any).value})`;
     let error = new Error(code);
@@ -197,7 +198,7 @@ export function throwOnParseError(
 export function throwOnError(
   ode: ODE,
   result: Result,
-): asserts result is { value: 0 } {
+): asserts result is { value: Result_Map["OK"] } {
   if (result.value) {
     const code = `${decodeResult(ode, result)} (${result.value})`;
     throw new Error(code);

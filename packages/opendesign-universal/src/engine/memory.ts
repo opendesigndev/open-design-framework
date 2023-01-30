@@ -42,7 +42,7 @@ type Scope = <Args extends readonly unknown[]>(
  * scope(() => console.log('finished'))
  * // it will log finished once it's time to clean up
  *
- * ## Example
+ * ## Examples
  *
  * ```typescript
  * // The following will log 1 2 3
@@ -52,14 +52,36 @@ type Scope = <Args extends readonly unknown[]>(
  *   return 3
  * })
  * console.log(result)
+ * ```
  *
- * // The following will log 1 2 and the error will propagate up
- * const result = automaticScope((scope) => {
- *   console.log(1)
- *   scope(() => console.log(2))
- *   throw new Error('fail')
+ * The following will log "setup cleanup" and the error will propagate up
+ *
+ * ```typescript
+ * automaticScope((scope) => {
+ *   console.log('setup')
+ *   scope(() => console.log('cleanup'))
+ *   somePotentiallyFailingCode()
  * })
- * console.log(result)
+ * ```
+ *
+ * Compare with this, where cleanup will never get called if preceding code throws
+ *
+ * ```typescript
+ * console.log('setup')
+ * somePotentiallyFailingCode()
+ * console.log('cleanup')
+ * ```
+ *
+ * Equivalent code without automaticScope would be, which is easy to mess up and
+ * it's inconvenient when multiple cleanups are needed.
+ *
+ * ```typescript
+ * try {
+ *   console.log('setup')
+ *   somePotentiallyFailingCode()
+ * } finally {
+ *   console.log('cleanup')
+ * }
  * ```
  *
  * @param cb
@@ -93,7 +115,36 @@ export async function automaticScopeAsync<T>(
 
 /**
  * Creates scope which you can manually destroy. Also returns AbortSignal with
- * the same lifetime as the scope.
+ * the same lifetime as the scope. You likely want to wrap this in some kind of
+ * try-finally, or use {@link automaticScope} instead.
+ *
+ * ## Example
+ *
+ * Let's say you have some object, which needs some ODE object to exist. You can
+ * use this function to manage the ODE object's lifetime.
+ *
+ * ```typescript
+ * class Klass {
+ *   #lifetime = detachedScope()
+ *
+ *   constructor() {
+ *     this.handle = this.#lifetime.scope(createHandle, deleter)
+ *   }
+ *
+ *   destroy() {
+ *     this.#lifetime.destroy()
+ *   }
+ * }
+ * ```
+ *
+ * Simple example would be:
+ *
+ * ```typescript
+ * const { scope, destroy } = detachedScope()
+ * scope(() => console.log('abc'))
+ * // ... later
+ * destroy() // logs abc
+ * ```
  */
 export function detachedScope(): {
   scope: Scope;

@@ -261,13 +261,19 @@ export class EditorImplementation implements Editor {
 
         // TODO: Replace this with event-based listening for missing fonts
         if (fontData) {
-          const font = await fontData;
-          const missingFonts = design_listMissingFonts(
-            engine.ode,
-            engine.design,
-          );
-          for (const fontName of missingFonts) {
-            this.setFont(fontName, font);
+          try {
+            const font = await fontData;
+            const missingFonts = design_listMissingFonts(
+              engine.ode,
+              engine.design,
+            );
+            for (const fontName of missingFonts) {
+              this.setFont(fontName, font);
+            }
+          } catch (e) {
+            // TODO: figure out better error handling story if this if becomes
+            // permanent and not just temporary workaround
+            env.warn(e);
           }
         }
 
