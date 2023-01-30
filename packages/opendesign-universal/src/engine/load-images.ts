@@ -25,7 +25,7 @@ export async function loadImages(
     for (const { data, path } of images) {
       engine.ode.HEAP8.set(data.data, ptr);
       automaticScope((scope) => {
-        const result = engine.ode.designLoadImagePixels(
+        const result = engine.ode.design_loadImagePixels(
           engine.designImageBase,
           createStringRef(engine.ode, scope, path),
           {
