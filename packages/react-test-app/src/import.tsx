@@ -10,6 +10,8 @@ import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
+import { useMemo } from "react";
+import { useCallback } from "react";
 import React, { Suspense, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
@@ -201,13 +203,14 @@ function performPaste(
   }
 }
 
-function getListOfLayers(
-  editor: Editor,
-) {
-  debugger
-  const artboard = editor.currentPage.findArtboard()
-  const layers = artboard.getListOfLayers()
-}
+type LayersMapType = {
+  [id: string]: {
+    id: string;
+    name: string;
+    children: string[];
+    type: string;
+  };
+};
 
 function Content({
   data,
@@ -218,16 +221,64 @@ function Content({
     | { type: "paste"; data: ImportedClipboardData };
   componentId: string | null;
 }) {
+  const [isReverse, setIsReverse] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const editor = useEditor({
     design: data.type === "file" ? data.data : undefined,
     componentId,
     onLoad(editor) {
+      setIsLoaded(true);
       if (data.type === "paste") {
         performPaste(editor, data.data);
       }
     },
     unstable_fallbackFont: "/static/inter.ttf",
   });
+
+  // const getListOfLayers = useMemo<LayersMapType>(() => {
+  //   if (!isLoaded) return;
+
+  //   console.log(layers);
+  //   return layers as unknown as LayersMapType;
+  // }, [isReverse, isLoaded, editor]);
+
+  const renderLayers = () => {
+    if (!isLoaded) return <li>Loading...</li>;
+    const artboard = editor.currentPage.findArtboard();
+    const layers = artboard?.getListOfLayers(isReverse);
+    if (!layers) return <li>no layers</li>;
+    console.log(layers);
+    const renderedLayers = new Set();
+    let count = 0;
+    let result = "";
+    // take first layer and check if it has parent
+    // if it has a parent, then take the parent and repeat the process
+    // if not, then it's a top level layer and we can render it and layers from this chain
+    const renderLayer = (layerId: string) => {
+      console.log(layerId, renderedLayers);
+      count++;
+      if (renderedLayers.has(layerId)) return null;
+      console.log("rendering", layerId);
+      const layer = layers.get(layerId);
+      renderedLayers.add(layerId);
+      // return (
+      //   <li key={layerId}>
+      //     {layer.name} {layer.type}
+      //     {layer.children.map(renderLayer)}
+      //   </li>
+      // );
+      result += `#${count} ${layerId} : "${layer.name}" ${
+        layer.type
+      }; children?::: ${layer.children.map(renderLayer)}!!`;
+      // return `${count} layer ${layer.name} ${layer.type} ${layer.children.map(
+      //   renderLayer,
+      // )}`;
+    };
+
+    layers.forEach((layer: any) => renderLayer(layer.id));
+    return result;
+  };
+
   return (
     <>
       <EditorProvider editor={editor}>
@@ -237,24 +288,32 @@ function Content({
             performPaste(editor, evt.data);
           }}
         />
-        <Button onClick={() => getListOfLayers(editor)}>
-          Get list of layers
-        </Button>
-        <div className="grow">
-          <Suspense>
-            <EditorCanvas editor={editor} />
-          </Suspense>
-          {data.type === "file" ? (
-            <div className="absolute top-4 right-4">
-              <Button
-                onClick={() =>
-                  void saveAs(new Blob([data.data]), "file.octopus")
-                }
-              >
-                Download .octopus
-              </Button>
-            </div>
-          ) : null}
+        <div className="flex flex-row py-2 grow">
+          <div className="basis-1/5">
+            <button
+              onClick={() => setIsReverse(!isReverse)}
+              disabled={!isLoaded}
+            >
+              {isReverse ? "Reverse" : "Normal"}
+            </button>
+            <ul>{renderLayers()}</ul>
+          </div>
+          <div className="basis-4/5">
+            <Suspense>
+              <EditorCanvas editor={editor} />
+            </Suspense>
+            {data.type === "file" ? (
+              <div className="absolute top-4 right-4">
+                <Button
+                  onClick={() =>
+                    void saveAs(new Blob([data.data]), "file.octopus")
+                  }
+                >
+                  Download .octopus
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </EditorProvider>
     </>
