@@ -1,3 +1,5 @@
+import "./import.css";
+
 import type { PasteEvent } from "@opendesign/react";
 import { EditorProvider } from "@opendesign/react";
 import { EditorCanvas, useEditor, usePaste } from "@opendesign/react";
@@ -10,8 +12,6 @@ import { readManifest } from "@opendesign/universal";
 import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
 import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
-import { useMemo } from "react";
-import { useCallback } from "react";
 import React, { Suspense, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
@@ -203,13 +203,11 @@ function performPaste(
   }
 }
 
-type LayersMapType = {
-  [id: string]: {
-    id: string;
-    name: string;
-    children: string[];
-    type: string;
-  };
+type LayerType = {
+  id: string;
+  name: string;
+  children: LayerType[];
+  type: string;
 };
 
 function Content({
@@ -223,6 +221,14 @@ function Content({
 }) {
   const [isReverse, setIsReverse] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [layers, setLayers] = useState<LayerType>({});
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    const artboard = editor?.currentPage.findArtboard();
+    setLayers(artboard?.getListOfLayers(isReverse));
+  }, [isReverse, isLoaded]);
+
   const editor = useEditor({
     design: data.type === "file" ? data.data : undefined,
     componentId,
@@ -235,48 +241,18 @@ function Content({
     unstable_fallbackFont: "/static/inter.ttf",
   });
 
-  // const getListOfLayers = useMemo<LayersMapType>(() => {
-  //   if (!isLoaded) return;
-
-  //   console.log(layers);
-  //   return layers as unknown as LayersMapType;
-  // }, [isReverse, isLoaded, editor]);
-
-  const renderLayers = () => {
-    if (!isLoaded) return <li>Loading...</li>;
-    const artboard = editor.currentPage.findArtboard();
-    const layers = artboard?.getListOfLayers(isReverse);
-    if (!layers) return <li>no layers</li>;
-    console.log(layers);
-    const renderedLayers = new Set();
-    let count = 0;
-    let result = "";
-    // take first layer and check if it has parent
-    // if it has a parent, then take the parent and repeat the process
-    // if not, then it's a top level layer and we can render it and layers from this chain
-    const renderLayer = (layerId: string) => {
-      console.log(layerId, renderedLayers);
-      count++;
-      if (renderedLayers.has(layerId)) return null;
-      console.log("rendering", layerId);
-      const layer = layers.get(layerId);
-      renderedLayers.add(layerId);
-      // return (
-      //   <li key={layerId}>
-      //     {layer.name} {layer.type}
-      //     {layer.children.map(renderLayer)}
-      //   </li>
-      // );
-      result += `#${count} ${layerId} : "${layer.name}" ${
-        layer.type
-      }; children?::: ${layer.children.map(renderLayer)}!!`;
-      // return `${count} layer ${layer.name} ${layer.type} ${layer.children.map(
-      //   renderLayer,
-      // )}`;
-    };
-
-    layers.forEach((layer: any) => renderLayer(layer.id));
-    return result;
+  const renderLayer = (layer: LayerType, level = 1) => {
+    const nextLevel = level + 1;
+    return (
+      <li key={layer.id} className="mb-2">
+        {layer.name} <small>{layer.type}</small>
+        {layer.children ? (
+          <ol className="nested-list ml-2">
+            {layer.children.map((l) => renderLayer(l, nextLevel))}
+          </ol>
+        ) : null}
+      </li>
+    );
   };
 
   return (
@@ -290,13 +266,13 @@ function Content({
         />
         <div className="flex flex-row py-2 grow">
           <div className="basis-1/5">
-            <button
+            <Button
               onClick={() => setIsReverse(!isReverse)}
               disabled={!isLoaded}
             >
-              {isReverse ? "Reverse" : "Normal"}
-            </button>
-            <ul>{renderLayers()}</ul>
+              Change order to {!isReverse ? "Reverse" : "Normal"}
+            </Button>
+            <ol className="nested-list">{renderLayer(layers)}</ol>
           </div>
           <div className="basis-4/5">
             <Suspense>
