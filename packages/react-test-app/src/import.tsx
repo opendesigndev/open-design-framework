@@ -205,13 +205,6 @@ function performPaste(
   }
 }
 
-type LayerType = {
-  id: string;
-  name: string;
-  layers: LayerType[];
-  type: string;
-};
-
 function Content({
   data,
   componentId,
@@ -244,7 +237,7 @@ function Content({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReverse, isLoaded]);
 
-  const renderLayer = (layer: LayerType | undefined, level = 1) => {
+  const renderLayer = (layer: LayerListItem | undefined, level = 1) => {
     const nextLevel = level + 1;
     if (!layer) return null;
     return (
