@@ -1,6 +1,8 @@
 import type { ComponentHandle } from "@opendesign/engine";
 
 import type { Engine } from "../engine/engine.js";
+import { createLayerList } from "../engine/engine.js";
+import { decodeLayerType } from "../engine/engine.js";
 import {
   createComponentFromOctopus,
   createParseError,
@@ -19,6 +21,13 @@ import type { LayerNode } from "./layer.js";
 import { LayerNodeImpl } from "./layer.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
+
+export type LayerListItem = {
+  id: string;
+  name: string;
+  type: LayerNode["type"];
+  layers: LayerListItem[];
+};
 
 export interface ArtboardNode extends BaseNode {
   type: "ARTBOARD";
@@ -82,7 +91,7 @@ export interface ArtboardNode extends BaseNode {
    *
    * @param reverse if true, returns layers in reverse order (from top to bottom), default is false
    */
-  getListOfLayers(reverse?: boolean): void;
+  getListOfLayers(reverse?: boolean): LayerListItem;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -162,34 +171,35 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   getListOfLayers(reverse = false) {
     return automaticScope((scope) => {
-      const createStringList = createObject("LayerList");
-      const layerList = createStringList(this.#engine.ode, scope);
+      const layerList = createLayerList(this.#engine.ode, scope);
       const result = this.#engine.ode.component_listLayers(
         this.__component,
         layerList,
       );
+      scope(() => void this.#engine.ode.destroyLayerList(layerList));
       throwOnError(this.#engine.ode, result);
       const layers = new Map();
       let rootLayer;
 
       for (let i = 0; i < layerList.n; i++) {
+        // TODO: figure out how to clean memory
         const layer = layerList.getEntry(i);
         const id = layer.id.string();
         const parentId = layer.parentId.string();
+        const layerType = decodeLayerType(this.#engine.ode, layer.type);
         // check if layer exists (boilerplated from child) and update it
         // otherwise create a new layer with empty children array
         if (layers.has(id)) {
           const existingLayer = layers.get(id);
           existingLayer.parentId = parentId;
           existingLayer.name = layer.name.string();
-          existingLayer.type = layer.type.constructor.name;
+          existingLayer.type = layerType;
           layers.set(id, existingLayer);
         } else {
           layers.set(id, {
             id,
-            parentId,
             name: layer.name.string(),
-            type: layer.type.constructor.name,
+            type: layerType,
             layers: [],
           });
         }

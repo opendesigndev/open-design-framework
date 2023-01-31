@@ -239,6 +239,7 @@ export function design_loadFontBytes(
 }
 
 export const createStringList = createObject("StringList");
+export const createLayerList = createObject("LayerList");
 
 export function design_listMissingFonts(ode: ODE, design: DesignHandle) {
   return automaticScope((scope) => {
