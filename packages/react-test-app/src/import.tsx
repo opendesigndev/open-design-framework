@@ -1,13 +1,20 @@
 import type { PasteEvent } from "@opendesign/react";
-import { EditorProvider } from "@opendesign/react";
-import { EditorCanvas, useEditor, usePaste } from "@opendesign/react";
+import {
+  EditorCanvas,
+  EditorProvider,
+  useEditor,
+  usePaste,
+} from "@opendesign/react";
 import type {
   Editor,
   ImportedClipboardData,
   Manifest,
 } from "@opendesign/universal";
-import { readManifest } from "@opendesign/universal";
-import { importFile, isOptimizedOctopusFile } from "@opendesign/universal";
+import {
+  importFile,
+  isOptimizedOctopusFile,
+  readManifest,
+} from "@opendesign/universal";
 import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
 import React, { Suspense, useEffect, useState } from "react";
@@ -240,10 +247,10 @@ function Content({
     return (
       <li
         key={layer.id}
-        className="[counter-increment:section] marker:[content:counters(section,'.')] mb-2 pl-4"
+        className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
       >
         {layer.name} <small>{layer.type}</small>
-        {layer.layers ? (
+        {layer.layers.length ? (
           <ol className="[counter-reset:section] ml-2">
             {layer.layers.map((l) => renderLayer(l, nextLevel))}
           </ol>
