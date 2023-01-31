@@ -11,7 +11,6 @@ import {
 } from "../engine/engine.js";
 import {
   automaticScope,
-  createObject,
   createStringRef,
   detachedScope,
 } from "../engine/memory.js";
