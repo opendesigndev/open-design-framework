@@ -16,6 +16,8 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
+import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
+
 async function convert(file: Blob) {
   const data = new Uint8Array(await file.arrayBuffer());
   if (isOptimizedOctopusFile(data.buffer)) return data;
@@ -221,7 +223,7 @@ function Content({
 }) {
   const [isReverse, setIsReverse] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [layers, setLayers] = useState<LayerType>({} as LayerType);
+  const [layers, setLayers] = useState<LayerListItem | undefined>();
 
   const editor = useEditor({
     design: data.type === "file" ? data.data : undefined,
@@ -238,16 +240,21 @@ function Content({
   useEffect(() => {
     if (!isLoaded) return;
     const artboard = editor?.currentPage.findArtboard();
-    setLayers(artboard?.getListOfLayers(isReverse) as unknown as LayerType);
+    setLayers(artboard?.getListOfLayers(isReverse));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReverse, isLoaded]);
 
-  const renderLayer = (layer: LayerType, level = 1) => {
+  const renderLayer = (layer: LayerType | undefined, level = 1) => {
     const nextLevel = level + 1;
+    if (!layer) return null;
     return (
-      <li key={layer.id} className="mb-2">
+      <li
+        key={layer.id}
+        className="[counter-increment:section] marker:[content:counters(section,'.')] mb-2 pl-4"
+      >
         {layer.name} <small>{layer.type}</small>
         {layer.layers ? (
-          <ol className="nested-list ml-2">
+          <ol className="[counter-reset:section] ml-2">
             {layer.layers.map((l) => renderLayer(l, nextLevel))}
           </ol>
         ) : null}
@@ -270,7 +277,7 @@ function Content({
             <Button onClick={() => setIsReverse(!isReverse)}>
               Change order to {!isReverse ? "Reverse" : "Normal"}
             </Button>
-            <ol className="nested-list">{renderLayer(layers)}</ol>
+            <ol className="[counter-reset:section]">{renderLayer(layers)}</ol>
           </div>
           <div className="basis-4/5">
             <Suspense>
