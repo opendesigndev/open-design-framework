@@ -131,7 +131,9 @@ function createEnumDecoder<EnumMap extends { [key: string]: number }>(
   ): keyof EnumMap | `UNKNOWN_${number}` {
     if (!decoder) {
       decoder = new Map();
-      for (const [k, v] of Object.entries(ode[enumName])) decoder.set(v, k);
+      for (const [k, v] of Object.entries(ode[enumName])) {
+        decoder.set(v.value, k);
+      }
     }
     return decoder.get(code.value) ?? "UNKNOWN_" + (code.value as number);
   };
