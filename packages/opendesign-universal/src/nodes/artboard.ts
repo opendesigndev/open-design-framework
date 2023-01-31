@@ -92,7 +92,7 @@ export interface ArtboardNode extends BaseNode {
    *
    * @param reverse if true, returns layers in reverse order (from top to bottom), default is false
    */
-  getListOfLayers(reverse?: boolean): LayerListItem | null;
+  getLayers(reverse?: boolean): LayerListItem | null;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -170,7 +170,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     );
   }
 
-  getListOfLayers(reverse = false) {
+  getLayers(reverse = false) {
     return automaticScope((scope) => {
       const layerList = createLayerList(this.#engine.ode, scope);
       const result = this.#engine.ode.component_listLayers(

@@ -238,7 +238,7 @@ function Content({
   useEffect(() => {
     if (!isLoaded) return;
     const artboard = editor?.currentPage.findArtboard();
-    setLayers(artboard?.getListOfLayers(isReverse));
+    setLayers(artboard?.getLayers(isReverse));
   }, [isReverse, isLoaded, editor]);
 
   const renderLayer = (layer?: LayerListItem | null, level = 1) => {
