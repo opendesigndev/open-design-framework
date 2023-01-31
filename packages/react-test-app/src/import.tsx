@@ -276,7 +276,7 @@ function Content({
             </Button>
             <ol className="[counter-reset:section]">{renderLayer(layers)}</ol>
           </div>
-          <div className="basis-4/5">
+          <div className="basis-4/5 border border-dashed">
             <Suspense>
               <EditorCanvas editor={editor} />
             </Suspense>
