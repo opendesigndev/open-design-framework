@@ -232,8 +232,7 @@ function Content({
     if (!isLoaded) return;
     const artboard = editor?.currentPage.findArtboard();
     setLayers(artboard?.getListOfLayers(isReverse));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReverse, isLoaded]);
+  }, [isReverse, isLoaded, editor]);
 
   const renderLayer = (layer: LayerListItem | undefined, level = 1) => {
     const nextLevel = level + 1;
