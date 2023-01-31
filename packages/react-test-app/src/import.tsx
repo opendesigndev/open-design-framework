@@ -221,7 +221,7 @@ function Content({
 }) {
   const [isReverse, setIsReverse] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [layers, setLayers] = useState<LayerListItem | undefined>();
+  const [layers, setLayers] = useState<LayerListItem | null>();
 
   const editor = useEditor({
     design: data.type === "file" ? data.data : undefined,
@@ -241,7 +241,7 @@ function Content({
     setLayers(artboard?.getListOfLayers(isReverse));
   }, [isReverse, isLoaded, editor]);
 
-  const renderLayer = (layer: LayerListItem | undefined, level = 1) => {
+  const renderLayer = (layer?: LayerListItem | null, level = 1) => {
     const nextLevel = level + 1;
     if (!layer) return null;
     return (

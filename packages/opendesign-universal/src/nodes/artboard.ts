@@ -1,4 +1,5 @@
 import type { ComponentHandle } from "@opendesign/engine";
+import { LayerType_Map } from "@opendesign/engine/logic-api.js";
 
 import type { Engine } from "../engine/engine.js";
 import { createLayerList } from "../engine/engine.js";
@@ -24,8 +25,9 @@ import { BaseNodeImpl } from "./node.js";
 export type LayerListItem = {
   id: string;
   name: string;
-  type: LayerNode["type"];
+  type: string;
   layers: LayerListItem[];
+  parentId?: string;
 };
 
 export interface ArtboardNode extends BaseNode {
@@ -90,7 +92,7 @@ export interface ArtboardNode extends BaseNode {
    *
    * @param reverse if true, returns layers in reverse order (from top to bottom), default is false
    */
-  getListOfLayers(reverse?: boolean): LayerListItem;
+  getListOfLayers(reverse?: boolean): LayerListItem | null;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -177,8 +179,8 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       );
       scope(() => void this.#engine.ode.destroyLayerList(layerList));
       throwOnError(this.#engine.ode, result);
-      const layers = new Map();
-      let rootLayer;
+      const layers: Map<string, LayerListItem> = new Map();
+      let rootLayer: string = "";
 
       for (let i = 0; i < layerList.n; i++) {
         // TODO: figure out how to clean memory
@@ -189,7 +191,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         // check if layer exists (boilerplated from child) and update it
         // otherwise create a new layer with empty children array
         if (layers.has(id)) {
-          const existingLayer = layers.get(id);
+          const existingLayer = layers.get(id) as LayerListItem;
           existingLayer.parentId = parentId;
           existingLayer.name = layer.name.string();
           existingLayer.type = layerType;
@@ -207,21 +209,32 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         if (parentId) {
           // check if parent exists, if not create a boilerplate
           if (!layers.has(parentId)) {
-            layers.set(parentId, { id: parentId, layers: [] });
+            layers.set(parentId, {
+              id: parentId,
+              type: "",
+              name: "",
+              layers: [],
+            });
           }
           // get parent and update children array considering reverse flag
-          const parent = layers.get(parentId);
-          if (reverse) {
-            parent.layers.unshift(layers.get(id));
-          } else {
-            parent.layers.push(layers.get(id));
+          if (layers.has(parentId)) {
+            const parent = layers.get(parentId) as LayerListItem;
+            if (reverse) {
+              parent.layers.unshift(layers.get(id) as LayerListItem);
+            } else {
+              parent.layers.push(layers.get(id) as LayerListItem);
+            }
           }
         } else {
           rootLayer = id;
         }
       }
 
-      return layers.get(rootLayer);
+      if (!rootLayer) {
+        throw new Error("No root layer found");
+      }
+
+      return layers.get(rootLayer) as LayerListItem;
     });
   }
 }
