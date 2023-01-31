@@ -210,6 +210,32 @@ function performPaste(
   }
 }
 
+function LayerList({
+  layers,
+  level = 1,
+}: {
+  layers: LayerListItem[];
+  level?: number;
+}) {
+  if (layers.length === 0) return null;
+
+  return (
+    <ol className="[counter-reset:section] ml-2">
+      {layers.map((layer) => (
+        <li
+          key={layer.id}
+          className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
+        >
+          {layer.name}
+          {layer.layers.length > 0 && (
+            <LayerList layers={layer.layers} level={level + 1} />
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function Content({
   data,
   componentId,
@@ -241,24 +267,6 @@ function Content({
     setLayers(artboard?.getLayers(isReverse));
   }, [isReverse, isLoaded, editor]);
 
-  const renderLayer = (layer?: LayerListItem | null, level = 1) => {
-    const nextLevel = level + 1;
-    if (!layer) return null;
-    return (
-      <li
-        key={layer.id}
-        className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
-      >
-        {layer.name} <small>{layer.type}</small>
-        {layer.layers.length ? (
-          <ol className="[counter-reset:section] ml-2">
-            {layer.layers.map((l) => renderLayer(l, nextLevel))}
-          </ol>
-        ) : null}
-      </li>
-    );
-  };
-
   return (
     <>
       <EditorProvider editor={editor}>
@@ -274,7 +282,8 @@ function Content({
             <Button onClick={() => setIsReverse(!isReverse)}>
               Change order to {!isReverse ? "Reverse" : "Normal"}
             </Button>
-            <ol className="[counter-reset:section]">{renderLayer(layers)}</ol>
+
+            <LayerList layers={layers?.layers ?? []} />
           </div>
           <div className="basis-4/5 border border-dashed">
             <Suspense>
