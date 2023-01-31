@@ -1,3 +1,0 @@
-ol.nested-list { counter-reset: item }
-ol.nested-list li{ display: block }
-ol.nested-list li:before { content: counters(item, ".") " "; counter-increment: item }

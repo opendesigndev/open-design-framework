@@ -1,5 +1,3 @@
-import "./import.css";
-
 import type { PasteEvent } from "@opendesign/react";
 import { EditorProvider } from "@opendesign/react";
 import { EditorCanvas, useEditor, usePaste } from "@opendesign/react";
