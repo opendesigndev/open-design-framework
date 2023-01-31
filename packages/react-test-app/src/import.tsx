@@ -206,7 +206,7 @@ function performPaste(
 type LayerType = {
   id: string;
   name: string;
-  children: LayerType[];
+  layers: LayerType[];
   type: string;
 };
 
@@ -223,12 +223,6 @@ function Content({
   const [isLoaded, setIsLoaded] = useState(false);
   const [layers, setLayers] = useState<LayerType>({} as LayerType);
 
-  useEffect(() => {
-    if (!isLoaded) return;
-    const artboard = editor?.currentPage.findArtboard();
-    setLayers(artboard?.getListOfLayers(isReverse) as unknown as LayerType);
-  }, [isReverse, isLoaded]);
-
   const editor = useEditor({
     design: data.type === "file" ? data.data : undefined,
     componentId,
@@ -241,14 +235,20 @@ function Content({
     unstable_fallbackFont: "/static/inter.ttf",
   });
 
+  useEffect(() => {
+    if (!isLoaded) return;
+    const artboard = editor?.currentPage.findArtboard();
+    setLayers(artboard?.getListOfLayers(isReverse) as unknown as LayerType);
+  }, [isReverse, isLoaded]);
+
   const renderLayer = (layer: LayerType, level = 1) => {
     const nextLevel = level + 1;
     return (
       <li key={layer.id} className="mb-2">
         {layer.name} <small>{layer.type}</small>
-        {layer.children ? (
+        {layer.layers ? (
           <ol className="nested-list ml-2">
-            {layer.children.map((l) => renderLayer(l, nextLevel))}
+            {layer.layers.map((l) => renderLayer(l, nextLevel))}
           </ol>
         ) : null}
       </li>
@@ -266,6 +266,7 @@ function Content({
         />
         <div className="flex flex-row py-2 grow">
           <div className="basis-1/5">
+            <h2 className="text-lg font-semibold mb-2">Layers</h2>
             <Button onClick={() => setIsReverse(!isReverse)}>
               Change order to {!isReverse ? "Reverse" : "Normal"}
             </Button>

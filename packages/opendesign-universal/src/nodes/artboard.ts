@@ -11,7 +11,6 @@ import {
   automaticScope,
   createObject,
   createStringRef,
-  deleter,
   detachedScope,
 } from "../engine/memory.js";
 import { generateUUID, todo } from "../internals.js";
@@ -164,7 +163,6 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   getListOfLayers(reverse = false) {
     return automaticScope((scope) => {
       const createStringList = createObject("LayerList");
-      debugger;
       const layerList = createStringList(this.#engine.ode, scope);
       const result = this.#engine.ode.component_listLayers(
         this.__component,
@@ -173,9 +171,9 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       throwOnError(this.#engine.ode, result);
       const layers = new Map();
       let rootLayer;
+
       for (let i = 0; i < layerList.n; i++) {
         const layer = layerList.getEntry(i);
-        // FIXME: scope deleter doesn't work here because ListEntry has no delete method
         const id = layer.id.string();
         const parentId = layer.parentId.string();
         // check if layer exists (boilerplated from child) and update it
@@ -192,28 +190,28 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
             parentId,
             name: layer.name.string(),
             type: layer.type.constructor.name,
-            children: [],
+            layers: [],
           });
         }
 
-        // check if layer has parent
+        // check if layer has parent, if not then it's a root layer
         if (parentId) {
           // check if parent exists, if not create a boilerplate
           if (!layers.has(parentId)) {
-            layers.set(parentId, { id: parentId, children: [] });
+            layers.set(parentId, { id: parentId, layers: [] });
           }
           // get parent and update children array considering reverse flag
           const parent = layers.get(parentId);
           if (reverse) {
-            parent.children.unshift(layers.get(id));
+            parent.layers.unshift(layers.get(id));
           } else {
-            parent.children.push(layers.get(id));
+            parent.layers.push(layers.get(id));
           }
-          // layers.set(parentId, parent);
         } else {
           rootLayer = id;
         }
       }
+
       return layers.get(rootLayer);
     });
   }
