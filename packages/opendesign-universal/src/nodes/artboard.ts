@@ -180,7 +180,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       scope(() => void this.#engine.ode.destroyLayerList(layerList));
       throwOnError(this.#engine.ode, result);
       const layers = new Map();
-      let rootLayer: string = "";
+      let rootLayer = "";
 
       for (let i = 0; i < layerList.n; i++) {
         // TODO: figure out how to clean memory

@@ -1,4 +1,5 @@
 import type { PasteEvent } from "@opendesign/react";
+import { useWaitForEditorLoaded } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
@@ -210,7 +211,7 @@ function performPaste(
   }
 }
 
-function LayerList({
+function Layers({
   layers,
   level = 1,
 }: {
@@ -221,18 +222,41 @@ function LayerList({
 
   return (
     <ol className="[counter-reset:section] ml-2">
-      {layers.map((layer) => (
-        <li
-          key={layer.id}
-          className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
-        >
-          {layer.name}
-          {layer.layers.length > 0 && (
-            <LayerList layers={layer.layers} level={level + 1} />
-          )}
-        </li>
-      ))}
+      {layers.map(
+        (layer) =>
+          layer && (
+            <li
+              key={layer.id}
+              className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
+            >
+              {layer.name}
+              {layer.layers.length > 0 && (
+                <Layers layers={layer.layers} level={level + 1} />
+              )}
+            </li>
+          ),
+      )}
     </ol>
+  );
+}
+
+function LayerList() {
+  const editor = useWaitForEditorLoaded();
+  const [isReverse, setIsReverse] = useState(false);
+  const artboard = editor?.currentPage.findArtboard();
+  const [layers, setLayers] = useState<LayerListItem | null>();
+
+  useEffect(() => {
+    setLayers(artboard?.getLayers(isReverse));
+  }, [artboard, isReverse]);
+
+  return (
+    <>
+      <Button onClick={() => setIsReverse(!isReverse)}>
+        Change order to {!isReverse ? "Reverse" : "Normal"}
+      </Button>
+      <Layers layers={layers?.layers ?? []} />
+    </>
   );
 }
 
@@ -245,27 +269,16 @@ function Content({
     | { type: "paste"; data: ImportedClipboardData };
   componentId: string | null;
 }) {
-  const [isReverse, setIsReverse] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [layers, setLayers] = useState<LayerListItem | null>();
-
   const editor = useEditor({
     design: data.type === "file" ? data.data : undefined,
     componentId,
     onLoad(editor) {
-      setIsLoaded(true);
       if (data.type === "paste") {
         performPaste(editor, data.data);
       }
     },
     unstable_fallbackFont: "/static/inter.ttf",
   });
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    const artboard = editor?.currentPage.findArtboard();
-    setLayers(artboard?.getLayers(isReverse));
-  }, [isReverse, isLoaded, editor]);
 
   return (
     <>
@@ -279,11 +292,9 @@ function Content({
         <div className="flex flex-row py-2 grow">
           <div className="basis-1/5">
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
-            <Button onClick={() => setIsReverse(!isReverse)}>
-              Change order to {!isReverse ? "Reverse" : "Normal"}
-            </Button>
-
-            <LayerList layers={layers?.layers ?? []} />
+            <Suspense>
+              <LayerList />
+            </Suspense>
           </div>
           <div className="basis-4/5 border border-dashed">
             <Suspense>
