@@ -1,0 +1,37 @@
+name: Experimental Release
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Experimental Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup_yarn
+      - name: Setup npm token
+        run: yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
+      - name: Build and publish experimental release
+        shell: bash
+        run: |
+          yarn changeset version --snapshot experimental --no-git-tag
+          cat << EOF > "$HOME/.npmrc"
+            //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          EOF
+          yarn prepare-release
+          yarn changeset publish --no-git-tag --tag experimental | tee $RUNNER_TEMP/rel.log
+          printf "## Published\n\n**tag:** experimental\n\n" > $GITHUB_STEP_SUMMARY
+          grep -R Publishing $RUNNER_TEMP/rel.log | sed 's/🦋  info Publishing /- /' | sed 's/"/`/g' >> $GITHUB_STEP_SUMMARY
+          printf "\n## Update commands\n"  >> $GITHUB_STEP_SUMMARY
+          grep -R Publishing $RUNNER_TEMP/rel.log | sed 's/🦋  info Publishing "/\n```\nyarn add /' | sed 's/" at "/@/' | sed 's/"/\n```/' >> $GITHUB_STEP_SUMMARY
+          printf '## Not published\n' >> $GITHUB_STEP_SUMMARY
+          printf '\n' >> $GITHUB_STEP_SUMMARY
+          printf "If something is not published then either it did not change or it's missing changeset.\n" >> $GITHUB_STEP_SUMMARY
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

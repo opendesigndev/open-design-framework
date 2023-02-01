@@ -7,5 +7,8 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
+  "snapshot": {
+    "prereleaseTemplate": "{tag}-{commit}-{datetime}"
+  },
   "ignore": ["docs", "react-test-app"]
 }
