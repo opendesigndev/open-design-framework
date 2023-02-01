@@ -1,5 +1,4 @@
 import type { ComponentHandle } from "@opendesign/engine";
-import { LayerType_Map } from "@opendesign/engine/logic-api.js";
 
 import type { Engine } from "../engine/engine.js";
 import { createLayerList } from "../engine/engine.js";
@@ -179,7 +178,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       );
       scope(() => void this.#engine.ode.destroyLayerList(layerList));
       throwOnError(this.#engine.ode, result);
-      const layers = new Map();
+      const layers = new Map<string, LayerListItem>();
       let rootLayer = "";
 
       for (let i = 0; i < layerList.n; i++) {
@@ -188,20 +187,25 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         const id = layer.id.string();
         const parentId = layer.parentId.string();
         const layerType = decodeLayerType(this.#engine.ode, layer.type);
-        // check if layer exists (boilerplated from child) and update it
-        // otherwise create a new layer with empty children array
-        if (layers.has(id)) {
-          const existingLayer = layers.get(id) as LayerListItem;
-          existingLayer.parentId = parentId;
-          existingLayer.name = layer.name.string();
-          existingLayer.type = layerType;
-          layers.set(id, existingLayer);
-        } else {
+        // check if layer exists (boilerplated parent layer from child) and update it
+        // otherwise create a new layer with empty children (layers) array
+        let boilerplatedLayer = layers.get(id)!;
+        if (!boilerplatedLayer) {
           layers.set(id, {
             id,
+            parentId,
             name: layer.name.string(),
             type: layerType,
             layers: [],
+          });
+        } else {
+          // take only children from boilerplated layer and update other fields
+          layers.set(id, {
+            id,
+            parentId,
+            name: layer.name.string(),
+            type: layerType,
+            layers: boilerplatedLayer.layers,
           });
         }
 
