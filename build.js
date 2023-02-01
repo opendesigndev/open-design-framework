@@ -9,7 +9,7 @@ run("yarn", ["workspace", "docs", "prebuild"]);
 console.info("Running typescript...");
 run("yarn", ["tsc", "-b"]);
 console.info("Creating changesets...");
-run("yarn", ["changeset", "version", "--snapshot"]);
+run("yarn", ["changeset", "version", "--snapshot", "not-released-yet"]);
 console.info("Building docs...");
 run("yarn", ["workspace", "docs", "build"]);
 console.info("Building react-test-app...");
