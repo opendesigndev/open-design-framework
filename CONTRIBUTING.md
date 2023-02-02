@@ -25,8 +25,7 @@ yarn dlx @yarnpkg/sdks vscode
 ```
 
 See [yarn's documentation](https://yarnpkg.com/getting-started/editor-sdks/) for
-more information. We'll likely commit those files to the repo in future, but
-right now I don't want to pollute git history while we are figuring things out.
+more information.
 
 Then you'll want to switch to workspace's typescript version:
 
@@ -39,3 +38,38 @@ Then you'll want to switch to workspace's typescript version:
 - If your typescript `type` has methods, change it to interface. It renders
   better in typedoc.
 - Same applies for type inheritance (nodes).
+
+## Release process
+
+We have an automated release process. Make your changes, run `yarn changeset`,
+write a changelog and commit the changelog in the same commit as your changes.
+
+**Experimental releases** Then, once it hits `main` branch, it will be
+automatically released as experimental version. See summary of experimental
+action (can be accessed via checkmark next to the commit) for resulting version
+names. This same workflow can also be triggered manually using following command:
+
+```bash
+gh workflow run "Experimental Release" --ref branch-name
+```
+
+You should not use those experimental releases in product, but they are good way
+to test the changes *before* you cut a stable release.
+
+**Stable release** To create a stable release first test it in a product using
+the experimental release and then merge automated PR titled "Version Packages"
+into `main`. It will: update changelogs, publish to npm, create github releases.
+See [changesets documentation](https://github.com/changesets/changesets) for more details.
+
+**Local testing** Sometimes, you want to test your changes locally without having to publish them
+to github and npm. To do that (within projects using yarn 3+) you can run
+`node make-linkable.js` and then change the dependency version to something
+similar to
+
+```json
+"@opendesign/react": "portal:../open-design-framework/packages/opendesign-react"
+```
+
+and run yarn. Depending on your setup, you might also have to have `yarn tsc -b --watch`
+running in this repository. Note that you should not commit changes made by the
+`make-linkable` script.
