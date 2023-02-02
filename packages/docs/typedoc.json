@@ -12,6 +12,7 @@
     "typedoc-plugin-mdn-links"
   ],
   "out": "dist",
+  "json": "dist/docs.json",
   "readme": "README.md",
   "excludePrivate": true,
   "includes": ".."

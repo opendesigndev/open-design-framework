@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prebuild": "node prebuild.js",
-    "build": "typedoc"
+    "build": "typedoc && node json-cleanup.js"
   },
   "dependencies": {
     "@opendesign/engine": "0.0.0-14ee8ea44c381d38b080617bfbd813797db76010",
