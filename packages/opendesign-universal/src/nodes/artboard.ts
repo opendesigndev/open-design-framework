@@ -81,6 +81,8 @@ export interface ArtboardNode extends BaseNode {
   /**
    * Returns list of all layers in this artboard.
    *
+   * By default returns layers in order from bottom to top. For example, background layer will be first.
+   *
    * @param reverse if true, returns layers in reverse order (from top to bottom), default is false
    */
   getLayers(reverse?: boolean): LayerListItem | null;
