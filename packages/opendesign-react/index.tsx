@@ -1,9 +1,4 @@
-import type {
-  CreateEditorOptions,
-  Editor,
-  EditorEvents,
-  Node,
-} from "@opendesign/universal";
+import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
 import type { MountOptions, MountResult } from "@opendesign/universal/dom";
 import { mount } from "@opendesign/universal/dom";
@@ -17,7 +12,6 @@ import {
 
 import type { LayerListItem } from "../opendesign-universal/src/nodes/artboard.js";
 import { useEditorContext } from "./src/context.js";
-import { usePaste } from "./src/paste.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
