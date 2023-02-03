@@ -34,7 +34,13 @@ const alias = Object.fromEntries(
 );
 
 export default defineConfig({
-  optimizeDeps: { exclude: [...localDeps] },
+  optimizeDeps: {
+    exclude: [...localDeps],
+    // NOTE: as of 3rd Feb 2023 vite does not pick up engine updates in dev mode
+    // therefore we disable the cache. If you want to reenable cache, test if
+    // updating engine works without having to pass --force to vite.
+    force: true,
+  },
   resolve: { alias },
   server: {
     fs: {
