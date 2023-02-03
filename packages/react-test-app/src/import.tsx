@@ -1,4 +1,5 @@
 import type { PasteEvent } from "@opendesign/react";
+import { useLayerList } from "@opendesign/react";
 import { useWaitForEditorLoaded } from "@opendesign/react";
 import {
   EditorCanvas,
@@ -241,21 +242,17 @@ function Layers({
 }
 
 function LayerList() {
-  const editor = useWaitForEditorLoaded();
   const [isReverse, setIsReverse] = useState(false);
-  const artboard = editor?.currentPage.findArtboard();
-  const [layers, setLayers] = useState<LayerListItem | null>();
+  const layers = useLayerList(isReverse);
 
-  useEffect(() => {
-    setLayers(artboard?.getLayers(isReverse));
-  }, [artboard, isReverse]);
+  if (!layers) return null;
 
   return (
     <>
       <Button onClick={() => setIsReverse(!isReverse)}>
         Change order to {!isReverse ? "Reverse" : "Normal"}
       </Button>
-      <Layers layers={layers?.layers ?? []} />
+      <Layers layers={layers?.layers} />
     </>
   );
 }
