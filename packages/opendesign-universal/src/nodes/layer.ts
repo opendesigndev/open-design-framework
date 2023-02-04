@@ -2,8 +2,6 @@ import type { ComponentHandle } from "@opendesign/engine";
 import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { Engine } from "../engine/engine.js";
-import { throwOnParseError } from "../engine/engine.js";
-import { createParseError } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
@@ -55,16 +53,15 @@ export class LayerNodeImpl extends BaseNodeImpl {
 
   createLayer(octopus: Octopus["schemas"]["Layer"]) {
     automaticScope((scope) => {
-      const parseError = createParseError(this.#engine.ode, scope);
+      const parseError = this.#engine.ode.ParseError(scope);
       const octopusString = JSON.stringify(octopus);
-      const res = this.#engine.ode.component_addLayer(
+      this.#engine.ode.component_addLayer(
         this.#component,
         createStringRef(this.#engine.ode, scope, this.#id), // parent
         createStringRef(this.#engine.ode, scope, ""), // before, empty means append
         createStringRef(this.#engine.ode, scope, octopusString), // octopus
         parseError,
       );
-      throwOnParseError(this.#engine.ode, res, parseError, octopusString);
     });
     this.#engine.redraw();
     return new LayerNodeImpl(
