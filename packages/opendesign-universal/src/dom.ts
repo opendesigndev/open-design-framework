@@ -4,8 +4,6 @@ import type { Editor } from "./editor.js";
 import { editorGetEngine } from "./editor.js";
 import { editorGetCanvas } from "./editor.js";
 import type { Renderer } from "./engine/engine.js";
-import { throwOnError } from "./engine/engine.js";
-import { createPR1FrameView, createPR1Renderer } from "./engine/engine.js";
 import { detachedScope } from "./engine/memory.js";
 import type { PageNodeImpl } from "./nodes/page.js";
 
@@ -68,15 +66,16 @@ export function mount(
   let width = 0;
   let height = 0;
 
-  const rendererHandle = createPR1Renderer(
-    engine.ode,
+  const rendererHandle = engine.ode.PR1_AnimationRendererHandle(scope);
+  engine.ode.pr1_createAnimationRenderer(
     scope,
     engine.rendererContext,
     (editor.currentPage as PageNodeImpl).__artboard?.__component!,
+    rendererHandle,
     engine.designImageBase,
   );
 
-  const frameView = createPR1FrameView(engine.ode, scope);
+  const frameView = engine.ode.PR1_FrameView(scope);
   frameView.width = canvas.width;
   frameView.height = canvas.height;
   frameView.scale = 0; // NOTE: this forces first draw
@@ -96,7 +95,7 @@ export function mount(
   // This will get called any other time
   const observer = new ResizeObserver(onResize);
   observer.observe(div);
-  scope(observer, disconnect);
+  scope(() => observer.disconnect());
 
   let space = 0;
   window.addEventListener(
@@ -166,10 +165,8 @@ export function mount(
     renderer.frameView.height = height;
     renderer.frameView.offset = offset;
     renderer.frameView.scale = scale;
-    throwOnError(
-      engine.ode,
-      engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0),
-    );
+
+    engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
   }
 
   function requestFrame() {
@@ -233,10 +230,6 @@ export function mount(
         offset[1],
     ] as const;
   }
-}
-
-function disconnect(observer: ResizeObserver) {
-  observer.disconnect();
 }
 
 let getScrollLineHeight = () => {

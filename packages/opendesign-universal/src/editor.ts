@@ -1,14 +1,9 @@
 import * as env from "@opendesign/env";
 
 import type { Engine } from "./engine/engine.js";
-import { throwOnError } from "./engine/engine.js";
 import { design_listMissingFonts } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
-import {
-  automaticScope,
-  createMemoryBuffer,
-  createStringRef,
-} from "./engine/memory.js";
+import { automaticScope, createStringRef } from "./engine/memory.js";
 import { todo } from "./internals.js";
 import { performance } from "./lib.js";
 import type { DesignNode } from "./nodes/design.js";
@@ -404,17 +399,16 @@ export class EditorImplementation implements Editor {
     const engine = editorGetEngine(this);
 
     automaticScope((scope) => {
-      const memory = createMemoryBuffer(engine.ode, scope);
+      const memory = engine.ode.MemoryBuffer(scope);
       const psNameRef = createStringRef(engine.ode, scope, postscriptName);
       const faceNameRef = createStringRef(engine.ode, scope, faceName ?? "");
 
-      const result = engine.ode.design_loadFontBytes(
+      engine.ode.design_loadFontBytes(
         engine.design,
         psNameRef,
         memory.withData(data),
         faceNameRef,
       );
-      throwOnError(engine.ode, result);
     });
   }
 }

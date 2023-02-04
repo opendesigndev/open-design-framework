@@ -1,14 +1,6 @@
-import type { ComponentHandle } from "@opendesign/engine";
+import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
 
 import type { Engine } from "../engine/engine.js";
-import { createLayerList } from "../engine/engine.js";
-import { decodeLayerType } from "../engine/engine.js";
-import {
-  createComponentFromOctopus,
-  createParseError,
-  throwOnError,
-  throwOnParseError,
-} from "../engine/engine.js";
 import {
   automaticScope,
   createStringRef,
@@ -117,14 +109,31 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       this.dimensions = parsed.dimensions;
     }
     this.#octopus = octopus;
-    this.__component = createComponentFromOctopus(
-      engine.ode,
-      this.#scope.scope,
-      this.#engine.design,
-      "page",
-      id,
-      octopus,
-    );
+    this.__component = engine.ode.ComponentHandle(this.#scope.scope);
+
+    const ode = this.#engine.ode;
+
+    automaticScope((tmpScope) => {
+      const pageRef = createStringRef(ode, tmpScope, "page");
+      const idRef = createStringRef(ode, tmpScope, id);
+      const octopusRef = createStringRef(ode, tmpScope, this.#octopus);
+      const metadata: ComponentMetadata = {
+        id: idRef,
+        page: pageRef,
+        position: [0, 0],
+      };
+      const parseError = ode.ParseError(tmpScope);
+      // TODO: this should be tmpScope and only move to #scope IFF add* call succeeds
+      const component = ode.ComponentHandle(this.#scope.scope);
+      ode.design_addComponentFromOctopusString(
+        this.#engine.design,
+        component,
+        metadata,
+        octopusRef,
+        parseError,
+      );
+      this.__component = component;
+    });
   }
 
   type = "ARTBOARD" as const;
@@ -141,13 +150,12 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   unstable_setStaticAnimation(animation: string) {
     automaticScope((scope) => {
       const ref = createStringRef(this.#engine.ode, scope, animation);
-      const parseError = createParseError(this.#engine.ode, scope);
-      const res = this.#engine.ode.pr1_component_loadAnimation(
+      const parseError = this.#engine.ode.ParseError(scope);
+      this.#engine.ode.pr1_component_loadAnimation(
         this.__component,
         ref,
         parseError,
       );
-      throwOnParseError(this.#engine.ode, res, parseError, animation);
     });
   }
 
@@ -171,13 +179,8 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   getLayers(reverse = false) {
     return automaticScope((scope) => {
-      const layerList = createLayerList(this.#engine.ode, scope);
-      const result = this.#engine.ode.component_listLayers(
-        this.__component,
-        layerList,
-      );
-      scope(() => void this.#engine.ode.destroyLayerList(layerList));
-      throwOnError(this.#engine.ode, result);
+      const layerList = this.#engine.ode.LayerList(scope);
+      this.#engine.ode.component_listLayers(scope, this.__component, layerList);
       const layers = new Map<string, LayerListItem>();
       let rootLayer = "";
 
@@ -186,7 +189,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         const layer = layerList.getEntry(i);
         const id = layer.id.string();
         const parentId = layer.parentId.string();
-        const layerType = decodeLayerType(this.#engine.ode, layer.type);
+        const layerType = this.#engine.ode.LayerType(layer.type);
         // check if layer exists (boilerplated parent layer from child) and update it
         // otherwise create a new layer with empty children (layers) array
         let boilerplatedLayer = layers.get(id)!;
