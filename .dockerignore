@@ -1,0 +1,11 @@
+*
+!/.changeset
+!/.yarn/plugins
+!/docs
+!/packages
+
+!/.yarnrc.yml
+!/package.json
+!/yarn.lock
+!/build.js
+!/tsconfig*
