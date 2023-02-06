@@ -14,14 +14,16 @@ console.info("Building docs...");
 run("yarn", ["workspace", "docs", "build"]);
 console.info("Building react-test-app...");
 run("yarn", ["workspace", "react-test-app", "vite", "build"]);
-console.info("Cleaning up changesets...");
-run("git", [
-  "checkout",
-  "@",
-  ".changeset",
-  ...packageFiles("CHANGELOG.md"),
-  ...packageFiles("package.json"),
-]);
+if (fs.existsSync(".git")) {
+  console.info("Cleaning up changesets...");
+  run("git", [
+    "checkout",
+    "@",
+    ".changeset",
+    ...packageFiles("CHANGELOG.md"),
+    ...packageFiles("package.json"),
+  ]);
+}
 
 const testApp = path.join(here, "packages", "react-test-app", "dist");
 const docs = path.join(here, "packages", "docs", "dist");
