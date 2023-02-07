@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     # only run when a pull request is open
     if: github.event.pull_request.state == 'open'
+    environment:
+      name: "Review ${{ github.event.pull_request.number }}"
+      url: https://review-odf-${{ github.event.pull_request.number }}.dokku.opendesign.site
     steps:
       - name: Cloning repo
         uses: actions/checkout@v2
