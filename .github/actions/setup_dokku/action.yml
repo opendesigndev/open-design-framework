@@ -24,7 +24,7 @@ runs:
     - id: script
       shell: bash
       run: |
-        mkdir -p ~/.ssh $RUNNER_TEMP/bin
+        mkdir -p ~/.ssh
         chmod 700 ~/.ssh
         printf "%s\n" '${{ inputs.ssh_host_key }}' >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts
