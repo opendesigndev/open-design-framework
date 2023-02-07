@@ -1,13 +1,13 @@
 ---
-name: "deploy"
+name: "Review App"
 
 on:
   # only run this workflow on pull request events
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, closed]
 
 jobs:
-  review_app:
+  deploy_review_app:
     runs-on: ubuntu-latest
     # only run when a pull request is open
     if: github.event.pull_request.state == 'open'
@@ -16,32 +16,36 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
-      - name: Push to dokku
-        uses: dokku/github-action@master
+      - id: dokku
+        uses: ./.github/actions/setup_dokku
         with:
-          # create a review app
-          command: review-apps:create
-          git_remote_url: "ssh://dokku@dokku.opendesign.site:22/odf"
-          git_push_flags: --no-verify # <- works around missing git-lfs
-          branch: main
-          # specify a name for the review app
-          review_app_name: review-odf-${{ github.event.pull_request.number }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          app_name: "review-odf-${{ github.event.pull_request.number }}"
+      - name: Create the review app
+        shell: bash
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        run: |
+          dokku apps:clone --skip-deploy --ignore-existing "odf" "${{ steps.dokku.outputs.app_name }}"
+          dokku domains:add "${{ steps.dokku.outputs.app_name }}" "${{ steps.dokku.outputs.app_name }}.dokku.opendesign.site"
+          dokku letsencrypt:enable "${{ steps.dokku.outputs.app_name }}"
+          dokku proxy:ports-add "${{ steps.dokku.outputs.app_name }}" https:443:80
+          dokku proxy:ports-remove "${{ steps.dokku.outputs.app_name }}" https:443:5000
+      - name: Push to dokku
+        shell: bash
+        run: git push --no-verify --force dokku HEAD:refs/heads/main
 
   destroy_review_app:
     runs-on: ubuntu-latest
     # only run when a pull request is closed
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     steps:
-      - name: Destroy the review app
-        uses: dokku/github-action@master
+      - name: Cloning repo
+        uses: actions/checkout@v2
+      - id: dokku
+        uses: ./.github/actions/setup_dokku
         with:
-          # destroy a review app
-          command: review-apps:destroy
-          git_remote_url: "ssh://dokku@dokku.opendesign.site:22/odf"
-          git_push_flags: --no-verify # <- works around missing git-lfs
-          branch: main
-          # specify a name for the review app
-          review_app_name: review-odf-${{ github.event.pull_request.number }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          app_name: "review-odf-${{ github.event.pull_request.number }}"
+
+      - name: Destroy the review app
+        run: dokku --force apps:destroy "${{ steps.dokku.outputs.app_name }}"

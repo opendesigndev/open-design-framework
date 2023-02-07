@@ -1,0 +1,39 @@
+name: Setup Dokku
+
+inputs:
+  ssh_host_key:
+    description: "The results of running `ssh-keyscan -t ssh-ed25519 $HOST`"
+    default: "dokku.opendesign.site ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFGPgqsCQyx8FrnBdXwSzeQ63gYHF1W/1AhA46bR8fNM"
+  ssh_host:
+    description: "Where we should connect via ssh"
+    default: "dokku@dokku.opendesign.site"
+  ssh_private_key:
+    description: "SSH key"
+    required: true
+  app_name:
+    description: Name of the dokku app to be deployed
+    required: true
+outputs:
+  app_name:
+    description: Re-outputs app_name input
+    value: ${{ steps.script.outputs.app_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: script
+      shell: bash
+      run: |
+        mkdir -p ~/.ssh $RUNNER_TEMP/bin
+        chmod 700 ~/.ssh
+        printf "%s\n" '${{ inputs.ssh_host_key }}' >> ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts
+        printf "%s\n%s\n%s\n" '#!/usr/bin/bash' 'set -xe' 'ssh "${{ inputs.ssh_host }}" -- "$@"' > /usr/local/bin/dokku
+        chmod +x /usr/local/bin/dokku
+
+        printf "%s" '${{ inputs.ssh_private_key }}' > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+
+        export APP_NAME=${{ inputs.app_name }}
+        if [ -d .git ]; then git remote add dokku "${{ inputs.ssh_host }}:$APP_NAME"; fi
+        echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
