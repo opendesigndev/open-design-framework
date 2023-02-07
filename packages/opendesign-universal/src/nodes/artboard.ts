@@ -21,6 +21,10 @@ export type LayerListItem = {
   parentId?: string;
 };
 
+export type getLayersOptions = {
+  naturalOrder?: boolean;
+};
+
 export interface ArtboardNode extends BaseNode {
   type: "ARTBOARD";
   /**
@@ -81,11 +85,13 @@ export interface ArtboardNode extends BaseNode {
   /**
    * Returns list of all layers in this artboard.
    *
-   * By default returns layers in order from bottom to top. For example, background layer will be first.
+   * By default returns layers in natural order - from top to bottom.
    *
-   * @param reverse if true, returns layers in reverse order (from top to bottom), default is false
+   * @param options
+   * @param options.naturalOrder - if true, returns layers in order from top to bottom. For example, background layer will be last.
+   * @returns list of layers
    */
-  getLayers(reverse?: boolean): LayerListItem | null;
+  getLayers(options?: getLayersOptions): LayerListItem | null;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -179,7 +185,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     );
   }
 
-  getLayers(reverse = false) {
+  getLayers({ naturalOrder = true }: getLayersOptions = {}) {
     return automaticScope((scope) => {
       const layerList = this.#engine.ode.LayerList(scope);
       this.#engine.ode.component_listLayers(scope, this.__component, layerList);
@@ -228,7 +234,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
           // get parent and update children array considering reverse flag
           if (layers.has(parentId)) {
             const parent = layers.get(parentId) as LayerListItem;
-            if (reverse) {
+            if (naturalOrder) {
               parent.layers.unshift(layers.get(id) as LayerListItem);
             } else {
               parent.layers.push(layers.get(id) as LayerListItem);

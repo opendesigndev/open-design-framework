@@ -2,15 +2,8 @@ import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
 import type { MountOptions, MountResult } from "@opendesign/universal/dom";
 import { mount } from "@opendesign/universal/dom";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import type { LayerListItem } from "../opendesign-universal/src/nodes/artboard.js";
 import { useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
@@ -172,39 +165,5 @@ export function useWaitForEditorLoaded(editorOverride?: Editor): Editor {
   return editor;
 }
 
-/**
- * Custom hook to get list of layers in the artboard.
- * Updates the list whenever new component is pasted into the artboard.
- *
- * @param reverse if true, the list is reversed
- * @param editorOverride if specified, the editor to use
- * @returns list of layers in the artboard if any or nullish value if no artboard is present
- */
-export function useLayerList(
-  reverse: boolean = false,
-  editorOverride?: Editor,
-): LayerListItem | null | undefined {
-  const editor = useWaitForEditorLoaded(editorOverride);
-  const artboard = editor.currentPage.findArtboard();
-  const [layers, setLayers] = useState<LayerListItem | null | undefined>();
-
-  const updateLayers = useCallback(() => {
-    setLayers(() => artboard?.getLayers(reverse));
-  }, [artboard, reverse]);
-
-  useEffect(() => {
-    window.addEventListener("paste", updateLayers);
-
-    return () => {
-      window.removeEventListener("paste", updateLayers);
-    };
-  }, [editor, updateLayers]);
-
-  useEffect(() => {
-    updateLayers();
-  }, [artboard, reverse, updateLayers]);
-
-  return layers;
-}
-
 export { type PasteEvent, usePaste } from "./src/paste.js";
+export { useLayerList } from "./src/use-layer-list.js";
