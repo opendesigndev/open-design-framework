@@ -23,7 +23,7 @@ export function useLayerList({
 }: useLayerListOptions): LayerListItem | null | undefined {
   const editor = useWaitForEditorLoaded(editorOverride);
   const layers = useSyncExternalStore(subscribe, () =>
-    getSnapshot({ editorOverride: editor, naturalOrder }),
+    getSnapshot({ editor, naturalOrder }),
   );
 
   return JSON.parse(layers);
@@ -34,8 +34,11 @@ function subscribe(callback: () => void) {
   return () => void window.removeEventListener("paste", callback);
 }
 
-function getSnapshot({ editorOverride, naturalOrder }: useLayerListOptions) {
-  const artboard = editorOverride?.currentPage.findArtboard();
+function getSnapshot({
+  editor,
+  naturalOrder,
+}: useLayerListOptions & { editor: Editor }) {
+  const artboard = editor?.currentPage.findArtboard();
   const layers = artboard?.getLayers({ naturalOrder });
 
   // TODO: stringify is a temporary solution for memoization to make it work with useSyncExternalStore
