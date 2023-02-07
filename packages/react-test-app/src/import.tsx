@@ -1,6 +1,5 @@
 import type { PasteEvent } from "@opendesign/react";
 import { useLayerList } from "@opendesign/react";
-import { useWaitForEditorLoaded } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
@@ -19,7 +18,7 @@ import {
 } from "@opendesign/universal";
 import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
@@ -243,7 +242,7 @@ function Layers({
 
 function LayerList() {
   const [isReverse, setIsReverse] = useState(false);
-  const layers = useLayerList(isReverse);
+  const layers = useLayerList({ naturalOrder: !isReverse });
 
   if (!layers) return null;
 
