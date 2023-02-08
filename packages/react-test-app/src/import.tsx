@@ -233,7 +233,7 @@ function Layers({
               className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
             >
               {layer.name}
-              {layer.layers.length > 0 && (
+              {layer.layers?.length > 0 && (
                 <Layers layers={layer.layers} level={level + 1} />
               )}
             </li>

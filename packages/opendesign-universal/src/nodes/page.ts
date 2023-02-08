@@ -1,8 +1,9 @@
+import type { Editor } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { todo } from "../internals.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
-import type { ArtboardNode } from "./artboard.js";
+import type { ArtboardNode, LayerListItem } from "./artboard.js";
 import { ArtboardNodeImpl } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
@@ -31,14 +32,17 @@ type AbortSignal = any;
 
 export class PageNodeImpl extends BaseNodeImpl implements PageNode {
   #engine: Engine;
+  #editor: Editor;
   // TODO: make private
   __artboard?: ArtboardNodeImpl;
   // TODO: call this on page destroy
   #destroySignal?: AbortSignal;
+  layers: LayerListItem | null = null;
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine, editor: Editor) {
     super();
     this.#engine = engine;
+    this.#editor = editor;
   }
 
   type = "PAGE" as const;
@@ -67,6 +71,7 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
         this.#engine,
         id,
         octopus.source ?? JSON.stringify(octopus.data),
+        this.#editor,
       );
       this.__artboard = artboard;
 

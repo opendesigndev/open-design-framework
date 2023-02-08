@@ -6,6 +6,7 @@ import { initEngine } from "./engine/engine.js";
 import { automaticScope, createStringRef } from "./engine/memory.js";
 import { todo } from "./internals.js";
 import { performance } from "./lib.js";
+import type { LayerListItem } from "./nodes/artboard.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
 import type { Node } from "./nodes/node.js";
@@ -87,6 +88,7 @@ export type EditorEvents = {
   timeupdate: { currentTime: number };
   play: {};
   pause: {};
+  layersUpdated: { layers: LayerListItem };
 };
 
 /**
@@ -113,6 +115,8 @@ export interface Editor {
    * Cleans up editors resources (primarily server connection).
    */
   destroy(): void;
+
+  layers: LayerListItem | null;
 
   /**
    *
@@ -183,6 +187,14 @@ export interface Editor {
    * @param faceName specifies face within multi-face font file, otherwise can be left blank
    */
   setFont(name: string, data: Uint8Array, faceName?: string): void;
+
+  /**
+   * Public method to notify the editor of an event from any node.
+   * @param sender the node that is sending the event
+   * @param event the event name
+   * @param data the event payload
+   */
+  notify(sender: object, event: string, data: any): void;
 }
 
 /**
@@ -217,6 +229,7 @@ export class EditorImplementation implements Editor {
   design = new DesignImplementation();
   loading = true;
   loaded: Promise<void>;
+  layers: LayerListItem | null = null;
 
   constructor(options: CreateEditorOptions) {
     const canvas = env.createCanvas();
@@ -294,7 +307,7 @@ export class EditorImplementation implements Editor {
 
     let page = this.#currentPage;
     if (!page) {
-      page = new PageNodeImpl(engine);
+      page = new PageNodeImpl(engine, this);
       this.#currentPage = page;
     }
     return page;
@@ -410,6 +423,12 @@ export class EditorImplementation implements Editor {
         faceNameRef,
       );
     });
+  }
+
+  notify(sender: object, event: string, data: any): void {
+    if (event === "layersUpdated") {
+      this.#dispatch("layersUpdated", { layers: data });
+    }
   }
 }
 
