@@ -2062,10 +2062,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/engine@npm:0.0.0-14ee8ea44c381d38b080617bfbd813797db76010":
-  version: 0.0.0-14ee8ea44c381d38b080617bfbd813797db76010
-  resolution: "@opendesign/engine@npm:0.0.0-14ee8ea44c381d38b080617bfbd813797db76010"
-  checksum: 1edb35c4b5059486de16db7125aa9a526fa611c3cde222e924f596a02e51f7389672366d352e473ceff4b790dbab8de28ba65a7317a9afa43fe1dd811bde4a74
+"@opendesign/engine@npm:0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5":
+  version: 0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5
+  resolution: "@opendesign/engine@npm:0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5"
+  checksum: ec881650e8abdb4c6f9e6b5ff6aeed5f58abfb9f1fe50f493344ff763dec303e688f62c111b23de80287b24723294c819eb60ab7e0b0d4742a0217180260ecf2
   languageName: node
   linkType: hard
 
@@ -2225,7 +2225,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
-    "@opendesign/engine": 0.0.0-14ee8ea44c381d38b080617bfbd813797db76010
+    "@opendesign/engine": 0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.0-alpha.40
     "@opendesign/octopus-fig": 3.0.0-rc.24
@@ -3691,7 +3691,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:packages/docs"
   dependencies:
-    "@opendesign/engine": 0.0.0-14ee8ea44c381d38b080617bfbd813797db76010
+    "@opendesign/engine": 0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     typedoc: ^0.23.21
@@ -6735,7 +6735,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-test-app@workspace:packages/react-test-app"
   dependencies:
-    "@opendesign/engine": 0.0.0-14ee8ea44c381d38b080617bfbd813797db76010
+    "@opendesign/engine": 0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     "@types/file-saver": ^2.0.5
