@@ -43,12 +43,8 @@ export class MemoryExporter {
     return filename;
   }
 
-  getImagePath(name: string): string {
-    return "images/" + name;
-  }
-
   async exportImage(name: string, data: Uint8Array): Promise<string> {
-    const path = this.getImagePath(name);
+    const path = "images/" + name;
     this._images.set(path, data);
     return path;
   }
