@@ -70,6 +70,7 @@ export function loadFile(
     engine,
     componentManifest.id,
     component,
+    editor,
   );
   (editor.currentPage as PageNodeImpl).__artboard = artboard;
 

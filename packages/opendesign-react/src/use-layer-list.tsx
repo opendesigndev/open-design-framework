@@ -1,5 +1,5 @@
 import type { Editor } from "@opendesign/universal";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
 import { useWaitForEditorLoaded } from "../index.js";
@@ -22,25 +22,17 @@ export function useLayerList({
   editorOverride,
 }: useLayerListOptions): LayerListItem | null | undefined {
   const editor = useWaitForEditorLoaded(editorOverride);
-  const layers = useSyncExternalStore(subscribe, () =>
-    getSnapshot({ editor, naturalOrder }),
-  );
+  const [layers, setLayers] = useState<LayerListItem | null | undefined>(null);
 
-  return JSON.parse(layers);
-}
+  useEffect(() => {
+    const artboard = editor?.currentPage.findArtboard();
+    setLayers(artboard?.getLayers({ naturalOrder }));
 
-function subscribe(callback: () => void) {
-  window.addEventListener("paste", callback);
-  return () => void window.removeEventListener("paste", callback);
-}
+    const unsubscribe = editor?.listen("layersUpdated", (data) => {
+      setLayers(data.layers);
+    });
+    return unsubscribe;
+  }, [editor, naturalOrder]);
 
-function getSnapshot({
-  editor,
-  naturalOrder,
-}: useLayerListOptions & { editor: Editor }) {
-  const artboard = editor?.currentPage.findArtboard();
-  const layers = artboard?.getLayers({ naturalOrder });
-
-  // TODO: stringify is a temporary solution for memoization to make it work with useSyncExternalStore
-  return JSON.stringify(layers);
+  return layers;
 }
