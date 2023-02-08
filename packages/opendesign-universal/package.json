@@ -19,7 +19,7 @@
     "@opendesign/manifest-ts": "^3.0.0-alpha.40",
     "@opendesign/octopus-fig": "3.0.0-rc.30",
     "@opendesign/octopus-ts": "^3.0.0-alpha.41",
-    "@opendesign/octopus-xd": "0.0.0-experimental-74372cb19-20230112",
+    "@opendesign/octopus-xd": "3.0.0-rc.20",
     "buffer": "^6.0.3",
     "fflate": "^0.7.4"
   },
