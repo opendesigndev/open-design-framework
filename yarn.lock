@@ -2098,13 +2098,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/manifest-ts@npm:3.0.0-alpha.38":
-  version: 3.0.0-alpha.38
-  resolution: "@opendesign/manifest-ts@npm:3.0.0-alpha.38"
-  checksum: dd8f9c2add69b19db7ac7411388f6124d7a84b7453265e6f7e9a29bc2985462f9b40e6ee69423098fdd387769f3747b5973ae6bc519d606f871e815b2bc12219
-  languageName: node
-  linkType: hard
-
 "@opendesign/manifest-ts@npm:3.0.1":
   version: 3.0.1
   resolution: "@opendesign/manifest-ts@npm:3.0.1"
@@ -2116,20 +2109,6 @@ __metadata:
   version: 3.0.0-alpha.40
   resolution: "@opendesign/manifest-ts@npm:3.0.0-alpha.40"
   checksum: fbecd06bdd66b941b42eae0e07ad90e3cd023c48c725081e26bf4c257fd373c3cfdc6ca616dc3d47b6c6208692c029b79404c0c30135cba277b64a922dfd243d
-  languageName: node
-  linkType: hard
-
-"@opendesign/octopus-common@npm:0.0.0-experimental-74372cb19-20230112":
-  version: 0.0.0-experimental-74372cb19-20230112
-  resolution: "@opendesign/octopus-common@npm:0.0.0-experimental-74372cb19-20230112"
-  dependencies:
-    "@opendesign/octopus-ts": 3.0.0-alpha.38
-    "@types/lodash": ^4.14.178
-    "@types/uuid": ^8.3.1
-    crc-32: ^1.2.2
-    lodash: ^4.17.21
-    uuid: ^8.3.2
-  checksum: b6246d788c5800f319dc8fc5c19951a7051459b8483b76056bc13bd9361b650eb28a15acf3f6f9338bf36948878dbac5ae301e26875f0a3b253dadc8555914ca
   languageName: node
   linkType: hard
 
@@ -2169,13 +2148,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/octopus-ts@npm:3.0.0-alpha.38":
-  version: 3.0.0-alpha.38
-  resolution: "@opendesign/octopus-ts@npm:3.0.0-alpha.38"
-  checksum: 71a3aff2229a8933bceb91db5cfcb16bc29f36440bf05c73737556b3c5838dde8cbb3584a0542b0bcc97ac1d4fceacbbc0636b530391e1b8a8966018ceff649c
-  languageName: node
-  linkType: hard
-
 "@opendesign/octopus-ts@npm:3.0.1":
   version: 3.0.1
   resolution: "@opendesign/octopus-ts@npm:3.0.1"
@@ -2190,13 +2162,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/octopus-xd@npm:0.0.0-experimental-74372cb19-20230112":
-  version: 0.0.0-experimental-74372cb19-20230112
-  resolution: "@opendesign/octopus-xd@npm:0.0.0-experimental-74372cb19-20230112"
+"@opendesign/octopus-xd@npm:3.0.0-rc.20":
+  version: 3.0.0-rc.20
+  resolution: "@opendesign/octopus-xd@npm:3.0.0-rc.20"
   dependencies:
-    "@opendesign/manifest-ts": 3.0.0-alpha.38
-    "@opendesign/octopus-common": 0.0.0-experimental-74372cb19-20230112
-    "@opendesign/octopus-ts": 3.0.0-alpha.38
+    "@opendesign/manifest-ts": 3.0.1
+    "@opendesign/octopus-common": 3.0.0-rc.28
+    "@opendesign/octopus-ts": 3.0.1
     "@types/blueimp-md5": ^2.18.0
     "@types/lodash": ^4.14.178
     "@types/pino": ^6.3.3
@@ -2210,7 +2182,7 @@ __metadata:
     pino-pretty: ^4.3.0
     time-stamp: ^2.2.0
     uuid: ^8.3.2
-  checksum: ade3462eac66b46b1859816cb6e085d1e924805de04ca72ffddc7869c7b588366ff2ebda68ba9ed0252b97bd1b353a8c258a630ae0fe20859e6f410c9e67d339
+  checksum: 54b583cff8895e90e727ad23d9aa6bd4427dd9bea3dae516d3a3ad0791fc86c296ed2c511a1a4781ec69471174b711b0ce1a706db6dc759a88e1575cf1dab3f8
   languageName: node
   linkType: hard
 
@@ -2235,7 +2207,7 @@ __metadata:
     "@opendesign/manifest-ts": ^3.0.0-alpha.40
     "@opendesign/octopus-fig": 3.0.0-rc.30
     "@opendesign/octopus-ts": ^3.0.0-alpha.41
-    "@opendesign/octopus-xd": 0.0.0-experimental-74372cb19-20230112
+    "@opendesign/octopus-xd": 3.0.0-rc.20
     buffer: ^6.0.3
     fflate: ^0.7.4
   languageName: unknown
