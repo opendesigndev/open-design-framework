@@ -1,5 +1,27 @@
 # @opendesign/react
 
+## 0.4.0
+
+### Minor Changes
+
+- c0529ae: Added custom hook for layer list in react. Change options for getLayers to object
+
+### Patch Changes
+
+- Updated dependencies [da048cc]
+- Updated dependencies [b04bf48]
+- Updated dependencies [8fe0577]
+- Updated dependencies [0452c23]
+- Updated dependencies [d54af2b]
+- Updated dependencies [e445a22]
+- Updated dependencies [02929ce]
+- Updated dependencies [04514f3]
+- Updated dependencies [f388b6d]
+- Updated dependencies [c4e296d]
+- Updated dependencies [c0529ae]
+- Updated dependencies [563ffae]
+  - @opendesign/universal@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
