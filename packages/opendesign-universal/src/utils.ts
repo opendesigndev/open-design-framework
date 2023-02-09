@@ -13,3 +13,27 @@ export function detachPromiseControls<T>(): DetachedPromiseControls<T> {
   });
   return { promise, resolve, reject };
 }
+
+/**
+ * Computes SHA-256 hash of input string, or returns null if this environment
+ * does not have sufficient crypto support.
+ *
+ * @param input string
+ * @returns base16 digest, or null
+ */
+export async function hashString(input: string): Promise<string | null> {
+  const TextEncoder = (globalThis as any).TextEncoder;
+  const subtle = (globalThis as any).crypto?.subtle;
+  if (!TextEncoder || !subtle?.digest) return null;
+  const t = new TextEncoder();
+  const value: ArrayBuffer = await subtle.digest("sha-256", t.encode(input));
+  return base16Buffer(value);
+}
+
+const base16 = "0123456789abcdef";
+function base16Buffer(buffer: ArrayBuffer) {
+  return Array.from(
+    new Uint8Array(buffer),
+    (item) => base16[item % 16] + base16[Math.floor(item / 16)],
+  ).join("");
+}

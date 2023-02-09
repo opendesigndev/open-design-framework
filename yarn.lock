@@ -2098,17 +2098,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/manifest-ts@npm:3.0.1":
+"@opendesign/manifest-ts@npm:3.0.1, @opendesign/manifest-ts@npm:^3.0.1":
   version: 3.0.1
   resolution: "@opendesign/manifest-ts@npm:3.0.1"
   checksum: 6b28cc0c223d3af061298d3c5273820713fe1fad87579ce624e98e932def04d750bbd6e5bcdc27e0743368f8c4ad2864f3c55f9e4955b73094a774f63400ccce
-  languageName: node
-  linkType: hard
-
-"@opendesign/manifest-ts@npm:^3.0.0-alpha.40":
-  version: 3.0.0-alpha.40
-  resolution: "@opendesign/manifest-ts@npm:3.0.0-alpha.40"
-  checksum: fbecd06bdd66b941b42eae0e07ad90e3cd023c48c725081e26bf4c257fd373c3cfdc6ca616dc3d47b6c6208692c029b79404c0c30135cba277b64a922dfd243d
   languageName: node
   linkType: hard
 
@@ -2148,17 +2141,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/octopus-ts@npm:3.0.1":
+"@opendesign/octopus-ts@npm:3.0.1, @opendesign/octopus-ts@npm:^3.0.1":
   version: 3.0.1
   resolution: "@opendesign/octopus-ts@npm:3.0.1"
   checksum: 000cbfd958eed7170256a54cb77e05dccc7412d186aab960f9f86c99377a6dff4d501a2394d16fa125c0c54126d51b1951f0d0b73ee5f63dd3331887bb4b6843
-  languageName: node
-  linkType: hard
-
-"@opendesign/octopus-ts@npm:^3.0.0-alpha.41":
-  version: 3.0.0-alpha.41
-  resolution: "@opendesign/octopus-ts@npm:3.0.0-alpha.41"
-  checksum: 69139d5fc1daa258bac4fde04febbd545746dd2e2afc500977b657ba213f057c81c9d36d6ac24cd8ebc6202f2e25e9028a81d9efb6df27eb321f90183576a289
   languageName: node
   linkType: hard
 
@@ -2204,9 +2190,9 @@ __metadata:
   dependencies:
     "@opendesign/engine": 0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5
     "@opendesign/env": "workspace:*"
-    "@opendesign/manifest-ts": ^3.0.0-alpha.40
+    "@opendesign/manifest-ts": ^3.0.1
     "@opendesign/octopus-fig": 3.0.0-rc.30
-    "@opendesign/octopus-ts": ^3.0.0-alpha.41
+    "@opendesign/octopus-ts": ^3.0.1
     "@opendesign/octopus-xd": 3.0.0-rc.20
     buffer: ^6.0.3
     fflate: ^0.7.4
