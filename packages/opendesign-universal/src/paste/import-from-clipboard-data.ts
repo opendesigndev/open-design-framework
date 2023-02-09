@@ -2,6 +2,7 @@ import type { Manifest } from "@opendesign/manifest-ts";
 import { createConverter, SourcePluginReader } from "@opendesign/octopus-fig";
 import type { Octopus } from "@opendesign/octopus-ts";
 
+import { hashString } from "../utils.js";
 import { MemoryExporter } from "./memory-exporter.js";
 
 export type ImportedClipboardData = {
@@ -32,7 +33,7 @@ export async function importFromClipboardData(
   if (!data) return null;
   const parsedData = tryJsonParse(data);
   if (!parsedData) return null;
-  if (parsedData.type === "ARTBOARD") {
+  if (parsedData.type === "OCTOPUS_COMPONENT") {
     // TODO: inspect closer that data is octopus
     return {
       manifest: {
@@ -46,15 +47,15 @@ export async function importFromClipboardData(
           },
         ],
         libraries: [],
-        origin: { name: "Paste", version: "0.0.0" },
+        origin: { name: "Octopus", version: parsedData.version },
         pages: [
           {
-            id: "Page",
+            id: (await hashString(data)) ?? "Page",
             children: [{ type: "COMPONENT", id: parsedData.id }],
-            name: "Page",
+            name: "Pasted Page",
           },
         ],
-        version: "",
+        version: "3.0.1",
       },
       files: [
         { type: "JSON", path: "octopus.json", data: parsedData, source: data },

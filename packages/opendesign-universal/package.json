@@ -16,9 +16,9 @@
   "dependencies": {
     "@opendesign/engine": "0.0.0-a3cb3326681e796ec46ca0255b4f9ed7f5be9ad5",
     "@opendesign/env": "workspace:*",
-    "@opendesign/manifest-ts": "^3.0.0-alpha.40",
+    "@opendesign/manifest-ts": "^3.0.1",
     "@opendesign/octopus-fig": "3.0.0-rc.30",
-    "@opendesign/octopus-ts": "^3.0.0-alpha.41",
+    "@opendesign/octopus-ts": "^3.0.1",
     "@opendesign/octopus-xd": "3.0.0-rc.20",
     "buffer": "^6.0.3",
     "fflate": "^0.7.4"
