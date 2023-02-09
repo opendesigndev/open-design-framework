@@ -46,7 +46,7 @@ export class LayerNodeImpl extends BaseNodeImpl {
   async paste(data: ImportedClipboardData): Promise<void> {
     const octopus = data.files.find((f) => f.type === "JSON");
     if (!octopus || octopus.type !== "JSON" || !octopus.data.content)
-      throw new Error("Paste data do not contain octopus");
+      throw new Error("Pasted data do not contain octopus");
     // TODO: figure out if we can use octopus.source so that parse errors have
     // correct position
     this.createLayer(octopus.data.content);

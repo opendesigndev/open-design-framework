@@ -61,7 +61,7 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
     if (!artboard) {
       const octopus = data.files.find((f) => f.type === "JSON");
       if (!octopus || octopus.type !== "JSON" || !octopus.data.content)
-        throw new Error("Paste data do not contain octopus");
+        throw new Error("Pasted data do not contain octopus");
       const id = octopus.data.id;
       artboard = new ArtboardNodeImpl(
         this.#engine,

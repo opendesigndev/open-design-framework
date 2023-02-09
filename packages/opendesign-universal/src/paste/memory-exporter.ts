@@ -19,11 +19,14 @@ export class MemoryExporter {
 
   finalizeExport(): void {
     const manifest = this._manifest;
-    if (!manifest) throw new Error("Missing manifest");
-    this._completed.resolve({
-      manifest,
-      files: this._files,
-    });
+    if (!manifest) {
+      this._completed.reject(new Error("Missing manifest"));
+    } else {
+      this._completed.resolve({
+        manifest,
+        files: this._files,
+      });
+    }
   }
 
   async exportComponent(
