@@ -8,18 +8,10 @@ import type { ImportedClipboardData } from "./import-from-clipboard-data.js";
 type ComponentConversionResult = any;
 
 export class MemoryExporter {
-  private _completed: DetachedPromiseControls<
-    ImportedClipboardData & {
-      manifest?: Manifest["schemas"]["OctopusManifest"];
-    }
-  > = detachPromiseControls();
+  private _completed: DetachedPromiseControls<ImportedClipboardData> =
+    detachPromiseControls();
   private _manifest?: Manifest["schemas"]["OctopusManifest"];
-  private _components = new Map<string, string>();
-  private _images = new Map<string, Uint8Array>();
-
-  private _stringify(value: unknown) {
-    return JSON.stringify(value, null, "  ");
-  }
+  private _files: ImportedClipboardData["files"] = [];
 
   async completed() {
     return this._completed.promise;
@@ -27,10 +19,10 @@ export class MemoryExporter {
 
   finalizeExport(): void {
     const manifest = this._manifest;
+    if (!manifest) throw new Error("Missing manifest");
     this._completed.resolve({
       manifest,
-      _components: this._components,
-      _images: this._images,
+      files: this._files,
     });
   }
 
@@ -38,14 +30,14 @@ export class MemoryExporter {
     artboard: ComponentConversionResult,
   ): Promise<string | null> {
     if (!artboard.value) return Promise.resolve(null);
-    const filename = `octopus-${artboard.id}.json`;
-    this._components.set(filename, this._stringify(artboard.value));
-    return filename;
+    const path = `octopus-${artboard.id}.json`;
+    this._files.push({ type: "JSON", path, data: artboard.value });
+    return path;
   }
 
   async exportImage(name: string, data: Uint8Array): Promise<string> {
     const path = "images/" + name;
-    this._images.set(path, data);
+    this._files.push({ type: "BINARY", path, data: data });
     return path;
   }
 

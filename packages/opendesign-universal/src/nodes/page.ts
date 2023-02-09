@@ -59,9 +59,15 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
   async paste(data: ImportedClipboardData) {
     let artboard = this.__artboard;
     if (!artboard) {
-      const octopus = data._components.values().next().value;
-      const id = JSON.parse(octopus).id;
-      artboard = new ArtboardNodeImpl(this.#engine, id, octopus);
+      const octopus = data.files.find((f) => f.type === "JSON");
+      if (!octopus || octopus.type !== "JSON" || !octopus.data.content)
+        throw new Error("Paste data do not contain octopus");
+      const id = octopus.data.id;
+      artboard = new ArtboardNodeImpl(
+        this.#engine,
+        id,
+        octopus.source ?? JSON.stringify(octopus.data),
+      );
       this.__artboard = artboard;
 
       await loadPastedImages(this.#engine, data);

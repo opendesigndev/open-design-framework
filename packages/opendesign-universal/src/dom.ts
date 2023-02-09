@@ -254,10 +254,13 @@ function parseScrollDelta(event: WheelEvent): [number, number] {
 }
 
 /**
- * Reads data from clipboard paste event and converts them to partial octopus file.
- * Do not rely on structure of returned data, but import it into Editor instead.
+ * Reads data from clipboard paste event and converts them to a .octopus file.
+ * Depending on the source of pasted data, some information might filled for it
+ * to be complete .octopus.
  *
- * @returns opaque object which can be imported into editor or null if import failed
+ * You can import this into editor using .paste method.
+ *
+ * @returns object representing parsed .octopus file
  */
 export function importFromClipboard(
   input?: ClipboardEvent | string,

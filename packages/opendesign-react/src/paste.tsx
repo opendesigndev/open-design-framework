@@ -26,12 +26,15 @@ export type PasteEvent = {
  * this situation, because no non-chrome browser currently support this.
  *
  * The listener will receive one of the following:
- * - ImportedClipboardData which you can use to paste design
+ * - ImportedClipboardData which you can use to paste design, or inspect manually
  * - string with contents of the clipboard, if clipboard is textual
  * - null
  *
  * If data comes from event (not manual trigger), then it will also receive a
  * ClipboardEvent.
+ *
+ * editor (either from context or via second argument) is only required if you
+ * do not call .preventDefault() in the callback
  *
  * ## Minimal usage
  *
