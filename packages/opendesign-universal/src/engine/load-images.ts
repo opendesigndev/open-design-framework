@@ -42,6 +42,10 @@ export async function loadImages(
 export function loadPastedImages(engine: Engine, data: ImportedClipboardData) {
   return loadImages(
     engine,
-    Array.from(data._images.entries(), ([path, data]) => ({ path, data })),
+    data.files.map((f) => (f.type === "BINARY" ? f : null)).filter(notNull),
   );
+}
+
+function notNull<T>(value: T | null): value is T {
+  return value !== null;
 }

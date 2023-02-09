@@ -1,19 +1,30 @@
+import type { Manifest } from "@opendesign/manifest-ts";
 import { createConverter, SourcePluginReader } from "@opendesign/octopus-fig";
+import type { Octopus } from "@opendesign/octopus-ts";
 
 import { MemoryExporter } from "./memory-exporter.js";
 
 export type ImportedClipboardData = {
-  _components: Map<string, string>;
-  _images: Map<string, Uint8Array>;
+  manifest: Manifest["schemas"]["OctopusManifest"];
+  files: (
+    | {
+        type: "JSON";
+        path: string;
+        data: Octopus["schemas"]["OctopusComponent"];
+        source?: string;
+      }
+    | { type: "BINARY"; path: string; data: Uint8Array }
+  )[];
 };
 
 /**
- * Parses data from clipboard into opaque structure which can then be imported
- * into Editor. Do not rely on structure of returned data.
+ * Parses data from clipboard into structure of a .octopus file. Depending on
+ * the source of pasted data, some information might filled for it to be
+ * complete .octopus.
  *
  * If you are in browser, you probably want to use `importFromClipboard` instead.
  *
- * @returns parsed data, or null if input data is not available or not in correct shape
+ * @returns object representing parsed .octopus file, or null if input data is not available or not in correct shape
  */
 export async function importFromClipboardData(
   data: string | undefined,
@@ -24,8 +35,30 @@ export async function importFromClipboardData(
   if (parsedData.type === "ARTBOARD") {
     // TODO: inspect closer that data is octopus
     return {
-      _components: new Map([["octopus.json", data]]),
-      _images: new Map(),
+      manifest: {
+        chunks: [],
+        components: [
+          {
+            dependencies: [],
+            id: parsedData.id,
+            location: { type: "RELATIVE", path: "octopus.json" },
+            name: "Pasted Octopus",
+          },
+        ],
+        libraries: [],
+        origin: { name: "Paste", version: "0.0.0" },
+        pages: [
+          {
+            id: "Page",
+            children: [{ type: "COMPONENT", id: parsedData.id }],
+            name: "Page",
+          },
+        ],
+        version: "",
+      },
+      files: [
+        { type: "JSON", path: "octopus.json", data: parsedData, source: data },
+      ],
     };
   }
   if (parsedData.type !== "OPEN_DESIGN_FIGMA_PLUGIN_SOURCE") return null;
