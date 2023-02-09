@@ -1,5 +1,29 @@
 # @opendesign/universal
 
+## 0.4.0
+
+### Minor Changes
+
+- 0452c23: Added method for getting list of layers in artboard
+- d54af2b: change ImportedClipboardData and mark it as part of public API
+- c4e296d: added support for setting fonts
+
+  - new setFont method on Editor
+  - new unstable_fallbackFont option when creating editor
+
+- c0529ae: Added custom hook for layer list in react. Change options for getLayers to object
+
+### Patch Changes
+
+- da048cc: upgraded to new engine version
+- b04bf48: update octopus and manifest versions
+- 8fe0577: fixed key type for enum decoder function
+- e445a22: update engine version
+- 02929ce: rewrote destroy function handling to be more automatic
+- 04514f3: add a temporary workaround to support octopus files using spec version older than alpha.41
+- f388b6d: update octopus-fig
+- 563ffae: update octopus-xd
+
 ## 0.3.0
 
 ### Minor Changes
