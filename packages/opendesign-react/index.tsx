@@ -4,7 +4,7 @@ import type { MountOptions, MountResult } from "@opendesign/universal/dom";
 import { mount } from "@opendesign/universal/dom";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { useEditorContext } from "./src/context.js";
+import { EditorProvider, useEditorContext } from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
@@ -61,21 +61,27 @@ export interface EditorCanvasProps extends MountOptions {
  * @returns
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
-  const { editor, disableGestures, onPointerMove, ...rest } = props;
+  const { editor, disableGestures, onPointerMove, children, ...rest } = props;
   if (editor.loading) {
     throw editor.loaded;
   }
 
-  const canvas = useRef<HTMLDivElement>(null);
+  const canvasParent = useRef<HTMLDivElement>(null);
+  const eventTarget = useRef<HTMLDivElement>(null);
   const resultRef = useRef<MountResult | null>(null);
+
   useLayoutEffect(() => {
-    const c = canvas.current!;
+    const c = canvasParent.current!;
     c.style.width = "100%";
     c.style.height = "100%";
     c.style.inset = "0";
     c.style.margin = "0";
     c.style.padding = "0";
-    const result = mount(editor, c, { disableGestures });
+    c.style.position = "absolute";
+    const result = mount(editor, c, {
+      disableGestures,
+      eventTarget: eventTarget.current!,
+    });
     resultRef.current = result;
     return () => {
       result.destroy();
@@ -84,16 +90,32 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   }, [disableGestures, editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");
   return (
-    <div
-      onPointerMove={(event) => {
-        const position = resultRef.current?.extractEventPosition(
-          event.nativeEvent,
-        );
-        if (!position) return;
-        onPointerMove?.({ position });
-      }}
-      ref={canvas}
-    />
+    <EditorProvider editor={editor}>
+      <div
+        onPointerMove={(event) => {
+          const position = resultRef.current?.extractEventPosition(
+            event.nativeEvent,
+          );
+          if (!position) return;
+          onPointerMove?.({ position });
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          inset: 0,
+          margin: 0,
+          padding: 0,
+          boxSizing: "border-box",
+          position: "relative",
+        }}
+        ref={eventTarget}
+      >
+        <div ref={canvasParent} />
+        <div style={{ position: "absolute", inset: 0, overflow: "clip" }}>
+          {children}
+        </div>
+      </div>
+    </EditorProvider>
   );
 }
 
