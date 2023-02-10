@@ -32,6 +32,39 @@ export type MountResult = {
   extractEventPosition(
     event: WheelEvent | MouseEvent | PointerEvent,
   ): readonly [number, number];
+
+  /**
+   * Adds function to be notified about certain event.
+   *
+   * @param eventName name of the event
+   * @param handler function to be called when the event occurs
+   * @returns function which unsubscribes from the event
+   */
+  subscribe<EventName extends keyof MountEventMap>(
+    eventName: EventName,
+    handler: MountEventHandler<EventName>,
+  ): () => void;
+
+  /**
+   * Returns information about current viewport
+   */
+  getViewport(): Viewport;
+};
+
+export type MountEventHandler<EventName extends keyof MountEventMap> = (
+  event: MountEventMap[EventName],
+) => void;
+
+export type Viewport = {
+  scale: number;
+  offset: readonly [number, number];
+  width: number;
+  height: number;
+  devicePixelRatio: number;
+};
+
+export type MountEventMap = {
+  viewportChange: { viewport: Viewport };
 };
 
 /**
@@ -74,6 +107,10 @@ export function mount(
   let scale = 1;
   let width = 0;
   let height = 0;
+
+  const handlers: {
+    [key in keyof MountEventMap]?: MountEventHandler<key>[];
+  } = {};
 
   const rendererHandle = engine.ode.PR1_AnimationRendererHandle(scope);
   engine.ode.pr1_createAnimationRenderer(
@@ -156,19 +193,33 @@ export function mount(
     );
   }
 
-  return { destroy, extractEventPosition };
+  return { destroy, extractEventPosition, subscribe, getViewport };
+
+  function subscribe<EventName extends keyof MountEventMap>(
+    event: EventName,
+    handler: MountEventHandler<EventName>,
+  ) {
+    let list = handlers[event];
+    if (!list) {
+      list = [];
+      handlers[event] = list;
+    }
+    list.push(handler);
+    return () => void list?.splice(list?.indexOf(handler), 1);
+  }
+
+  function getViewport(): Viewport {
+    return {
+      devicePixelRatio: window.devicePixelRatio,
+      height,
+      offset,
+      scale,
+      width,
+    };
+  }
 
   function draw() {
     frameRequested = false;
-    if (
-      offset[0] === renderer.frameView.offset[0] &&
-      offset[1] === renderer.frameView.offset[1] &&
-      renderer.frameView.scale === scale &&
-      renderer.frameView.width === width &&
-      renderer.frameView.height === height
-    ) {
-      return;
-    }
 
     renderer.frameView.width = width;
     renderer.frameView.height = height;
@@ -176,6 +227,12 @@ export function mount(
     renderer.frameView.scale = scale;
 
     engine.ode.pr1_animation_drawFrame(rendererHandle, renderer.frameView, 0);
+    if (handlers.viewportChange?.length) {
+      const event = { viewport: getViewport() };
+      for (const handler of handlers.viewportChange) {
+        handler(event);
+      }
+    }
   }
 
   function requestFrame() {
