@@ -9,6 +9,14 @@ import type { PageNodeImpl } from "./nodes/page.js";
 
 export type MountOptions = {
   disableGestures?: boolean;
+
+  /**
+   * Changes where we listen to events. Defaults to parent.
+   *
+   * This allows you to set a element further up in hierarchy to allow a sibling
+   * element which overlaps with parent without having to set pointer-events: none;
+   */
+  eventTarget?: HTMLElement;
 };
 
 export type MountResult = {
@@ -42,22 +50,23 @@ export type MountResult = {
  * ```
  *
  * @param editor
- * @param div
+ * @param parent
  * @param options
  * @returns
  */
 export function mount(
   editor: Editor,
-  div: HTMLDivElement,
+  parent: HTMLDivElement,
   options?: MountOptions,
 ): MountResult {
   const canvas: HTMLCanvasElement = editorGetCanvas(editor);
   const engine = editorGetEngine(editor);
+  const eventTarget = options?.eventTarget ?? parent;
 
   const { scope, signal, destroy } = detachedScope();
-  div.appendChild(canvas);
+  parent.appendChild(canvas);
   scope(() => void canvas.parentElement?.removeChild(canvas));
-  div.style.boxSizing = "border-box";
+  parent.style.boxSizing = "border-box";
   canvas.style.position = "absolute";
   canvas.style.transformOrigin = "top left";
   let frameRequested = false;
@@ -94,7 +103,7 @@ export function mount(
   window.addEventListener("resize", onResize, { signal });
   // This will get called any other time
   const observer = new ResizeObserver(onResize);
-  observer.observe(div);
+  observer.observe(parent);
   scope(() => observer.disconnect());
 
   let space = 0;
@@ -119,8 +128,8 @@ export function mount(
   );
 
   if (!options?.disableGestures) {
-    div.addEventListener("wheel", onWheel, { passive: false, signal });
-    div.addEventListener(
+    eventTarget.addEventListener("wheel", onWheel, { passive: false, signal });
+    eventTarget.addEventListener(
       "click",
       (event) => {
         console.log(extractEventPosition(event));
@@ -128,21 +137,21 @@ export function mount(
       { signal },
     );
 
-    div.addEventListener(
+    eventTarget.addEventListener(
       "pointermove",
       (event: PointerEvent) => {
         if (event.buttons === 4 || performance.now() - space < 1000)
-          div.setPointerCapture(event.pointerId);
-        if (!div.hasPointerCapture(event.pointerId)) return;
+          eventTarget.setPointerCapture(event.pointerId);
+        if (!eventTarget.hasPointerCapture(event.pointerId)) return;
         offset[0] -= (event.movementX / scale) * window.devicePixelRatio;
         offset[1] -= (event.movementY / scale) * window.devicePixelRatio;
         requestFrame();
       },
       { signal },
     );
-    div.addEventListener(
+    eventTarget.addEventListener(
       "pointerup",
-      (event) => void div.releasePointerCapture(event.pointerId),
+      (event) => void eventTarget.releasePointerCapture(event.pointerId),
       { signal },
     );
   }
@@ -204,7 +213,7 @@ export function mount(
   }
 
   function onResize() {
-    const rect = div.getBoundingClientRect();
+    const rect = parent.getBoundingClientRect();
     const newWidth = rect.width * window.devicePixelRatio;
     const newHeight = rect.height * window.devicePixelRatio;
     if (canvas.width === newWidth && canvas.height === newHeight) {
@@ -222,11 +231,12 @@ export function mount(
 
   function extractEventPosition(event: WheelEvent | MouseEvent | PointerEvent) {
     const scale = renderer.frameView.scale;
+    const rect = parent.getBoundingClientRect();
 
     return [
-      ((event.clientX - div.offsetLeft) * window.devicePixelRatio) / scale +
+      ((event.clientX - rect.left) * window.devicePixelRatio) / scale +
         offset[0],
-      ((event.clientY - div.offsetTop) * window.devicePixelRatio) / scale +
+      ((event.clientY - rect.top) * window.devicePixelRatio) / scale +
         offset[1],
     ] as const;
   }
