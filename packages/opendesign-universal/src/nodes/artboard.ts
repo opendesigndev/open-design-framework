@@ -92,6 +92,28 @@ export interface ArtboardNode extends BaseNode {
    * @returns list of layers
    */
   getLayers(options?: getLayersOptions): LayerListItem | null;
+
+  /**
+   * Returns layer corresponding to a given id.
+   *
+   * @param id
+   */
+  getLayerById(id: string): LayerNode | null;
+
+  /**
+   * Returns ID of a layer or artboard at a position. If no object is there,
+   * then it returns null.
+   *
+   * ```typescript
+   * console.log(editor.currentPage.identifyLayer([10, 10]))
+   * ```
+   *
+   * @param position
+   */
+  identifyLayer(
+    position: readonly [number, number],
+    radius?: number,
+  ): string | null;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -251,6 +273,27 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
       return layers.get(rootLayer) as LayerListItem;
     });
+  }
+
+  identifyLayer(position: readonly [number, number], radius = 1) {
+    return automaticScope((scope) => {
+      const string = this.#engine.ode.String(scope, "");
+      this.#engine.ode.component_identifyLayer(
+        this.__component,
+        string,
+        position,
+        0.5,
+      );
+      const ref = string.ref();
+      scope(() => ref.delete());
+      return ref.string() || null;
+    });
+  }
+
+  getLayerById(id: string): LayerNode | null {
+    // TODO: detect if layer does not exist
+    // TODO: maybe guarantee referential equality for layer with same id somehow
+    return new LayerNodeImpl("GROUP", this.__component, id, this.#engine);
   }
 }
 

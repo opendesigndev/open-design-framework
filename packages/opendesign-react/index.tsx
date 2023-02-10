@@ -61,7 +61,8 @@ export interface EditorCanvasProps extends MountOptions {
  * @returns
  */
 export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
-  const { editor, disableGestures, onPointerMove, children, ...rest } = props;
+  const { editor, disableGestures, onPointerMove, children, onClick, ...rest } =
+    props;
   if (editor.loading) {
     throw editor.loaded;
   }
@@ -98,6 +99,19 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
           );
           if (!position) return;
           onPointerMove?.({ position });
+        }}
+        onClick={(event) => {
+          if (!onClick) return;
+          const position = resultRef.current?.extractEventPosition(
+            event.nativeEvent,
+          );
+          if (!position) return;
+          const id = editor.currentPage.findArtboard()?.identifyLayer(position);
+          onClick({
+            target: id
+              ? editor.currentPage.findArtboard()?.getLayerById(id) ?? null
+              : null,
+          });
         }}
         style={{
           width: "100%",
