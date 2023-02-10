@@ -8,6 +8,27 @@ import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
+export type Rectangle = readonly [
+  a: readonly [x: number, y: number],
+  b: readonly [x: number, y: number],
+];
+
+export type Transformation = readonly [
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  e: number,
+  f: number,
+];
+
+export type LayerMetrics = {
+  transformation: Transformation;
+  logicalBounds: Rectangle;
+  graphicalBounds: Rectangle;
+  transformedGraphicalBounds: Rectangle;
+};
+
 export interface LayerNode extends BaseNode {
   type: "SHAPE" | "TEXT" | "COMPONENT_REFERENCE" | "GROUP" | "MASK_GROUP";
 
@@ -22,9 +43,14 @@ export interface LayerNode extends BaseNode {
    * Creates layer from octopus data
    */
   createLayer(octopus: Octopus["schemas"]["Layer"]): LayerNode;
+
+  /**
+   * Returns information about layer bounding box
+   */
+  readMetrics(): LayerMetrics;
 }
 
-export class LayerNodeImpl extends BaseNodeImpl {
+export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
   type: LayerNode["type"];
   #component: ComponentHandle;
   #id: string;
@@ -70,5 +96,19 @@ export class LayerNodeImpl extends BaseNodeImpl {
       octopus.id,
       this.#engine,
     );
+  }
+
+  readMetrics(): LayerMetrics {
+    return automaticScope((scope) => {
+      const id = createStringRef(this.#engine.ode, scope, this.#id);
+      const metrics = this.#engine.ode.LayerMetrics(scope);
+      this.#engine.ode.component_getLayerMetrics(this.#component, id, metrics);
+      return {
+        graphicalBounds: metrics.graphicalBounds,
+        logicalBounds: metrics.logicalBounds,
+        transformation: metrics.transformation,
+        transformedGraphicalBounds: metrics.transformedGraphicalBounds,
+      };
+    });
   }
 }

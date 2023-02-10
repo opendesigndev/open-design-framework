@@ -1,10 +1,24 @@
-import type { CreateEditorOptions, Editor, Node } from "@opendesign/universal";
+import type {
+  CreateEditorOptions,
+  Editor,
+  LayerNode,
+  Node,
+} from "@opendesign/universal";
 import { createEditor } from "@opendesign/universal";
-import type { MountOptions, MountResult } from "@opendesign/universal/dom";
+import type {
+  MountEventHandler,
+  MountOptions,
+  MountResult,
+} from "@opendesign/universal/dom";
 import { mount } from "@opendesign/universal/dom";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { EditorProvider, useEditorContext } from "./src/context.js";
+import {
+  CanvasContextProvider,
+  EditorProvider,
+  useCanvasContext,
+  useEditorContext,
+} from "./src/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
@@ -69,7 +83,7 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
 
   const canvasParent = useRef<HTMLDivElement>(null);
   const eventTarget = useRef<HTMLDivElement>(null);
-  const resultRef = useRef<MountResult | null>(null);
+  const [canvasContext, setCanvasContext] = useState<MountResult | null>(null);
 
   useLayoutEffect(() => {
     const c = canvasParent.current!;
@@ -83,52 +97,57 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
       disableGestures,
       eventTarget: eventTarget.current!,
     });
-    resultRef.current = result;
+    setCanvasContext(result);
     return () => {
       result.destroy();
-      resultRef.current = null;
+      setCanvasContext((r) => (r === result ? null : r));
     };
   }, [disableGestures, editor]);
   if (Object.keys(rest).length) todo("this prop is not yet supported");
+
   return (
     <EditorProvider editor={editor}>
-      <div
-        onPointerMove={(event) => {
-          const position = resultRef.current?.extractEventPosition(
-            event.nativeEvent,
-          );
-          if (!position) return;
-          onPointerMove?.({ position });
-        }}
-        onClick={(event) => {
-          if (!onClick) return;
-          const position = resultRef.current?.extractEventPosition(
-            event.nativeEvent,
-          );
-          if (!position) return;
-          const id = editor.currentPage.findArtboard()?.identifyLayer(position);
-          onClick({
-            target: id
-              ? editor.currentPage.findArtboard()?.getLayerById(id) ?? null
-              : null,
-          });
-        }}
-        style={{
-          width: "100%",
-          height: "100%",
-          inset: 0,
-          margin: 0,
-          padding: 0,
-          boxSizing: "border-box",
-          position: "relative",
-        }}
-        ref={eventTarget}
-      >
-        <div ref={canvasParent} />
-        <div style={{ position: "absolute", inset: 0, overflow: "clip" }}>
-          {children}
+      <CanvasContextProvider value={canvasContext}>
+        <div
+          onPointerMove={(event) => {
+            const position = canvasContext?.extractEventPosition(
+              event.nativeEvent,
+            );
+            if (!position) return;
+            onPointerMove?.({ position });
+          }}
+          onClick={(event) => {
+            if (!onClick) return;
+            const position = canvasContext?.extractEventPosition(
+              event.nativeEvent,
+            );
+            if (!position) return;
+            const id = editor.currentPage
+              .findArtboard()
+              ?.identifyLayer(position);
+            onClick({
+              target: id
+                ? editor.currentPage.findArtboard()?.getLayerById(id) ?? null
+                : null,
+            });
+          }}
+          style={{
+            width: "100%",
+            height: "100%",
+            inset: 0,
+            margin: 0,
+            padding: 0,
+            boxSizing: "border-box",
+            position: "relative",
+          }}
+          ref={eventTarget}
+        >
+          <div ref={canvasParent} />
+          <div style={{ position: "absolute", inset: 0, overflow: "clip" }}>
+            {children}
+          </div>
         </div>
-      </div>
+      </CanvasContextProvider>
     </EditorProvider>
   );
 }
@@ -144,23 +163,70 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
  * @param props
  */
 export function RelativeMarker(
-  props:
-    | {
-        children: React.ReactNode;
-        node: Node;
-        /**
-         * The element's size will be reduced by this many CSS pixels.
-         * Can be negative.
-         */
-        inset?: number;
-      }
+  props: {
+    children: React.ReactNode;
+    node: LayerNode; // TODO: <- change to Node
+    /**
+     * The element's size will be reduced by this many CSS pixels.
+     * Can be negative.
+     */
+    inset?: number;
+  } /* TODO:
     | {
         children: React.ReactNode;
         x: number;
         y: number;
-      },
+      } */,
 ): JSX.Element {
-  todo();
+  const ref = useRef<HTMLDivElement>(null);
+  const canvas = useCanvasContext();
+  useLayoutEffect(() => {
+    const div = ref.current;
+    if (!div) return;
+    const metrics = props.node.readMetrics();
+
+    const handler: MountEventHandler<"viewportChange"> = ({ viewport }) => {
+      div.style.width =
+        (metrics.graphicalBounds[1][0] - metrics.graphicalBounds[0][0]) *
+          (viewport.scale / window.devicePixelRatio) -
+        (props.inset ?? 0) * 2 +
+        "px";
+      div.style.height =
+        (metrics.graphicalBounds[1][1] - metrics.graphicalBounds[0][1]) *
+          (viewport.scale / window.devicePixelRatio) -
+        (props.inset ?? 0) * 2 +
+        "px";
+      div.style.left =
+        (metrics.transformation[4] +
+          metrics.graphicalBounds[0][0] -
+          viewport.offset[0]) *
+          (viewport.scale / window.devicePixelRatio) -
+        (props.inset ?? 0) +
+        "px";
+      div.style.top =
+        (metrics.transformation[5] +
+          metrics.graphicalBounds[0][1] -
+          viewport.offset[1]) *
+          (viewport.scale / window.devicePixelRatio) -
+        (props.inset ?? 0) +
+        "px";
+
+      div.style.position = "absolute";
+    };
+    handler({ viewport: canvas.getViewport() });
+    return canvas.subscribe("viewportChange", handler);
+  }, [canvas, props.inset, props.node]);
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: "absolute",
+        display: "grid",
+      }}
+    >
+      {props.children}
+    </div>
+  );
 }
 
 /**

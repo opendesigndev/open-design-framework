@@ -166,13 +166,6 @@ export function mount(
 
   if (!options?.disableGestures) {
     eventTarget.addEventListener("wheel", onWheel, { passive: false, signal });
-    eventTarget.addEventListener(
-      "click",
-      (event) => {
-        console.log(extractEventPosition(event));
-      },
-      { signal },
-    );
 
     eventTarget.addEventListener(
       "pointermove",

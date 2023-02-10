@@ -79,51 +79,6 @@ function ZoomEvent() {
   );
 }
 
-function PinOnPosition() {
-  const editor = useEditor();
-
-  return (
-    <Suspense>
-      <EditorCanvas editor={editor}>
-        <RelativeMarker x={100} y={100}>
-          <div style={{ width: 8, height: 8, background: "red" }}></div>
-        </RelativeMarker>
-      </EditorCanvas>
-    </Suspense>
-  );
-}
-
-// see 3-hovered-layer-overlay-alt.tsx for alternative implementation
-function HoveredLayerOverlay() {
-  const editor = useEditor();
-  const [hoveredNode, setHoveredNode] = useState<Node | null>(null);
-
-  return (
-    <Suspense>
-      <EditorCanvas
-        editor={editor}
-        onNodeHover={(event) => {
-          if (event.target) {
-            setHoveredNode(event.target);
-          } else {
-            setHoveredNode(null);
-          }
-        }}
-      >
-        {hoveredNode ? (
-          <RelativeMarker
-            node={hoveredNode}
-            // https://developer.mozilla.org/en-US/docs/Web/CSS/inset
-            inset={-2}
-          >
-            <div style={{ border: "2px solid red" }} />
-          </RelativeMarker>
-        ) : null}
-      </EditorCanvas>
-    </Suspense>
-  );
-}
-
 declare function saveAs(buffer: ArrayBuffer): void;
 function ExportLayerToPng() {
   const editor = useEditor({

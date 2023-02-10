@@ -1,7 +1,9 @@
 import type { Editor } from "@opendesign/universal";
+import type { MountResult } from "@opendesign/universal/dom";
 import { createContext, useContext } from "react";
 
 const context = createContext<Editor | null>(null);
+const canvasContext = createContext<MountResult | null>(null);
 
 /**
  * Provides editor to a subtree. This allows you to use editor-based hooks
@@ -41,4 +43,20 @@ export function useEditorContextOptional(
   editorOverride?: Editor,
 ): Editor | null {
   return useContext(context) ?? editorOverride ?? null;
+}
+
+/**
+ * @internal
+ */
+export const CanvasContextProvider = canvasContext.Provider;
+
+/**
+ * @internal
+ */
+export function useCanvasContext() {
+  const value = useContext(canvasContext);
+  if (!value) {
+    throw new Error("You must render this in a subtree of EditorCanvas");
+  }
+  return value;
 }
