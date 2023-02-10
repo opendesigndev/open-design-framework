@@ -1,12 +1,11 @@
 import { Component } from "react";
-import {
-  type Location,
-  UNSAFE_LocationContext,
-  useRouteError,
-} from "react-router-dom";
+import { type Location, UNSAFE_LocationContext } from "react-router-dom";
 
 type State = { error: null | { location: Location } };
-export class ErrorBoundary extends Component<{ children: JSX.Element }, State> {
+export class ErrorBoundary extends Component<
+  { children: React.ReactNode },
+  State
+> {
   state: State = { error: null };
   declare context: React.ContextType<typeof UNSAFE_LocationContext>;
 

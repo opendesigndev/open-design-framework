@@ -1,4 +1,5 @@
 import type { PasteEvent } from "@opendesign/react";
+import { RelativeMarker } from "@opendesign/react";
 import { useLayerList } from "@opendesign/react";
 import {
   EditorCanvas,
@@ -9,6 +10,7 @@ import {
 import type {
   Editor,
   ImportedClipboardData,
+  LayerNode,
   Manifest,
 } from "@opendesign/universal";
 import {
@@ -23,6 +25,7 @@ import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
 import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
+import { ErrorBoundary } from "./error-boundary.js";
 
 async function convert(file: Blob) {
   const data = new Uint8Array(await file.arrayBuffer());
@@ -275,6 +278,7 @@ function Content({
     },
     unstable_fallbackFont: "/static/inter.ttf",
   });
+  const [selectedLayer, setSelectedLayer] = useState<LayerNode | null>(null);
 
   return (
     <>
@@ -294,7 +298,24 @@ function Content({
           </div>
           <div className="basis-4/5 border border-dashed">
             <Suspense>
-              <EditorCanvas editor={editor} />
+              <EditorCanvas
+                editor={editor}
+                onClick={({ target }) => {
+                  if (
+                    target &&
+                    target?.type !== "ARTBOARD" &&
+                    target.type !== "PAGE"
+                  ) {
+                    setSelectedLayer(target);
+                  }
+                }}
+              >
+                <ErrorBoundary>
+                  {selectedLayer ? (
+                    <LayerOutline layer={selectedLayer} />
+                  ) : null}
+                </ErrorBoundary>
+              </EditorCanvas>
             </Suspense>
             {data.type === "file" ? (
               <div className="absolute top-4 right-4">
@@ -311,5 +332,13 @@ function Content({
         </div>
       </EditorProvider>
     </>
+  );
+}
+
+function LayerOutline({ layer }: { layer: LayerNode }) {
+  return (
+    <RelativeMarker node={layer}>
+      <div className="border border-solid border-red-800" />
+    </RelativeMarker>
   );
 }
