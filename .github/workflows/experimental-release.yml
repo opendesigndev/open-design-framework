@@ -2,9 +2,11 @@ name: Experimental Release
 
 on:
   workflow_dispatch: {}
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - "Release"
+    types:
+      - completed
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
