@@ -1,5 +1,11 @@
 # @opendesign/universal
 
+## 0.4.1
+
+### Patch Changes
+
+- 7acdfc1: fix release process
+
 ## 0.4.0
 
 ### Minor Changes
