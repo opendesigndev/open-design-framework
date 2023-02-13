@@ -1,5 +1,13 @@
 # @opendesign/react
 
+## 0.4.1
+
+### Patch Changes
+
+- 7acdfc1: fix release process
+- Updated dependencies [7acdfc1]
+  - @opendesign/universal@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes
