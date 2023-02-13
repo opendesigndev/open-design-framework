@@ -52,3 +52,12 @@ jobs:
 
       - name: Destroy the review app
         run: dokku --force apps:destroy "${{ steps.dokku.outputs.app_name }}"
+      - name: Mark environment as inactive
+        run: |
+          ID=`gh api \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/$GITHUB_REPOSITORY/deployments?ref=$GITHUB_REF_NAME&per_page=1" \
+            --jq ".[0].id"`
+          gh api -H "Accept: application/vnd.github+json" --method POST "/repos/$GITHUB_REPOSITORY/deployments/$ID/statuses" -f state=inactive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
