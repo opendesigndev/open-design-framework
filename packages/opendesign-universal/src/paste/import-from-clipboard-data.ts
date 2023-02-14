@@ -5,17 +5,22 @@ import type { Octopus } from "@opendesign/octopus-ts";
 import { hashString } from "../utils.js";
 import { MemoryExporter } from "./memory-exporter.js";
 
+export type ImportedClipboardDataJSONFile = {
+  type: "JSON";
+  path: string;
+  data: Octopus["schemas"]["OctopusComponent"];
+  source?: string;
+};
+
+export type ImportedClipboardDataBinaryFile = {
+  type: "BINARY";
+  path: string;
+  data: Uint8Array;
+};
+
 export type ImportedClipboardData = {
   manifest: Manifest["schemas"]["OctopusManifest"];
-  files: (
-    | {
-        type: "JSON";
-        path: string;
-        data: Octopus["schemas"]["OctopusComponent"];
-        source?: string;
-      }
-    | { type: "BINARY"; path: string; data: Uint8Array }
-  )[];
+  files: (ImportedClipboardDataJSONFile | ImportedClipboardDataBinaryFile)[];
 };
 
 /**

@@ -72,6 +72,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
   }
 
   async paste(data: ImportedClipboardData): Promise<void> {
+    // TODO: the same filtering is in page if no artboard is present. Do we need this?
     const octopus = data.files.find((f) => f.type === "JSON");
     if (!octopus || octopus.type !== "JSON" || !octopus.data.content)
       throw new Error("Pasted data do not contain octopus");

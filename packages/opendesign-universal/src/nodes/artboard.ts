@@ -1,4 +1,5 @@
 import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
+import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
@@ -127,6 +128,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   // TODO: make private
   __rootLayerId: string;
   #octopus: string;
+  #layersIds: Set<string> = new Set();
 
   constructor(
     engine: Engine,
@@ -201,9 +203,47 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     return this.#octopus;
   }
 
+  _updateLayerIds(
+    data?: Octopus["schemas"]["Layer"],
+  ): Octopus["schemas"]["Layer"] | undefined {
+    if (!data) {
+      return;
+    }
+    // TODO: use ODE API to check for duplication when it's available
+    if (this.#layersIds.has(data.id)) {
+      data.id = generateUUID();
+      this.#layersIds.add(data.id);
+    }
+
+    if ("layers" in data) {
+      if (Array.isArray(data.layers)) {
+        for (const layer of data.layers) {
+          this._updateLayerIds(layer);
+        }
+      }
+    }
+
+    return data;
+  }
+
   paste(data: ImportedClipboardData): Promise<void> {
+    const transformedData = {
+      ...data,
+      files: data.files.map((f) =>
+        f.type !== "JSON"
+          ? f
+          : {
+              ...f,
+              data: {
+                ...f.data,
+                content: this._updateLayerIds(f.data.content),
+              },
+            },
+      ),
+    };
+
     return this.getRootLayer()
-      .paste(data)
+      .paste(transformedData)
       .then(() => {
         this.#editor?._notify(this, "PASTE_SUCCESS");
       })
@@ -235,6 +275,9 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         const id = layer.id.string();
         const parentId = layer.parentId.string();
         const layerType = this.#engine.ode.LayerType(layer.type);
+        // save layer id to the Set for later duplication checks
+        // TODO: this adds to complexity since it needs to traverse octopus date before sending it to the engine
+        this.#layersIds.add(id);
         // check if layer exists (boilerplated parent layer from child) and update it
         // otherwise create a new layer with empty children (layers) array
         let boilerplatedLayer = layers.get(id)!;
