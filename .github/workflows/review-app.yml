@@ -56,8 +56,9 @@ jobs:
         run: |
           ID=`gh api \
             -H "Accept: application/vnd.github+json" \
-            "/repos/$GITHUB_REPOSITORY/deployments?ref=$GITHUB_REF_NAME&per_page=1" \
+            "/repos/$GITHUB_REPOSITORY/deployments?ref=$HEAD_REF&per_page=1" \
             --jq ".[0].id"`
           gh api -H "Accept: application/vnd.github+json" --method POST "/repos/$GITHUB_REPOSITORY/deployments/$ID/statuses" -f state=inactive
         env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
