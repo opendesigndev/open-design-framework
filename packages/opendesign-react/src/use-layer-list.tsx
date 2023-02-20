@@ -22,17 +22,19 @@ export function useLayerList({
   editorOverride,
 }: useLayerListOptions): LayerListItem | null | undefined {
   const editor = useWaitForEditorLoaded(editorOverride);
-  const [layers, setLayers] = useState<LayerListItem | null | undefined>(null);
+  const artboard = editor?.currentPage.findArtboard();
+  const [layers, setLayers] = useState<LayerListItem | null | undefined>(() =>
+    artboard?.getLayers({ naturalOrder }),
+  );
 
   useEffect(() => {
-    const artboard = editor?.currentPage.findArtboard();
     setLayers(artboard?.getLayers({ naturalOrder }));
 
     const unsubscribe = editor?.listen("layersUpdated", (data) => {
       setLayers(data.layers);
     });
     return unsubscribe;
-  }, [editor, naturalOrder]);
+  }, [artboard, editor, naturalOrder]);
 
   return layers;
 }
