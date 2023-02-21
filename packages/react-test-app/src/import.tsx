@@ -221,7 +221,7 @@ function Layers({
   layers: LayerListItem[];
   level?: number;
 }) {
-  if (layers.length === 0) return null;
+  if (!layers || layers?.length === 0) return null;
 
   return (
     <ol className="[counter-reset:section] ml-2">
@@ -233,7 +233,7 @@ function Layers({
               className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
             >
               {layer.name}
-              {layer.layers?.length > 0 && (
+              {layer.layers.length > 0 && (
                 <Layers layers={layer.layers} level={level + 1} />
               )}
             </li>
@@ -245,7 +245,7 @@ function Layers({
 
 function LayerList() {
   const [isReverse, setIsReverse] = useState(false);
-  const layers = useLayerList({ naturalOrder: !isReverse });
+  const layers = useLayerList({ naturalOrder: !isReverse }, "first");
 
   if (!layers) return null;
 
@@ -254,9 +254,16 @@ function LayerList() {
       <Button onClick={() => setIsReverse(!isReverse)}>
         Change order to {!isReverse ? "Reverse" : "Normal"}
       </Button>
-      <Layers layers={layers?.layers} />
+      <Layers layers={layers.layers} />
     </>
   );
+}
+
+function SecondLayerList() {
+  const layers = useLayerList({}, "second");
+  if (!layers) return null;
+
+  return <Layers layers={layers.layers} />;
 }
 
 function Content({
@@ -294,6 +301,13 @@ function Content({
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
             <Suspense>
               <LayerList />
+            </Suspense>
+            <hr />
+            <h2 className="text-lg font-semibold mb-2">
+              Second layer list (without naturalOrder parameter)
+            </h2>
+            <Suspense>
+              <SecondLayerList />
             </Suspense>
           </div>
           <div className="basis-4/5 border border-dashed">

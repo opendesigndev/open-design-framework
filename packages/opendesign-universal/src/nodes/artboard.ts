@@ -1,6 +1,6 @@
 import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
 
-import type { Editor } from "../editor.js";
+import type { Editor, EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import {
   automaticScope,
@@ -84,8 +84,7 @@ export interface ArtboardNode extends BaseNode {
   getRootLayer(): LayerNode;
 
   /**
-   * Initiate API call to Engine to get list of all layers in this artboard and dispatch an event when it is ready.
-   * Then store the result in this.#layers.
+   * Returns list of all layers in this artboard.
    *
    * By default gets layers in natural order - from top to bottom.
    *
@@ -120,7 +119,7 @@ export interface ArtboardNode extends BaseNode {
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   #engine: Engine;
-  #editor: Editor | undefined;
+  #editor: EditorImplementation | undefined;
   #layers: LayerListItem | undefined;
   #naturalLayersOrder: boolean = true;
   // TODO: cleanup
@@ -135,7 +134,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     engine: Engine,
     id: string = generateUUID(),
     octopus?: string,
-    editor?: Editor,
+    editor?: EditorImplementation,
   ) {
     super();
     this.#engine = engine;
@@ -290,10 +289,14 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       if (!rootLayer) {
         throw new Error("No root layer found");
       }
-      this.setLayers(layers.get(rootLayer) as LayerListItem);
-      this.#editor?.notify(this, "layersUpdated", this.#layers);
+      // this.setLayers(layers.get(rootLayer) as LayerListItem);
+      this.#editor?.notify(
+        this,
+        "layersUpdated",
+        layers.get(rootLayer) as LayerListItem,
+      );
 
-      return this.#layers;
+      return layers.get(rootLayer) as LayerListItem;
     });
   }
 
