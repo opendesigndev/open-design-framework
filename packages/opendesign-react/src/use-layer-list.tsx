@@ -17,24 +17,28 @@ type useLayerListOptions = {
  * @param options.editorOverride - editor to use instead of the one from context
  * @returns list of layers in the artboard if any or nullish value if no artboard is present
  */
-export function useLayerList({
-  naturalOrder = true,
-  editorOverride,
-}: useLayerListOptions): LayerListItem | null | undefined {
+export function useLayerList(
+  options?: useLayerListOptions,
+): LayerListItem | null | undefined {
+  const { naturalOrder = true, editorOverride } = options || {};
   const editor = useWaitForEditorLoaded(editorOverride);
-  const artboard = editor?.currentPage.findArtboard();
   const [layers, setLayers] = useState<LayerListItem | null | undefined>(() =>
-    artboard?.getLayers({ naturalOrder }),
+    editor?.currentPage.findArtboard()?.getLayers({ naturalOrder }),
   );
 
   useEffect(() => {
-    setLayers(artboard?.getLayers({ naturalOrder }));
+    // need to update layers when order is changed because getLayers doesn't trigger any events in Editor
+    setLayers(editor?.currentPage.findArtboard()?.getLayers({ naturalOrder }));
 
-    const unsubscribe = editor?.listen("layersUpdated", (data) => {
-      setLayers(data.layers);
-    });
+    const unsubscribe = editor?.listen(
+      `layersList${naturalOrder ? "" : "Reversed"}`,
+      (data) => {
+        setLayers(data.layers);
+      },
+    );
+
     return unsubscribe;
-  }, [artboard, editor, naturalOrder]);
+  }, [editor, naturalOrder]);
 
   return layers;
 }

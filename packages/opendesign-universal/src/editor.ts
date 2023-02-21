@@ -7,13 +7,21 @@ import { automaticScope, createStringRef } from "./engine/memory.js";
 import { todo } from "./internals.js";
 import { performance } from "./lib.js";
 import type { LayerListItem } from "./nodes/artboard.js";
+import { ArtboardNodeImpl } from "./nodes/artboard.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
-import type { Node } from "./nodes/node.js";
+import type { BaseNodeImpl, Node } from "./nodes/node.js";
 import type { PageNode } from "./nodes/page.js";
 import { PageNodeImpl } from "./nodes/page.js";
 import { loadFile } from "./octopus-file/load-file.js";
 import { canvasSymbol, engineSymbol } from "./symbols.js";
+
+export enum EditorMediatorEvents {
+  PASTE_SUCCESS = "PASTE_SUCCESS",
+  PASTE_FAILURE = "PASTE_FAILURE",
+  ARTBOARD_CREATED = "ARTBOARD_CREATED",
+  ARTBOARD_LOADED = "ARTBOARD_LOADED",
+}
 
 export type CreateEditorOptions = {
   /**
@@ -88,7 +96,8 @@ export type EditorEvents = {
   timeupdate: { currentTime: number };
   play: {};
   pause: {};
-  layersUpdated: { layers: LayerListItem };
+  layersList: { layers: LayerListItem | undefined };
+  layersListReversed: { layers: LayerListItem | undefined };
 };
 
 /**
@@ -194,7 +203,7 @@ export interface Editor {
    * @param event the event name
    * @param data the event payload
    */
-  notify(sender: object, event: string, data: any): void;
+  notify(sender: BaseNodeImpl, event: EditorMediatorEvents, data?: any): void;
 }
 
 /**
@@ -425,11 +434,33 @@ export class EditorImplementation implements Editor {
     });
   }
 
-  notify(sender: object, event: string, data: any): void {
-    if (event === "layersUpdated") {
-      this.#dispatch("layersUpdated", { layers: data });
+  notify(sender: object, event: EditorMediatorEvents, data?: any): void {
+    if (event === EditorMediatorEvents.PASTE_SUCCESS) {
+      if (sender instanceof ArtboardNodeImpl) {
+        this.#handleLayersListUpdateOnPaste();
+      }
     }
   }
+
+  #anyLayersListeners(reversed?: boolean) {
+    return this.#events.has(`layersList${reversed ? "Reversed" : ""}`);
+  }
+
+  #handleLayersListUpdateOnPaste = () => {
+    if (this.#anyLayersListeners()) {
+      this.#dispatch("layersList", {
+        layers: this.#currentPage?.findArtboard()?.getLayers(),
+      });
+    }
+
+    if (this.#anyLayersListeners(true)) {
+      this.#dispatch("layersListReversed", {
+        layers: this.#currentPage
+          ?.findArtboard()
+          ?.getLayers({ naturalOrder: false }),
+      });
+    }
+  };
 }
 
 /**

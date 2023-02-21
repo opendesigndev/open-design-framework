@@ -1,6 +1,7 @@
 import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
 
-import type { Editor, EditorImplementation } from "../editor.js";
+import type { EditorImplementation } from "../editor.js";
+import { Editor, EditorMediatorEvents } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import {
   automaticScope,
@@ -120,8 +121,6 @@ export interface ArtboardNode extends BaseNode {
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   #engine: Engine;
   #editor: EditorImplementation | undefined;
-  #layers: LayerListItem | undefined;
-  #naturalLayersOrder: boolean = true;
   // TODO: cleanup
   #scope = detachedScope();
   // TODO: make private
@@ -187,10 +186,6 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     todo();
   }
 
-  setLayers(layers: LayerListItem): void {
-    this.#layers = layers;
-  }
-
   unstable_setStaticAnimation(animation: string) {
     automaticScope((scope) => {
       const ref = createStringRef(this.#engine.ode, scope, animation);
@@ -210,8 +205,11 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   paste(data: ImportedClipboardData): Promise<void> {
     return this.getRootLayer()
       .paste(data)
-      .finally(() => {
-        this.getLayers({ naturalOrder: this.#naturalLayersOrder });
+      .then(() => {
+        this.#editor?.notify(this, EditorMediatorEvents.PASTE_SUCCESS);
+      })
+      .catch((e) => {
+        this.#editor?.notify(this, EditorMediatorEvents.PASTE_FAILURE, e);
       });
   }
 
@@ -227,7 +225,6 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   getLayers({ naturalOrder = true }: getLayersOptions = {}) {
     return automaticScope((scope) => {
-      this.#naturalLayersOrder = naturalOrder;
       const layerList = this.#engine.ode.LayerList(scope);
       this.#engine.ode.component_listLayers(scope, this.__component, layerList);
       const layers = new Map<string, LayerListItem>();
@@ -275,7 +272,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
           // get parent and update children array considering reverse flag
           if (layers.has(parentId)) {
             const parent = layers.get(parentId) as LayerListItem;
-            if (this.#naturalLayersOrder) {
+            if (naturalOrder) {
               parent.layers.unshift(layers.get(id) as LayerListItem);
             } else {
               parent.layers.push(layers.get(id) as LayerListItem);
@@ -289,12 +286,6 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       if (!rootLayer) {
         throw new Error("No root layer found");
       }
-      // this.setLayers(layers.get(rootLayer) as LayerListItem);
-      this.#editor?.notify(
-        this,
-        "layersUpdated",
-        layers.get(rootLayer) as LayerListItem,
-      );
 
       return layers.get(rootLayer) as LayerListItem;
     });
