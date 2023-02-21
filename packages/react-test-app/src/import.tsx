@@ -245,7 +245,7 @@ function Layers({
 
 function LayerList() {
   const [isReverse, setIsReverse] = useState(false);
-  const layers = useLayerList({ naturalOrder: !isReverse }, "first");
+  const layers = useLayerList({ naturalOrder: !isReverse });
 
   if (!layers) return null;
 
@@ -260,7 +260,7 @@ function LayerList() {
 }
 
 function SecondLayerList() {
-  const layers = useLayerList({}, "second");
+  const layers = useLayerList();
   if (!layers) return null;
 
   return <Layers layers={layers.layers} />;

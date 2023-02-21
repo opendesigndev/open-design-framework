@@ -39,7 +39,7 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
   #destroySignal?: AbortSignal;
   layers: LayerListItem | null = null;
 
-  constructor(engine: Engine, editor: Editor) {
+  constructor(engine: Engine, editor: EditorImplementation) {
     super();
     this.#engine = engine;
     this.#editor = editor;
