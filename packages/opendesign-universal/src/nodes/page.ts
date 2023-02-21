@@ -1,4 +1,4 @@
-import type { Editor, EditorImplementation } from "../editor.js";
+import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { todo } from "../internals.js";
