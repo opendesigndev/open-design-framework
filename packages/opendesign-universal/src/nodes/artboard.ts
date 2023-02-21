@@ -1,7 +1,7 @@
 import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
 
 import type { EditorImplementation } from "../editor.js";
-import { Editor, EditorMediatorEvents } from "../editor.js";
+import { EditorMediatorEvents } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import {
   automaticScope,
