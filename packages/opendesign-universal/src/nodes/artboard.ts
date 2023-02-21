@@ -282,7 +282,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         this.__component,
         string,
         position,
-        0.5,
+        radius,
       );
       const ref = string.ref();
       scope(() => ref.delete());
