@@ -32,6 +32,8 @@ export type LayerMetrics = {
 export interface LayerNode extends BaseNode {
   type: "SHAPE" | "TEXT" | "COMPONENT_REFERENCE" | "GROUP" | "MASK_GROUP";
 
+  id: string;
+
   /**
    * Adds data which was previously read from clipboard into this layer.
    *
@@ -53,7 +55,7 @@ export interface LayerNode extends BaseNode {
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
   type: LayerNode["type"];
   #component: ComponentHandle;
-  #id: string;
+  id: string;
   #engine: Engine;
 
   constructor(
@@ -65,7 +67,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     super();
     this.type = type;
     this.#component = component;
-    this.#id = id;
+    this.id = id;
     this.#engine = engine;
   }
 
@@ -87,7 +89,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       const octopusString = JSON.stringify(octopus);
       this.#engine.ode.component_addLayer(
         this.#component,
-        createStringRef(this.#engine.ode, scope, this.#id), // parent
+        createStringRef(this.#engine.ode, scope, this.id), // parent
         createStringRef(this.#engine.ode, scope, ""), // before, empty means append
         createStringRef(this.#engine.ode, scope, octopusString), // octopus
         parseError,
@@ -104,7 +106,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   readMetrics(): LayerMetrics {
     return automaticScope((scope) => {
-      const id = createStringRef(this.#engine.ode, scope, this.#id);
+      const id = createStringRef(this.#engine.ode, scope, this.id);
       const metrics = this.#engine.ode.LayerMetrics(scope);
       this.#engine.ode.component_getLayerMetrics(this.#component, id, metrics);
       return {

@@ -217,9 +217,11 @@ function performPaste(
 function Layers({
   layers,
   level = 1,
+  selected,
 }: {
   layers: LayerListItem[];
   level?: number;
+  selected?: string;
 }) {
   if (!layers || layers?.length === 0) return null;
 
@@ -230,11 +232,17 @@ function Layers({
           layer && (
             <li
               key={layer.id}
-              className="[counter-increment:section] marker:[content:counters(section,'.')] pl-4"
+              className={`[counter-increment:section] marker:[content:counters(section,'.')] pl-4 ${
+                layer.id === selected && "bg-violet-300"
+              }`}
             >
               {layer.name}
               {layer.layers.length > 0 && (
-                <Layers layers={layer.layers} level={level + 1} />
+                <Layers
+                  layers={layer.layers}
+                  level={level + 1}
+                  selected={selected}
+                />
               )}
             </li>
           ),
@@ -243,7 +251,7 @@ function Layers({
   );
 }
 
-function LayerList() {
+function LayerList({ selected }: { selected?: string }) {
   const [isReverse, setIsReverse] = useState(false);
   const layers = useLayerList({ naturalOrder: !isReverse });
 
@@ -254,7 +262,7 @@ function LayerList() {
       <Button onClick={() => setIsReverse(!isReverse)}>
         Change order to {!isReverse ? "Reverse" : "Normal"}
       </Button>
-      <Layers layers={layers.layers} />
+      <Layers layers={layers.layers} selected={selected} />
     </>
   );
 }
@@ -300,7 +308,7 @@ function Content({
           <div className="basis-1/5">
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
             <Suspense>
-              <LayerList />
+              <LayerList selected={selectedLayer?.id} />
             </Suspense>
             <hr />
             <h2 className="text-lg font-semibold mb-2">
