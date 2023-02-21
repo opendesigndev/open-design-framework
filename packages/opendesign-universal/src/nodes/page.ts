@@ -1,4 +1,4 @@
-import type { Editor } from "../editor.js";
+import type { Editor, EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { todo } from "../internals.js";
@@ -32,7 +32,7 @@ type AbortSignal = any;
 
 export class PageNodeImpl extends BaseNodeImpl implements PageNode {
   #engine: Engine;
-  #editor: Editor;
+  #editor: EditorImplementation;
   // TODO: make private
   __artboard?: ArtboardNodeImpl;
   // TODO: call this on page destroy
