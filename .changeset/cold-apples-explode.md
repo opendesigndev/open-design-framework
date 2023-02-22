@@ -2,4 +2,4 @@
 "@opendesign/universal": minor
 ---
 
-Made id as puplic field for LayerNode
+Made id as public field for LayerNode
