@@ -442,18 +442,18 @@ export class EditorImplementation implements Editor {
     }
   }
 
-  #anyLayersListeners(reversed?: boolean) {
+  #hasLayersListeners(reversed?: boolean) {
     return this.#events.has(`layersList${reversed ? "Reversed" : ""}`);
   }
 
   #handleLayersListUpdateOnPaste = () => {
-    if (this.#anyLayersListeners()) {
+    if (this.#hasLayersListeners()) {
       this.#dispatch("layersList", {
         layers: this.#currentPage?.findArtboard()?.getLayers(),
       });
     }
 
-    if (this.#anyLayersListeners(true)) {
+    if (this.#hasLayersListeners(true)) {
       this.#dispatch("layersListReversed", {
         layers: this.#currentPage
           ?.findArtboard()
