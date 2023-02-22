@@ -196,14 +196,6 @@ export interface Editor {
    * @param faceName specifies face within multi-face font file, otherwise can be left blank
    */
   setFont(name: string, data: Uint8Array, faceName?: string): void;
-
-  /**
-   * Public method to notify the editor of an event from any node.
-   * @param sender the node that is sending the event
-   * @param event the event name
-   * @param data the event payload
-   */
-  notify(sender: BaseNodeImpl, event: EditorMediatorEvents, data?: any): void;
 }
 
 /**
@@ -434,7 +426,7 @@ export class EditorImplementation implements Editor {
     });
   }
 
-  notify(sender: object, event: EditorMediatorEvents, data?: any): void {
+  _notify(sender: object, event: EditorMediatorEvents, data?: any): void {
     if (event === EditorMediatorEvents.PASTE_SUCCESS) {
       if (sender instanceof ArtboardNodeImpl) {
         this.#handleLayersListUpdateOnPaste();

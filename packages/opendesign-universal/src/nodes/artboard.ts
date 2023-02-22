@@ -206,10 +206,10 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     return this.getRootLayer()
       .paste(data)
       .then(() => {
-        this.#editor?.notify(this, EditorMediatorEvents.PASTE_SUCCESS);
+        this.#editor?._notify(this, EditorMediatorEvents.PASTE_SUCCESS);
       })
       .catch((e) => {
-        this.#editor?.notify(this, EditorMediatorEvents.PASTE_FAILURE, e);
+        this.#editor?._notify(this, EditorMediatorEvents.PASTE_FAILURE, e);
       });
   }
 
