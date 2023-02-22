@@ -1,7 +1,6 @@
 import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
 
 import type { EditorImplementation } from "../editor.js";
-import { EditorMediatorEvents } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import {
   automaticScope,
@@ -206,10 +205,10 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     return this.getRootLayer()
       .paste(data)
       .then(() => {
-        this.#editor?._notify(this, EditorMediatorEvents.PASTE_SUCCESS);
+        this.#editor?._notify(this, "PASTE_SUCCESS");
       })
       .catch((e) => {
-        this.#editor?._notify(this, EditorMediatorEvents.PASTE_FAILURE, e);
+        this.#editor?._notify(this, "PASTE_FAILURE", e);
       });
   }
 
