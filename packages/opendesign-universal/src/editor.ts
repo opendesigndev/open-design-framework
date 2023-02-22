@@ -10,18 +10,17 @@ import type { LayerListItem } from "./nodes/artboard.js";
 import { ArtboardNodeImpl } from "./nodes/artboard.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
-import type { BaseNodeImpl, Node } from "./nodes/node.js";
+import type { Node } from "./nodes/node.js";
 import type { PageNode } from "./nodes/page.js";
 import { PageNodeImpl } from "./nodes/page.js";
 import { loadFile } from "./octopus-file/load-file.js";
 import { canvasSymbol, engineSymbol } from "./symbols.js";
 
-export enum EditorMediatorEvents {
-  PASTE_SUCCESS = "PASTE_SUCCESS",
-  PASTE_FAILURE = "PASTE_FAILURE",
-  ARTBOARD_CREATED = "ARTBOARD_CREATED",
-  ARTBOARD_LOADED = "ARTBOARD_LOADED",
-}
+export type EditorMediatorEvents =
+  | "PASTE_SUCCESS"
+  | "PASTE_FAILURE"
+  | "ARTBOARD_CREATED"
+  | "ARTBOARD_LOADED";
 
 export type CreateEditorOptions = {
   /**
@@ -427,10 +426,8 @@ export class EditorImplementation implements Editor {
   }
 
   _notify(sender: object, event: EditorMediatorEvents, data?: any): void {
-    if (event === EditorMediatorEvents.PASTE_SUCCESS) {
-      if (sender instanceof ArtboardNodeImpl) {
-        this.#handleLayersListUpdateOnPaste();
-      }
+    if (event === "PASTE_SUCCESS") {
+      this.#handleLayersListUpdateOnPaste();
     }
   }
 
