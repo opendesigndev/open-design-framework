@@ -1,5 +1,20 @@
 # @opendesign/universal
 
+## 0.5.0
+
+### Minor Changes
+
+- 358e361: Made id as public field for LayerNode
+- 568e34e: add a way to read viewport information and listen to changes on mounted editor
+- f59f836: add methods getLayerById and identifyLayer to ArtboardNode
+- 1c55c63: add option to specify eventTarget different from parent div to allow greater flexibility of dom structure
+- 5db2f68: add readMetrics method to LayerNode
+
+### Patch Changes
+
+- c52196a: Added event listener for internal paste method for proper layer list update
+- 08fd4f1: Fixed multiple paste of the same Layer
+
 ## 0.4.1
 
 ### Patch Changes
