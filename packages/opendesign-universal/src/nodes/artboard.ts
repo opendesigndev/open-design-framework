@@ -203,6 +203,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     return this.#octopus;
   }
 
+  // FIXME: this method mutates the data
   _updateLayerIds(
     data?: Octopus["schemas"]["Layer"],
   ): Octopus["schemas"]["Layer"] | undefined {
