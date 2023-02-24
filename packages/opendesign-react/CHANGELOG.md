@@ -1,5 +1,25 @@
 # @opendesign/react
 
+## 0.5.0
+
+### Minor Changes
+
+- 1c55c63: implemented children prop on EditorCanvas
+- 5db2f68: implement RelativeMarker component
+- f59f836: implemented onClick prop of EditorCanvas
+
+### Patch Changes
+
+- c52196a: Added event listener for internal paste method for proper layer list update
+- Updated dependencies [358e361]
+- Updated dependencies [568e34e]
+- Updated dependencies [f59f836]
+- Updated dependencies [1c55c63]
+- Updated dependencies [5db2f68]
+- Updated dependencies [c52196a]
+- Updated dependencies [08fd4f1]
+  - @opendesign/universal@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes
