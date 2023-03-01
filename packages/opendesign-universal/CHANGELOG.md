@@ -1,5 +1,11 @@
 # @opendesign/universal
 
+## 0.5.1
+
+### Patch Changes
+
+- cea316d: update opendesign engine
+
 ## 0.5.0
 
 ### Minor Changes
