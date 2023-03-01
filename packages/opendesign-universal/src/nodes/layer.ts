@@ -113,7 +113,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       return {
         graphicalBounds: metrics.graphicalBounds,
         logicalBounds: metrics.logicalBounds,
-        transformation: metrics.transformation,
+        transformation: metrics.transformation.matrix,
         transformedGraphicalBounds: metrics.transformedGraphicalBounds,
       };
     });

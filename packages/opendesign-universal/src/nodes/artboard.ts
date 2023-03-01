@@ -7,6 +7,8 @@ import {
   automaticScope,
   createStringRef,
   detachedScope,
+  readString,
+  readStringRef,
 } from "../engine/memory.js";
 import { generateUUID, todo } from "../internals.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
@@ -273,8 +275,8 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       for (let i = 0; i < layerList.n; i++) {
         // TODO: figure out how to clean memory
         const layer = layerList.getEntry(i);
-        const id = layer.id.string();
-        const parentId = layer.parentId.string();
+        const id = readStringRef(this.#engine.ode, layer.id);
+        const parentId = readStringRef(this.#engine.ode, layer.parentId);
         const layerType = this.#engine.ode.LayerType(layer.type);
         // save layer id to the Set for later duplication checks
         // TODO: this adds to complexity since it needs to traverse octopus date before sending it to the engine
@@ -286,7 +288,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
           layers.set(id, {
             id,
             parentId,
-            name: layer.name.string(),
+            name: readStringRef(this.#engine.ode, layer.name),
             type: layerType,
             layers: [],
           });
@@ -295,7 +297,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
           layers.set(id, {
             id,
             parentId,
-            name: layer.name.string(),
+            name: readStringRef(this.#engine.ode, layer.name),
             type: layerType,
             layers: boilerplatedLayer.layers,
           });
@@ -343,9 +345,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         position,
         radius,
       );
-      const ref = string.ref();
-      scope(() => ref.delete());
-      return ref.string() || null;
+      return readString(this.#engine.ode, string) || null;
     });
   }
 
