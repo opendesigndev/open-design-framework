@@ -7,6 +7,7 @@ import type {
 import type { WrappedODE } from "./engine-wrapper.js";
 import { loadEngine } from "./engine-wrapper.js";
 import type { Scope } from "./memory.js";
+import { readStringRef } from "./memory.js";
 import { createStringRef } from "./memory.js";
 import { automaticScope, detachedScope } from "./memory.js";
 
@@ -18,8 +19,7 @@ export function design_listMissingFonts(ode: WrappedODE, design: DesignHandle) {
     const fonts: string[] = [];
     for (let i = 0; i < fontList.n; ++i) {
       const font = fontList.getEntry(i);
-      scope(() => font.delete());
-      fonts.push(font.string());
+      fonts.push(readStringRef(ode, font));
     }
     return fonts;
   });

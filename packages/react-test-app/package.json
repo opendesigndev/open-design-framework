@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@opendesign/engine": "0.0.0-3a2db4b32a7deabacca245d9404316e55abe1777",
+    "@opendesign/engine": "0.2.1-b915fd7-20230301",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "autoprefixer": "^10.4.13",
