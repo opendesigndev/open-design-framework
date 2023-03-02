@@ -11,7 +11,13 @@ import type {
   MountResult,
 } from "@opendesign/universal/dom";
 import { mount } from "@opendesign/universal/dom";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   CanvasContextProvider,
@@ -84,6 +90,7 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
   const canvasParent = useRef<HTMLDivElement>(null);
   const eventTarget = useRef<HTMLDivElement>(null);
   const [canvasContext, setCanvasContext] = useState<MountResult | null>(null);
+  const [selectedLayer, setSelectedLayer] = useState<LayerNode | null>(null);
 
   useLayoutEffect(() => {
     const c = canvasParent.current!;
@@ -103,6 +110,94 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
       setCanvasContext((r) => (r === result ? null : r));
     };
   }, [disableGestures, editor]);
+
+  useEffect(() => {
+    const keyPressHandler = (event: KeyboardEvent) => {
+      if (!selectedLayer) return;
+      event.preventDefault();
+
+      if (event.key === "Escape") {
+        setSelectedLayer(null);
+      }
+
+      if (event.key === "ArrowUp") {
+        selectedLayer.moveY(getDelta(event, -1));
+      }
+
+      if (event.key === "ArrowDown") {
+        selectedLayer.moveY(getDelta(event, 1));
+      }
+
+      if (event.key === "ArrowLeft") {
+        selectedLayer.moveX(getDelta(event, -1));
+      }
+
+      if (event.key === "ArrowRight") {
+        selectedLayer.moveX(getDelta(event, 1));
+      }
+      canvasContext?.requestFrame();
+    };
+
+    document.addEventListener("keydown", keyPressHandler);
+
+    if (eventTarget.current) {
+      eventTarget.current.onpointerdown = (event) => {
+        event.preventDefault();
+
+        const position = canvasContext?.extractEventPosition(event);
+        console.debug({ position });
+        if (!position) return;
+        const id = editor.currentPage.findArtboard()?.identifyLayer(position);
+        const layer = id
+          ? editor.currentPage.findArtboard()?.getLayerById(id) ?? null
+          : null;
+
+        onClick?.({
+          target: layer,
+        });
+
+        let layerX = 0;
+        let layerY = 0;
+        let cursorOffestX = 0;
+        let cursorOffestY = 0;
+
+        setSelectedLayer(layer);
+        if (layer) {
+          const layerTransformation = layer.readMetrics().transformation;
+          layerX = layerTransformation[4];
+          layerY = layerTransformation[5];
+          cursorOffestX = position[0] - layerX;
+          cursorOffestY = position[1] - layerY;
+        }
+
+        function onPointerMove(moveEvent: PointerEvent): void {
+          const movePosition = canvasContext?.extractEventPosition(moveEvent);
+
+          if (!layer || !movePosition) return;
+
+          const moveX = movePosition[0] - cursorOffestX;
+          const moveY = movePosition[1] - cursorOffestY;
+          layer?.setPosition([moveX, moveY]);
+          canvasContext?.requestFrame();
+        }
+
+        document.addEventListener("pointermove", onPointerMove);
+        document.onpointerleave = () => {
+          document.removeEventListener("pointermove", onPointerMove);
+          document.onpointerleave = null;
+        };
+        document.onpointerup = () => {
+          document.removeEventListener("pointermove", onPointerMove);
+          document.onpointerup = null;
+        };
+      };
+    }
+
+    return () => {
+      document.removeEventListener("keydown", keyPressHandler);
+    };
+  }, [canvasContext, editor.currentPage, onClick, selectedLayer]);
+
   if (Object.keys(rest).length) todo("this prop is not yet supported");
 
   return (
@@ -115,21 +210,6 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
             );
             if (!position) return;
             onPointerMove?.({ position });
-          }}
-          onClick={(event) => {
-            if (!onClick) return;
-            const position = canvasContext?.extractEventPosition(
-              event.nativeEvent,
-            );
-            if (!position) return;
-            const id = editor.currentPage
-              .findArtboard()
-              ?.identifyLayer(position);
-            onClick({
-              target: id
-                ? editor.currentPage.findArtboard()?.getLayerById(id) ?? null
-                : null,
-            });
           }}
           style={{
             width: "100%",
@@ -180,12 +260,15 @@ export function RelativeMarker(
 ): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const canvas = useCanvasContext();
-  useLayoutEffect(() => {
-    const div = ref.current;
-    if (!div) return;
-    const metrics = props.node.readMetrics();
 
-    const handler: MountEventHandler<"viewportChange"> = ({ viewport }) => {
+  const handler: MountEventHandler<"viewportChange"> = useCallback(
+    ({ viewport }) => {
+      const div = ref.current!;
+
+      if (!div) return;
+
+      const metrics = props.node.readMetrics();
+
       div.style.width =
         (metrics.graphicalBounds[1][0] - metrics.graphicalBounds[0][0]) *
           (viewport.scale / window.devicePixelRatio) -
@@ -212,10 +295,17 @@ export function RelativeMarker(
         "px";
 
       div.style.position = "absolute";
-    };
+    },
+    [props.inset, props.node],
+  );
+  useLayoutEffect(() => {
+    const div = ref.current;
+    if (!div) return;
+
     handler({ viewport: canvas.getViewport() });
     return canvas.subscribe("viewportChange", handler);
-  }, [canvas, props.inset, props.node]);
+  }, [canvas, handler, props.inset, props.node]);
+
   return (
     <div
       ref={ref}
@@ -265,6 +355,19 @@ export function useWaitForEditorLoaded(editorOverride?: Editor): Editor {
   const editor = useEditorContext(editorOverride);
   if (editor.loading) throw editor.loaded;
   return editor;
+}
+
+/**
+ * Calculates delta based on modifier keys.
+ * @param event
+ * @param delta
+ * @returns delta in pixels
+ */
+export function getDelta(event: KeyboardEvent, delta: number): number {
+  if (event.shiftKey) {
+    return delta * 10;
+  }
+  return delta;
 }
 
 export { type PasteEvent, usePaste } from "./src/paste.js";

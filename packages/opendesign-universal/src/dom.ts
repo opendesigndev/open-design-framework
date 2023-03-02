@@ -49,6 +49,11 @@ export type MountResult = {
    * Returns information about current viewport
    */
   getViewport(): Viewport;
+
+  /**
+   * Forces rendering of the next frame
+   */
+  requestFrame(): void;
 };
 
 export type MountEventHandler<EventName extends keyof MountEventMap> = (
@@ -184,9 +189,33 @@ export function mount(
       (event) => void eventTarget.releasePointerCapture(event.pointerId),
       { signal },
     );
+
+    eventTarget.addEventListener(
+      "pointermove",
+      (event: PointerEvent) => {
+        if (event.buttons === 4 || performance.now() - space < 1000)
+          eventTarget.setPointerCapture(event.pointerId);
+        if (!eventTarget.hasPointerCapture(event.pointerId)) return;
+        offset[0] -= (event.movementX / scale) * window.devicePixelRatio;
+        offset[1] -= (event.movementY / scale) * window.devicePixelRatio;
+        requestFrame();
+      },
+      { signal },
+    );
+    eventTarget.addEventListener(
+      "pointerup",
+      (event) => void eventTarget.releasePointerCapture(event.pointerId),
+      { signal },
+    );
   }
 
-  return { destroy, extractEventPosition, subscribe, getViewport };
+  return {
+    destroy,
+    extractEventPosition,
+    subscribe,
+    getViewport,
+    requestFrame,
+  };
 
   function subscribe<EventName extends keyof MountEventMap>(
     event: EventName,

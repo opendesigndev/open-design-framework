@@ -5,6 +5,11 @@ import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import {
+  matrixMultiply,
+  matrixToTransformation,
+  transformationToMatrix,
+} from "../utils.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
@@ -14,12 +19,12 @@ export type Rectangle = readonly [
 ];
 
 export type Transformation = readonly [
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
+  a: number, // scale x
+  b: number, // shear y
+  c: number, // shear x
+  d: number, // scale y
+  e: number, // translate x
+  f: number, // translate y
 ];
 
 export type LayerMetrics = {
@@ -50,6 +55,60 @@ export interface LayerNode extends BaseNode {
    * Returns information about layer bounding box
    */
   readMetrics(): LayerMetrics;
+
+  /**
+   * Transform layer by given transformation matrix
+   * @param transformation transformation matrix @see Transformation
+   *
+   * @example
+   * ```typescript
+   * // move layer by 10px in x and 20px in y
+   * layer.transform([1, 0, 0, 1, 10, 20]);
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // rotate layer by 90 degrees
+   * layer.transform([0, 1, -1, 0, 0, 0]);
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // scale layer by 2x
+   * layer.transform([2, 0, 0, 2, 0, 0]);
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // scale layer by 2x in x and 3x in y
+   * layer.transform([2, 0, 0, 3, 0, 0]);
+   * ```
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  transform(transformation: Transformation): boolean;
+
+  /**
+   * Move layer by x axis by given offset
+   * @param offset offset in px
+   * @returns true if transformation was applied, false if it was not applied
+   * @see transform
+   */
+  moveX(offset: number): boolean;
+
+  /**
+   * Move layer by y axis by given offset
+   * @param offset offset in px
+   * @returns true if transformation was applied, false if it was not applied
+   * @see transform
+   */
+  moveY(offset: number): boolean;
+
+  /**
+   * Set layer's position relative to canvas by x/y coordinates
+   * @param coordinates coordinates in px, an array of two numbers, each number is optional
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  setPosition(coordinates: [x?: number, y?: number]): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -116,6 +175,133 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         transformation: metrics.transformation.matrix,
         transformedGraphicalBounds: metrics.transformedGraphicalBounds,
       };
+    });
+  }
+
+  transform(transformation: Transformation): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const currentTransformation = this.readMetrics().transformation;
+      const currentTransformationMatrix = transformationToMatrix(
+        currentTransformation,
+      );
+      const newTransformationMatrix = transformationToMatrix(transformation);
+      const newTransformation = matrixMultiply(
+        currentTransformationMatrix,
+        newTransformationMatrix,
+      );
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform: matrixToTransformation(newTransformation),
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
+    });
+  }
+
+  moveX(offset: number): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const currentTransformation = [...this.readMetrics().transformation];
+      currentTransformation[4] += offset;
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform: currentTransformation,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
+    });
+  }
+
+  moveY(offset: number): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const currentTransformation = [...this.readMetrics().transformation];
+      currentTransformation[5] += offset;
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform: currentTransformation,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
+    });
+  }
+
+  setPosition(coordinates: [x?: number, y?: number]): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const transform = [...this.readMetrics().transformation];
+      if (coordinates[0] !== undefined) transform[4] = coordinates[0];
+      if (coordinates[1] !== undefined) transform[5] = coordinates[1];
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      if (coordinates[0] !== undefined || coordinates[1] !== undefined) {
+        this.#engine.ode.component_modifyLayer(
+          this.#component,
+          id,
+          transformationString,
+          parseError,
+        );
+        this.#engine.redraw();
+        return true;
+      }
+      return false;
     });
   }
 }
