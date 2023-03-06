@@ -190,24 +190,6 @@ export function mount(
       (event) => void eventTarget.releasePointerCapture(event.pointerId),
       { signal },
     );
-
-    eventTarget.addEventListener(
-      "pointermove",
-      (event: PointerEvent) => {
-        if (event.buttons === 4 || performance.now() - space < 1000)
-          eventTarget.setPointerCapture(event.pointerId);
-        if (!eventTarget.hasPointerCapture(event.pointerId)) return;
-        offset[0] -= (event.movementX / scale) * window.devicePixelRatio;
-        offset[1] -= (event.movementY / scale) * window.devicePixelRatio;
-        _requestFrame();
-      },
-      { signal },
-    );
-    eventTarget.addEventListener(
-      "pointerup",
-      (event) => void eventTarget.releasePointerCapture(event.pointerId),
-      { signal },
-    );
   }
 
   return {

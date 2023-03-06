@@ -2399,23 +2399,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/engine-darwin-arm64@npm:0.3.1-02dfd1c-20230413":
-  version: 0.3.1-02dfd1c-20230413
-  resolution: "@opendesign/engine-darwin-arm64@npm:0.3.1-02dfd1c-20230413"
+"@opendesign/engine-darwin-arm64@npm:0.3.1-f64e572-20230510":
+  version: 0.3.1-f64e572-20230510
+  resolution: "@opendesign/engine-darwin-arm64@npm:0.3.1-f64e572-20230510"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@opendesign/engine-darwin-x64@npm:0.3.1-02dfd1c-20230413":
-  version: 0.3.1-02dfd1c-20230413
-  resolution: "@opendesign/engine-darwin-x64@npm:0.3.1-02dfd1c-20230413"
+"@opendesign/engine-darwin-x64@npm:0.3.1-f64e572-20230510":
+  version: 0.3.1-f64e572-20230510
+  resolution: "@opendesign/engine-darwin-x64@npm:0.3.1-f64e572-20230510"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@opendesign/engine-linux-x64@npm:0.3.1-02dfd1c-20230413":
-  version: 0.3.1-02dfd1c-20230413
-  resolution: "@opendesign/engine-linux-x64@npm:0.3.1-02dfd1c-20230413"
+"@opendesign/engine-linux-x64@npm:0.3.1-f64e572-20230510":
+  version: 0.3.1-f64e572-20230510
+  resolution: "@opendesign/engine-linux-x64@npm:0.3.1-f64e572-20230510"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
@@ -2426,24 +2426,24 @@ __metadata:
   languageName: node
   linkType: soft
 
-"@opendesign/engine-wasm@npm:0.3.1-02dfd1c-20230413":
-  version: 0.3.1-02dfd1c-20230413
-  resolution: "@opendesign/engine-wasm@npm:0.3.1-02dfd1c-20230413"
+"@opendesign/engine-wasm@npm:0.3.1-f64e572-20230510":
+  version: 0.3.1-f64e572-20230510
+  resolution: "@opendesign/engine-wasm@npm:0.3.1-f64e572-20230510"
   dependencies:
     "@emnapi/runtime": ^0.32.2
-  checksum: 1cd336db3ae4e792be826a94173df1bbbce57ac8356501e03ee3372b7f087ca62dea64b9e26d1ca45010b8b4bdd92b915e3c85909f2b39968d8a42402fda8ed4
+  checksum: 93ebdea638f965bae18e0eda002b32f77247e19a57072db8cc4234e3a0d1dff45e80ce66275e66c1ab255f84d69bf718a2349c0bf2dac294051871633b903699
   languageName: node
   linkType: hard
 
-"@opendesign/engine@npm:0.3.1-02dfd1c-20230413":
-  version: 0.3.1-02dfd1c-20230413
-  resolution: "@opendesign/engine@npm:0.3.1-02dfd1c-20230413"
+"@opendesign/engine@npm:0.3.1-f64e572-20230510":
+  version: 0.3.1-f64e572-20230510
+  resolution: "@opendesign/engine@npm:0.3.1-f64e572-20230510"
   dependencies:
-    "@opendesign/engine-darwin-arm64": 0.3.1-02dfd1c-20230413
-    "@opendesign/engine-darwin-x64": 0.3.1-02dfd1c-20230413
-    "@opendesign/engine-linux-x64": 0.3.1-02dfd1c-20230413
-    "@opendesign/engine-source": 0.3.1-02dfd1c-20230413
-    "@opendesign/engine-wasm": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine-darwin-arm64": 0.3.1-f64e572-20230510
+    "@opendesign/engine-darwin-x64": 0.3.1-f64e572-20230510
+    "@opendesign/engine-linux-x64": 0.3.1-f64e572-20230510
+    "@opendesign/engine-source": 0.3.1-f64e572-20230510
+    "@opendesign/engine-wasm": 0.3.1-f64e572-20230510
   dependenciesMeta:
     "@opendesign/engine-darwin-arm64":
       optional: true
@@ -2453,7 +2453,7 @@ __metadata:
       optional: true
     "@opendesign/engine-source":
       optional: true
-  checksum: 762ddaf1ba4eca933304acc93802f87d72a91906f3732f3c342b1496f86ebe90bd6b825a096c590303d6482e2c6cc67b1d2444baf3db07cc2bbe4b412e67fd33
+  checksum: 276afe46d85dbeab5529d6b356c90c693f079f80a7370ce6cfcd22f033b94466cba8a37644989fdc72b0c965d56ce5b5b199dddaacbc2900021325145cb360e9
   languageName: node
   linkType: hard
 
@@ -2577,7 +2577,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
-    "@opendesign/engine": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine": 0.3.1-f64e572-20230510
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.1
     "@opendesign/octopus-fig": 3.0.0-rc.30
@@ -2585,6 +2585,7 @@ __metadata:
     "@opendesign/octopus-xd": 3.0.0-rc.20
     buffer: ^6.0.3
     fflate: ^0.7.4
+    gl-matrix: ^3.4.3
   languageName: unknown
   linkType: soft
 
@@ -4293,7 +4294,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:packages/docs"
   dependencies:
-    "@opendesign/engine": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine": 0.3.1-f64e572-20230510
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     typedoc: ^0.23.21
@@ -5732,6 +5733,13 @@ __metadata:
   version: 4.5.0
   resolution: "get-tsconfig@npm:4.5.0"
   checksum: 687ee2bd69a5a07db2e2edeb4d6c41c3debb38f6281a66beb643e3f5b520252e27fcbbb5702bdd9a5f05dcf8c1d2e0150a4d8a960ad75cbdea74e06a51e91b02
+  languageName: node
+  linkType: hard
+
+"gl-matrix@npm:^3.4.3":
+  version: 3.4.3
+  resolution: "gl-matrix@npm:3.4.3"
+  checksum: c47830ba727f3d0fab635c48135af96aef66274079a3e0afd6f68b68c98eae9fc1bcfdc7312fe2301e4fd22dd24c5e0f1b5d025960a208e50d07101ed8d940f9
   languageName: node
   linkType: hard
 
@@ -7369,8 +7377,8 @@ __metadata:
   resolution: "opendesign@workspace:packages/opendesign"
   dependencies:
     "@esbuild-kit/esm-loader": ^2.5.5
-    "@opendesign/engine": 0.3.1-02dfd1c-20230413
-    "@opendesign/engine-wasm": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine": 0.3.1-f64e572-20230510
+    "@opendesign/engine-wasm": 0.3.1-f64e572-20230510
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     "@types/express": ^4.17.17

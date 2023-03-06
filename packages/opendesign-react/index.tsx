@@ -261,6 +261,11 @@ export function RelativeMarker(
      * Can be negative.
      */
     inset?: number;
+    /**
+     * this is a workaround since RelativeMarker does not react on changes in node (transformations)
+     * TODO: fix this
+     */
+    stale?: unknown;
   } /* TODO:
     | {
         children: React.ReactNode;
@@ -279,27 +284,38 @@ export function RelativeMarker(
 
       const metrics = props.node.readMetrics();
 
+      const width =
+        metrics.transformedGraphicalBounds[1][0] -
+        metrics.transformedGraphicalBounds[0][0];
+      const height =
+        metrics.transformedGraphicalBounds[1][1] -
+        metrics.transformedGraphicalBounds[0][1];
+
+      const left =
+        width > 0
+          ? metrics.transformation[4] + metrics.graphicalBounds[0][0]
+          : metrics.transformation[4] + metrics.graphicalBounds[0][0] + width;
+
+      const top =
+        height > 0
+          ? metrics.transformation[5] + metrics.graphicalBounds[0][1]
+          : metrics.transformation[5] + metrics.graphicalBounds[0][1] + height;
+
       div.style.width =
-        (metrics.graphicalBounds[1][0] - metrics.graphicalBounds[0][0]) *
-          (viewport.scale / window.devicePixelRatio) -
+        Math.abs(width) * (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) * 2 +
         "px";
       div.style.height =
-        (metrics.graphicalBounds[1][1] - metrics.graphicalBounds[0][1]) *
-          (viewport.scale / window.devicePixelRatio) -
+        Math.abs(height) * (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) * 2 +
         "px";
       div.style.left =
-        (metrics.transformation[4] +
-          metrics.graphicalBounds[0][0] -
-          viewport.offset[0]) *
+        (left - viewport.offset[0]) *
           (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) +
         "px";
       div.style.top =
-        (metrics.transformation[5] +
-          metrics.graphicalBounds[0][1] -
-          viewport.offset[1]) *
+        (top - viewport.offset[1]) *
           (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) +
         "px";
@@ -308,12 +324,20 @@ export function RelativeMarker(
     },
     [props.inset, props.node],
   );
+
+  useEffect(() => {
+    handler({ viewport: canvas.getViewport() });
+  }, [canvas, handler, props.node, props.stale]);
+
   useLayoutEffect(() => {
     const div = ref.current;
     if (!div) return;
 
     handler({ viewport: canvas.getViewport() });
-    return canvas.subscribe("viewportChange", handler);
+    const unsubViewportChange = canvas.subscribe("viewportChange", handler);
+    return () => {
+      unsubViewportChange();
+    };
   }, [canvas, handler, props.inset, props.node]);
 
   return (
@@ -380,5 +404,8 @@ function getDelta(event: KeyboardEvent, delta: number): number {
   return delta;
 }
 
+export { LayerFrame as LayerMask } from "./src/layer-frame/layer-frame.js";
+export { LayerFrameWrapper as LayerMaskWrapper } from "./src/layer-frame/layer-frame-wrapper.js";
+export { useResizable } from "./src/layer-frame/use-resize.js";
 export { type PasteEvent, usePaste } from "./src/paste.js";
 export { useLayerList } from "./src/use-layer-list.js";

@@ -1,6 +1,6 @@
 import type { PasteEvent } from "@opendesign/react";
 import { RelativeMarker } from "@opendesign/react";
-import { useLayerList } from "@opendesign/react";
+import { LayerMaskWrapper, useLayerList } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
@@ -18,12 +18,21 @@ import {
   isOptimizedOctopusFile,
   readOctopusFile,
 } from "@opendesign/universal";
+import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
-import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react";
+import React, {
+  Fragment,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
 import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
+import type { Origin } from "../../opendesign-universal/src/nodes/layer.js";
 import { ErrorBoundary } from "./error-boundary.js";
 
 export async function convert(file: Blob) {
@@ -323,6 +332,49 @@ function Content({
         <div className="basis-1/5 min-w-[200px] p-2">
           <div className="h-14 flex items-center p-1">
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
+            <Suspense>
+              <LayerList selected={selectedLayer?.id} />
+            </Suspense>
+            <hr />
+            <h2 className="text-lg font-semibold mb-2">
+              Second layer list (without naturalOrder parameter)
+            </h2>
+            <Suspense>
+              <SecondLayerList />
+            </Suspense>
+          </div>
+          <div className="basis-4/5 border border-dashed">
+            <Suspense>
+              <EditorCanvas
+                editor={editor}
+                onClick={({ target }) => {
+                  if (
+                    target &&
+                    target?.type !== "ARTBOARD" &&
+                    target.type !== "PAGE"
+                  ) {
+                    setSelectedLayer(target);
+                  }
+                }}
+              >
+                <ErrorBoundary>
+                  {selectedLayer ? (
+                    <LayerOutline layer={selectedLayer} />
+                  ) : null}
+                </ErrorBoundary>
+              </EditorCanvas>
+            </Suspense>
+            {data.type === "file" ? (
+              <div className="absolute top-4 right-4">
+                <Button
+                  onClick={() =>
+                    void saveAs(new Blob([data.data]), "file.octopus")
+                  }
+                >
+                  Download .octopus
+                </Button>
+              </div>
+            ) : null}
           </div>
           <Suspense>
             <LayerList
@@ -357,9 +409,12 @@ function Content({
 }
 
 function LayerOutline({ layer }: { layer: LayerNode }) {
-  return (
-    <RelativeMarker node={layer}>
-      <div className="border border-solid border-red-800" />
-    </RelativeMarker>
+  const changeDimensionsHandler = useCallback(
+    (width?: number, height?: number, origin?: Origin) => {
+      layer.setSize(width, height, origin);
+    },
+    [layer],
   );
+
+  return <LayerMaskWrapper onResize={changeDimensionsHandler} node={layer} />;
 }

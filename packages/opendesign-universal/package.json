@@ -14,14 +14,15 @@
     "entryPoint": "index.ts"
   },
   "dependencies": {
-    "@opendesign/engine": "0.3.1-02dfd1c-20230413",
+    "@opendesign/engine": "0.3.1-f64e572-20230510",
     "@opendesign/env": "workspace:*",
     "@opendesign/manifest-ts": "^3.0.1",
     "@opendesign/octopus-fig": "3.0.0-rc.30",
     "@opendesign/octopus-ts": "^3.0.1",
     "@opendesign/octopus-xd": "3.0.0-rc.20",
     "buffer": "^6.0.3",
-    "fflate": "^0.7.4"
+    "fflate": "^0.7.4",
+    "gl-matrix": "^3.4.3"
   },
   "exports": {
     ".": "./dist/index.js",
