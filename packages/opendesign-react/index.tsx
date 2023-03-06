@@ -145,7 +145,6 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
         event.preventDefault();
 
         const position = canvasContext?.extractEventPosition(event);
-        console.debug({ position });
         if (!position) return;
         const id = editor.currentPage.findArtboard()?.identifyLayer(position);
         const layer = id
