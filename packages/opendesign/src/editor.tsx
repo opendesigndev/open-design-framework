@@ -1,3 +1,9 @@
+import {
+  ResizeBothHandle,
+  ResizeContainer,
+  ResizeHeightHandle,
+  ResizeWidthHandle,
+} from "@mir4a/resize-container-react";
 import type { PasteEvent } from "@opendesign/react";
 import { RelativeMarker } from "@opendesign/react";
 import { useLayerList } from "@opendesign/react";
@@ -18,7 +24,10 @@ import {
   isOptimizedOctopusFile,
   readOctopusFile,
 } from "@opendesign/universal";
-import type { PropsWithChildren } from "react";
+import saveAs from "file-saver";
+import type { PropsWithChildren, Ref } from "react";
+import { useRef } from "react";
+import { useCallback } from "react";
 import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
@@ -357,9 +366,50 @@ function Content({
 }
 
 function LayerOutline({ layer }: { layer: LayerNode }) {
+  console.log(layer.readMetrics().graphicalBounds);
+
+  const changeWidthHandler = useCallback(
+    ({ width }: { width?: number }) => {
+      width && layer.setWidth(width);
+    },
+    [layer],
+  );
+
+  const changeHeightHandler = useCallback(
+    ({ height }: { height?: number }) => {
+      height && layer.setHeight(height);
+    },
+    [layer],
+  );
+
+  const changeDimensionsHandler = useCallback(
+    ({ width, height }: { width?: number; height?: number }) => {
+      console.log(width, height);
+      width && layer.setWidth(width);
+      height && layer.setHeight(height);
+    },
+    [layer],
+  );
+
+  const onResizeEnd = useCallback((_: any, ref: Ref<HTMLDivElement>) => {
+    if (ref?.current) {
+      ref.current.style.width = "";
+      ref.current.style.height = "";
+    }
+    console.log("resize end");
+  }, []);
+
   return (
     <RelativeMarker node={layer}>
-      <div className="border border-solid border-red-800" />
+      <ResizeContainer
+        onResize={changeDimensionsHandler}
+        onResizeEnd={onResizeEnd}
+      >
+        <div className="border border-solid border-red-800" />
+        <ResizeWidthHandle />
+        <ResizeHeightHandle />
+        <ResizeBothHandle />
+      </ResizeContainer>
     </RelativeMarker>
   );
 }

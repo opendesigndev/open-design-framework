@@ -71,6 +71,28 @@ export interface LayerNode extends BaseNode {
    * @param coordinates coordinates in px, an array of two numbers, each number is optional
    */
   setPosition(coordinates: [x?: number, y?: number]): void;
+
+  /**
+   * Change layer's size by given width and height
+   * @param width width in px
+   * @param height height in px
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  setSize(width: number, height: number): boolean;
+
+  /**
+   * Change layer's width by given width
+   * @param width width in px
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  setWidth(width: number): boolean;
+
+  /**
+   * Change layer's height by given height
+   * @param height height in px
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  setHeight(height: number): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -194,6 +216,99 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         );
         this.#engine.redraw();
       }
+    });
+  }
+
+  setWidth(width: number): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const metrix = this.readMetrics();
+      const widthRatio = width / metrix.graphicalBounds[1][0];
+      const transform = [...metrix.transformation];
+      // const scaleWidth = width / transform[0];
+      transform[0] = widthRatio;
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
+    });
+  }
+
+  setHeight(height: number): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const metrix = this.readMetrics();
+      const heightRatio = height / metrix.graphicalBounds[1][1];
+      const transform = [...metrix.transformation];
+      transform[3] = heightRatio;
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
+    });
+  }
+
+  setSize(width: number, height: number): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const transform = [...this.readMetrics().transformation];
+      transform[0] = width;
+      transform[3] = height;
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
     });
   }
 }
