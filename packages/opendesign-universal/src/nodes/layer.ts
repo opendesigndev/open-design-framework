@@ -57,37 +57,6 @@ export interface LayerNode extends BaseNode {
   readMetrics(): LayerMetrics;
 
   /**
-   * Transform layer by given transformation matrix
-   * @param transformation transformation matrix @see Transformation
-   *
-   * @example
-   * ```typescript
-   * // move layer by 10px in x and 20px in y
-   * layer.transform([1, 0, 0, 1, 10, 20]);
-   * ```
-   *
-   * @example
-   * ```typescript
-   * // rotate layer by 90 degrees
-   * layer.transform([0, 1, -1, 0, 0, 0]);
-   * ```
-   *
-   * @example
-   * ```typescript
-   * // scale layer by 2x
-   * layer.transform([2, 0, 0, 2, 0, 0]);
-   * ```
-   *
-   * @example
-   * ```typescript
-   * // scale layer by 2x in x and 3x in y
-   * layer.transform([2, 0, 0, 3, 0, 0]);
-   * ```
-   * @returns true if transformation was applied, false if it was not applied
-   */
-  transform(transformation: Transformation): boolean;
-
-  /**
    * Move layer by x axis by given offset
    * @param offset offset in px
    * @returns true if transformation was applied, false if it was not applied
@@ -109,6 +78,13 @@ export interface LayerNode extends BaseNode {
    * @returns true if transformation was applied, false if it was not applied
    */
   setPosition(coordinates: [x?: number, y?: number]): boolean;
+
+  /**
+   * Transform layer by given transformation matrix
+   * @param transformation transformation matrix @see Transformation
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  transform(transformation: Transformation): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -175,42 +151,6 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         transformation: metrics.transformation.matrix,
         transformedGraphicalBounds: metrics.transformedGraphicalBounds,
       };
-    });
-  }
-
-  transform(transformation: Transformation): boolean {
-    return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
-      const currentTransformation = this.readMetrics().transformation;
-      const currentTransformationMatrix = transformationToMatrix(
-        currentTransformation,
-      );
-      const newTransformationMatrix = transformationToMatrix(transformation);
-      const newTransformation = matrixMultiply(
-        currentTransformationMatrix,
-        newTransformationMatrix,
-      );
-      const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform: matrixToTransformation(newTransformation),
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      this.#engine.ode.component_modifyLayer(
-        this.#component,
-        id,
-        transformationString,
-        parseError,
-      );
-      this.#engine.redraw();
-      return true;
     });
   }
 
@@ -302,6 +242,33 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         return true;
       }
       return false;
+    });
+  }
+
+  transform(matrix: Transformation): boolean {
+    return automaticScope((scope) => {
+      const parseError = this.#engine.ode.ParseError(scope);
+      const transformOctopus = {
+        subject: "LAYER",
+        op: "PROPERTY_CHANGE",
+        values: {
+          transform: matrix,
+        },
+      };
+      const transformationString = createStringRef(
+        this.#engine.ode,
+        scope,
+        JSON.stringify(transformOctopus),
+      );
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      this.#engine.ode.component_modifyLayer(
+        this.#component,
+        id,
+        transformationString,
+        parseError,
+      );
+      this.#engine.redraw();
+      return true;
     });
   }
 }

@@ -155,18 +155,12 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
           target: layer,
         });
 
-        let layerX = 0;
-        let layerY = 0;
-        let cursorOffestX = 0;
-        let cursorOffestY = 0;
+        let matrix: DOMMatrix | undefined;
 
         setSelectedLayer(layer);
         if (layer) {
           const layerTransformation = layer.readMetrics().transformation;
-          layerX = layerTransformation[4];
-          layerY = layerTransformation[5];
-          cursorOffestX = position[0] - layerX;
-          cursorOffestY = position[1] - layerY;
+          matrix = new DOMMatrix(`matrix(${layerTransformation.join(",")})`);
         }
 
         function onPointerMove(moveEvent: PointerEvent): void {
@@ -174,9 +168,10 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
 
           if (!layer || !movePosition) return;
 
-          const moveX = movePosition[0] - cursorOffestX;
-          const moveY = movePosition[1] - cursorOffestY;
-          layer?.setPosition([moveX, moveY]);
+          matrix = matrix?.translate(moveEvent.movementX, moveEvent.movementY);
+
+          const { a, b, c, d, e, f } = matrix?.toJSON();
+          layer?.transform([a, b, c, d, e, f]);
           canvasContext?.requestFrame();
         }
 
