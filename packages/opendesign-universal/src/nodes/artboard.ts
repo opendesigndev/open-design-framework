@@ -118,6 +118,13 @@ export interface ArtboardNode extends BaseNode {
     position: readonly [number, number],
     radius?: number,
   ): string | null;
+
+  /**
+   * Get parent layer of a given layer.
+   * @param layerId
+   * @returns parent layer or null if layer is root layer
+   */
+  getParentLayer(layerId: string): LayerNode | null;
 }
 
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
@@ -131,6 +138,8 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   __rootLayerId: string;
   #octopus: string;
   #layersIds: Set<string> = new Set();
+  // TODO: it's a workaround for now, we should have a proper API for getting the parent layer of a layer
+  #layersParents: Map<string, string> = new Map();
 
   constructor(
     engine: Engine,
@@ -281,6 +290,8 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         // save layer id to the Set for later duplication checks
         // TODO: this adds to complexity since it needs to traverse octopus date before sending it to the engine
         this.#layersIds.add(id);
+        this.#layersParents.set(id, parentId);
+
         // check if layer exists (boilerplated parent layer from child) and update it
         // otherwise create a new layer with empty children (layers) array
         let boilerplatedLayer = layers.get(id)!;
@@ -353,6 +364,15 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     // TODO: detect if layer does not exist
     // TODO: maybe guarantee referential equality for layer with same id somehow
     return new LayerNodeImpl("GROUP", this.__component, id, this.#engine);
+  }
+
+  getParentLayer(layerId: string): LayerNode | null {
+    // TODO: get from the engine when API is available
+    const parentId = this.#layersParents.get(layerId);
+    if (!parentId) {
+      return null;
+    }
+    return this.getLayerById(parentId);
   }
 }
 
