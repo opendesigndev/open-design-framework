@@ -184,7 +184,14 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
             deltaY = movePosition[1] - currentPosition.y;
           }
 
-          matrix = matrix?.translateSelf(deltaX, deltaY);
+          const translationPoint = new DOMPoint(deltaX, deltaY);
+
+          matrix = matrix?.preMultiplySelf(
+            new DOMMatrix().translateSelf(
+              translationPoint.x,
+              translationPoint.y,
+            ),
+          );
 
           const { a, b, c, d, e, f } = matrix?.toJSON();
           layer?.transform([a, b, c, d, e, f]);
