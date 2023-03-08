@@ -155,10 +155,28 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
           target: layer,
         });
 
-        let matrix: DOMMatrix;
-
         setSelectedLayer(layer);
-        if (layer) {
+
+        let matrix: DOMMatrix;
+        let parentMatrix: DOMMatrix;
+
+        if (layer && id) {
+          const parent = editor.currentPage.findArtboard()?.getParentLayer(id);
+
+          if (!parent) return;
+
+          const parentTransformation = parent.readMetrics().transformation;
+          const parentTransformationMatrix = {
+            a: parentTransformation[0],
+            b: parentTransformation[1],
+            c: parentTransformation[2],
+            d: parentTransformation[3],
+            e: parentTransformation[4],
+            f: parentTransformation[5],
+          };
+
+          parentMatrix = DOMMatrix.fromMatrix(parentTransformationMatrix);
+
           const layerTransformation = layer.readMetrics().transformation;
           const initialMatrixValue = {
             a: layerTransformation[0],
@@ -176,9 +194,11 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
           const movePosition = canvasContext?.extractEventPosition(moveEvent);
 
           if (!layer || !movePosition) return;
+
           const currentPosition = matrix?.transformPoint(new DOMPoint(0, 0));
           let deltaX = 0;
           let deltaY = 0;
+
           if (currentPosition) {
             deltaX = movePosition[0] - currentPosition.x;
             deltaY = movePosition[1] - currentPosition.y;
@@ -186,11 +206,11 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
 
           const translationPoint = new DOMPoint(deltaX, deltaY);
 
-          matrix = matrix?.preMultiplySelf(
-            new DOMMatrix().translateSelf(
-              translationPoint.x,
-              translationPoint.y,
-            ),
+          matrix?.preMultiplySelf(
+            parentMatrix
+              ?.inverse()
+              .translateSelf(translationPoint.x, translationPoint.y)
+              .multiplySelf(parentMatrix),
           );
 
           const { a, b, c, d, e, f } = matrix?.toJSON();
