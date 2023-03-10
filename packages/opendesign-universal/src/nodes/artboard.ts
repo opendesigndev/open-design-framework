@@ -6,8 +6,6 @@ import type { Engine } from "../engine/engine.js";
 import {
   automaticScope,
   createStringRef,
-  detachedScope,
-  readString,
   readStringRef,
 } from "../engine/memory.js";
 import { generateUUID, todo } from "../internals.js";
@@ -123,8 +121,6 @@ export interface ArtboardNode extends BaseNode {
 export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   #engine: Engine;
   #editor: EditorImplementation | undefined;
-  // TODO: cleanup
-  #scope = detachedScope();
   // TODO: make private
   __component: ComponentHandle;
   // TODO: make private
@@ -153,11 +149,10 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
       this.dimensions = parsed.dimensions;
     }
     this.#octopus = octopus;
-    this.__component = engine.ode.ComponentHandle(this.#scope.scope);
 
     const ode = this.#engine.ode;
 
-    automaticScope((tmpScope) => {
+    this.__component = automaticScope((tmpScope) => {
       const pageRef = createStringRef(ode, tmpScope, "page");
       const idRef = createStringRef(ode, tmpScope, id);
       const octopusRef = createStringRef(ode, tmpScope, this.#octopus);
@@ -166,17 +161,12 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
         page: pageRef,
         position: [0, 0],
       };
-      const parseError = ode.ParseError(tmpScope);
-      // TODO: this should be tmpScope and only move to #scope IFF add* call succeeds
-      const component = ode.ComponentHandle(this.#scope.scope);
-      ode.design_addComponentFromOctopusString(
+      return ode.design_addComponentFromOctopusString(
         this.#engine.design,
-        component,
         metadata,
         octopusRef,
-        parseError,
+        {},
       );
-      this.__component = component;
     });
   }
 
@@ -194,12 +184,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   unstable_setStaticAnimation(animation: string) {
     automaticScope((scope) => {
       const ref = createStringRef(this.#engine.ode, scope, animation);
-      const parseError = this.#engine.ode.ParseError(scope);
-      this.#engine.ode.pr1_component_loadAnimation(
-        this.__component,
-        ref,
-        parseError,
-      );
+      this.#engine.ode.pr1_component_loadAnimation(this.__component, ref, {});
     });
   }
 
@@ -269,17 +254,17 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   getLayers({ naturalOrder = true }: getLayersOptions = {}) {
     return automaticScope((scope) => {
-      const layerList = this.#engine.ode.LayerList(scope);
-      this.#engine.ode.component_listLayers(scope, this.__component, layerList);
+      const layerList = this.#engine.ode.component_listLayers(
+        scope,
+        this.__component,
+      );
       const layers = new Map<string, LayerListItem>();
       let rootLayer = "";
 
       for (let i = 0; i < layerList.n; i++) {
-        // TODO: figure out how to clean memory
-        const layer = layerList.getEntry(i);
+        const layer = this.#engine.ode.LayerList_getEntry(layerList, i);
         const id = readStringRef(this.#engine.ode, layer.id);
         const parentId = readStringRef(this.#engine.ode, layer.parentId);
-        const layerType = this.#engine.ode.LayerType(layer.type);
         // save layer id to the Set for later duplication checks
         // TODO: this adds to complexity since it needs to traverse octopus date before sending it to the engine
         this.#layersIds.add(id);
@@ -293,7 +278,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
             id,
             parentId,
             name: readStringRef(this.#engine.ode, layer.name),
-            type: layerType,
+            type: layer.type,
             layers: [],
           });
         } else {
@@ -302,7 +287,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
             id,
             parentId,
             name: readStringRef(this.#engine.ode, layer.name),
-            type: layerType,
+            type: layer.type,
             layers: boilerplatedLayer.layers,
           });
         }
@@ -341,16 +326,13 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   }
 
   identifyLayer(position: readonly [number, number], radius = 1) {
-    return automaticScope((scope) => {
-      const string = this.#engine.ode.String(scope, "");
+    return this.#engine.ode.getString(
       this.#engine.ode.component_identifyLayer(
         this.__component,
-        string,
         position,
         radius,
-      );
-      return readString(this.#engine.ode, string) || null;
-    });
+      ),
+    );
   }
 
   getLayerById(id: string): LayerNode | null {

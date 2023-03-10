@@ -33,6 +33,11 @@ const alias = Object.fromEntries(
   }),
 );
 
+const engineWrapper = path.join(require.resolve("@opendesign/engine"), "..");
+const engineDir = engineWrapper.endsWith("wrapper")
+  ? path.join(require.resolve("@opendesign/engine"), ...Array(6).fill(".."))
+  : null;
+
 export default defineConfig({
   optimizeDeps: {
     exclude: [...localDeps],
@@ -44,7 +49,7 @@ export default defineConfig({
   resolve: { alias },
   server: {
     fs: {
-      allow: ["../..", path.join(require.resolve("@opendesign/engine"), "..")],
+      allow: ["../..", engineDir].filter(Boolean),
     },
   },
   plugins: [
