@@ -13,12 +13,11 @@ import { automaticScope, detachedScope } from "./memory.js";
 
 export function design_listMissingFonts(ode: WrappedODE, design: DesignHandle) {
   return automaticScope((scope) => {
-    const fontList = ode.StringList(scope);
-    ode.design_listMissingFonts(scope, design, fontList);
+    const fontList = ode.design_listMissingFonts(scope, design);
 
     const fonts: string[] = [];
     for (let i = 0; i < fontList.n; ++i) {
-      const font = fontList.getEntry(i);
+      const font = ode.StringList_getEntry(fontList, i);
       fonts.push(readStringRef(ode, font));
     }
     return fonts;
@@ -73,24 +72,18 @@ export async function initEngine(
   const { scope, destroy: finish } = detachedScope();
 
   try {
-    const engineAttributes = ode.EngineAttributes(scope);
-    const engine = ode.EngineHandle(scope);
-    ode.createEngine(scope, engine, engineAttributes);
+    const engineAttributes = ode.initializeEngineAttributes();
+    const engine = ode.createEngine(scope, engineAttributes);
 
-    const rendererCtx = ode.RendererContextHandle(scope);
-    automaticScope((tmpScope) =>
+    const rendererCtx = automaticScope((tmpScope) =>
       ode.createRendererContext(
         scope,
         engine,
-        rendererCtx,
         createCanvasSelector(ode, tmpScope, canvas),
       ),
     );
-    const design = ode.DesignHandle(scope);
-    ode.createDesign(scope, engine, design);
-
-    const imageBase = ode.DesignImageBaseHandle(scope);
-    ode.createDesignImageBase(scope, rendererCtx, design, imageBase);
+    const design = ode.createDesign(scope, engine);
+    const imageBase = ode.createDesignImageBase(scope, rendererCtx, design);
 
     const renderers = new Set<Renderer>();
 

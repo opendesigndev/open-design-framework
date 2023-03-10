@@ -11,7 +11,7 @@ for (const [packageName, conf] of list) {
   console.log(base);
   const target = new URL(
     path.join("external", packageName.split("/").slice(-1)[0]),
-    import.meta.url
+    import.meta.url,
   ).pathname;
   refs[packageName] = target;
   fs.mkdirSync(target, { recursive: true });
@@ -47,5 +47,6 @@ function rm(target) {
 function pkgRoot(pkgName) {
   const src = require.resolve(pkgName);
   const index = src.lastIndexOf(pkgName);
+  if (index < 0) return src.split("/").slice(0, -1).join("/");
   return src.substring(0, index + pkgName.length);
 }

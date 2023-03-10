@@ -1,4 +1,4 @@
-import type { String as ODEString, StringRef } from "@opendesign/engine";
+import type { StringRef } from "@opendesign/engine";
 
 import type { AbortSignal } from "../lib.js";
 import { AbortController } from "../lib.js";
@@ -180,16 +180,10 @@ export function deleter(arg: { delete: () => void }) {
 }
 
 export function createStringRef(ode: WrappedODE, scope: Scope, text: string) {
-  const string = ode.String(scope, text);
-  const ref = string.ref();
-
-  return ref;
-}
-
-export function readString(ode: WrappedODE, string: ODEString): string {
-  return readStringRef(ode, string.ref());
+  return ode.makeString(scope, text);
 }
 
 export function readStringRef(ode: WrappedODE, ref: StringRef): string {
-  return ode.raw.UTF8ToString(ref.data, ref.length);
+  if (ref.length === 0) return "";
+  return ode.getString(ref);
 }

@@ -13,31 +13,23 @@ export async function loadImages(
       return { data: await parseImage(image.data), path: image.path };
     }) || [],
   );
-  const maxBytes = images.reduce(
-    (prev, image) => prev + image.data.data.byteLength,
-    0,
-  );
-  // FIXME: This is not working with recent builds of the engine (_malloc and _free are not exported)
-  // automaticScope((scope) => {
-  //   const ptr = engine.ode.raw._malloc(maxBytes);
-  //   if (ptr === 0) throw new Error("Failed to allocate memory");
-  //   scope(() => engine.ode.raw._free(ptr));
-  //   for (const { data, path } of images) {
-  //     engine.ode.raw.HEAPU8.set(data.data, ptr);
-  //     automaticScope((scope) => {
-  //       engine.ode.design_loadImagePixels(
-  //         engine.designImageBase,
-  //         createStringRef(engine.ode, scope, path),
-  //         {
-  //           pixels: ptr,
-  //           format: engine.ode.PIXEL_FORMAT_RGBA,
-  //           height: data.height,
-  //           width: data.width,
-  //         },
-  //       );
-  //     });
-  //   }
-  // });
+  if (images.length < 1) return;
+  automaticScope((scope) => {
+    for (const { data, path } of images) {
+      automaticScope((scope) => {
+        engine.ode.design_loadImagePixels(
+          engine.designImageBase,
+          createStringRef(engine.ode, scope, path),
+          {
+            pixels: engine.ode.makeMemoryBuffer(scope, data.data.buffer).data,
+            format: engine.ode.PIXEL_FORMAT_RGBA,
+            height: data.height,
+            width: data.width,
+          },
+        );
+      });
+    }
+  });
 }
 
 export function loadPastedImages(engine: Engine, data: ImportedClipboardData) {

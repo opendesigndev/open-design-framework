@@ -1,4 +1,5 @@
-import type { ComponentHandle, Scalar_array_6 } from "@opendesign/engine";
+import type { ComponentHandle } from "@opendesign/engine";
+import { Scalar_array_6 } from "@opendesign/engine";
 import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { Engine } from "../engine/engine.js";
@@ -106,14 +107,13 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   createLayer(octopus: Octopus["schemas"]["Layer"]) {
     automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
       const octopusString = JSON.stringify(octopus);
       this.#engine.ode.component_addLayer(
         this.#component,
         createStringRef(this.#engine.ode, scope, this.id), // parent
         createStringRef(this.#engine.ode, scope, ""), // before, empty means append
         createStringRef(this.#engine.ode, scope, octopusString), // octopus
-        parseError,
+        {},
       );
     });
     this.#engine.redraw();
@@ -128,13 +128,13 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
   readMetrics(): LayerMetrics {
     return automaticScope((scope) => {
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const metrics = this.#engine.ode.LayerMetrics(scope);
-      this.#engine.ode.component_getLayerMetrics(this.#component, id, metrics);
+      const res = this.#engine.ode.component_getLayerMetrics(
+        this.#component,
+        id,
+      );
       return {
-        graphicalBounds: metrics.graphicalBounds,
-        logicalBounds: metrics.logicalBounds,
-        transformation: metrics.transformation.matrix,
-        transformedGraphicalBounds: metrics.transformedGraphicalBounds,
+        ...res,
+        transformation: res.transformation.matrix,
       };
     });
   }
@@ -148,10 +148,8 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       this.#engine.ode.component_transformLayer(
         this.#component,
         id,
-        this.#engine.ode.raw.TransformationBasis.PARENT_COMPONENT,
-        {
-          matrix: [1, 0, 0, 1, offset, 0],
-        },
+        "PARENT_COMPONENT",
+        { matrix: [1, 0, 0, 1, offset, 0] },
       );
       this.#engine.redraw();
     });
@@ -166,10 +164,8 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       this.#engine.ode.component_transformLayer(
         this.#component,
         id,
-        this.#engine.ode.raw.TransformationBasis.PARENT_COMPONENT,
-        {
-          matrix: [1, 0, 0, 1, 0, offset],
-        },
+        "PARENT_COMPONENT",
+        { matrix: [1, 0, 0, 1, 0, offset] },
       );
       this.#engine.redraw();
     });
@@ -179,7 +175,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     return automaticScope((scope) => {
       // const parseError = this.#engine.ode.ParseError(scope);
       const currentTransformation = [...this.readMetrics().transformation];
-      const transform = [1, 0, 0, 1, 0, 0];
+      const transform = [1, 0, 0, 1, 0, 0] satisfies Scalar_array_6;
 
       if (coordinates[0] !== undefined)
         transform[4] = coordinates[0] - currentTransformation[4];
@@ -193,10 +189,8 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         this.#engine.ode.component_transformLayer(
           this.#component,
           id,
-          this.#engine.ode.raw.TransformationBasis.PARENT_COMPONENT,
-          {
-            matrix: transform as unknown as Scalar_array_6,
-          },
+          "PARENT_COMPONENT",
+          { matrix: transform },
         );
         this.#engine.redraw();
       }

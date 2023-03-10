@@ -412,14 +412,13 @@ export class EditorImplementation implements Editor {
     const engine = editorGetEngine(this);
 
     automaticScope((scope) => {
-      const memory = engine.ode.MemoryBuffer(scope);
       const psNameRef = createStringRef(engine.ode, scope, postscriptName);
       const faceNameRef = createStringRef(engine.ode, scope, faceName ?? "");
 
       engine.ode.design_loadFontBytes(
         engine.design,
         psNameRef,
-        memory.withData(data),
+        engine.ode.makeMemoryBuffer(scope, data.buffer),
         faceNameRef,
       );
     });

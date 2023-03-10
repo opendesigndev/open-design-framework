@@ -118,19 +118,19 @@ export function mount(
     [key in keyof MountEventMap]?: MountEventHandler<key>[];
   } = {};
 
-  const rendererHandle = engine.ode.PR1_AnimationRendererHandle(scope);
-  engine.ode.pr1_createAnimationRenderer(
+  const rendererHandle = engine.ode.pr1_createAnimationRenderer(
     scope,
     engine.rendererContext,
     (editor.currentPage as PageNodeImpl).__artboard?.__component!,
-    rendererHandle,
     engine.designImageBase,
   );
 
-  const frameView = engine.ode.PR1_FrameView(scope);
-  frameView.width = canvas.width;
-  frameView.height = canvas.height;
-  frameView.scale = 0; // NOTE: this forces first draw
+  const frameView = {
+    width: canvas.width,
+    height: canvas.height,
+    scale: 0, // NOTE: this forces first draw
+    offset: [0, 0] as const,
+  };
   const renderer: Renderer = {
     handle: rendererHandle,
     frameView,
@@ -172,6 +172,15 @@ export function mount(
 
   if (!options?.disableGestures) {
     eventTarget.addEventListener("wheel", onWheel, { passive: false, signal });
+
+    eventTarget.addEventListener(
+      "pointerdown",
+      (event: PointerEvent) => {
+        if (event.buttons === 4 || performance.now() - space < 1000)
+          eventTarget.setPointerCapture(event.pointerId);
+      },
+      { signal },
+    );
 
     eventTarget.addEventListener(
       "pointermove",
