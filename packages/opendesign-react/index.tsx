@@ -155,39 +155,19 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
           target: layer,
         });
 
+        let layerX = 0;
+        let layerY = 0;
+        let cursorOffestX = 0;
+        let cursorOffestY = 0;
+
         setSelectedLayer(layer);
 
-        let matrix: DOMMatrix;
-        let parentMatrix: DOMMatrix;
-
-        if (layer && id) {
-          const parent = editor.currentPage.findArtboard()?.getParentLayer(id);
-
-          if (!parent) return;
-
-          const parentTransformation = parent.readMetrics().transformation;
-          const parentTransformationMatrix = {
-            a: parentTransformation[0],
-            b: parentTransformation[1],
-            c: parentTransformation[2],
-            d: parentTransformation[3],
-            e: parentTransformation[4],
-            f: parentTransformation[5],
-          };
-
-          parentMatrix = DOMMatrix.fromMatrix(parentTransformationMatrix);
-
+        if (layer) {
           const layerTransformation = layer.readMetrics().transformation;
-          const initialMatrixValue = {
-            a: layerTransformation[0],
-            b: layerTransformation[1],
-            c: layerTransformation[2],
-            d: layerTransformation[3],
-            e: layerTransformation[4],
-            f: layerTransformation[5],
-          };
-
-          matrix = DOMMatrix.fromMatrix(initialMatrixValue);
+          layerX = layerTransformation[4];
+          layerY = layerTransformation[5];
+          cursorOffestX = position[0] - layerX;
+          cursorOffestY = position[1] - layerY;
         }
 
         function onPointerMove(moveEvent: PointerEvent): void {
@@ -195,26 +175,9 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
 
           if (!layer || !movePosition) return;
 
-          const currentPosition = matrix?.transformPoint(new DOMPoint(0, 0));
-          let deltaX = 0;
-          let deltaY = 0;
-
-          if (currentPosition) {
-            deltaX = movePosition[0] - currentPosition.x;
-            deltaY = movePosition[1] - currentPosition.y;
-          }
-
-          const translationPoint = new DOMPoint(deltaX, deltaY);
-
-          matrix?.preMultiplySelf(
-            parentMatrix
-              ?.inverse()
-              .translateSelf(translationPoint.x, translationPoint.y)
-              .multiplySelf(parentMatrix),
-          );
-
-          const { a, b, c, d, e, f } = matrix?.toJSON();
-          layer?.transform([a, b, c, d, e, f]);
+          const moveX = movePosition[0] - cursorOffestX;
+          const moveY = movePosition[1] - cursorOffestY;
+          layer?.setPosition([moveX, moveY]);
           canvasContext?.requestFrame();
         }
 

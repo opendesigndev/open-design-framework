@@ -156,28 +156,13 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   moveX(offset: number): boolean {
     return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
+      // const parseError = this.#engine.ode.ParseError(scope);
       const currentTransformation = [...this.readMetrics().transformation];
       currentTransformation[4] += offset;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform: currentTransformation,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      this.#engine.ode.component_modifyLayer(
-        this.#component,
-        id,
-        transformationString,
-        parseError,
-      );
+      this.#engine.ode.component_transformLayer(this.#component, id, 2, {
+        matrix: [1, 0, 0, 1, offset, 0],
+      });
       this.#engine.redraw();
       return true;
     });
@@ -185,28 +170,13 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   moveY(offset: number): boolean {
     return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
+      // const parseError = this.#engine.ode.ParseError(scope);
       const currentTransformation = [...this.readMetrics().transformation];
       currentTransformation[5] += offset;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform: currentTransformation,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      this.#engine.ode.component_modifyLayer(
-        this.#component,
-        id,
-        transformationString,
-        parseError,
-      );
+      this.#engine.ode.component_transformLayer(this.#component, id, 2, {
+        matrix: [1, 0, 0, 1, 0, offset],
+      });
       this.#engine.redraw();
       return true;
     });
@@ -214,30 +184,22 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   setPosition(coordinates: [x?: number, y?: number]): boolean {
     return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
-      const transform = [...this.readMetrics().transformation];
-      if (coordinates[0] !== undefined) transform[4] = coordinates[0];
-      if (coordinates[1] !== undefined) transform[5] = coordinates[1];
+      // const parseError = this.#engine.ode.ParseError(scope);
+      const currentTransformation = [...this.readMetrics().transformation];
+      const transform = [1, 0, 0, 1, 0, 0];
+
+      if (coordinates[0] !== undefined)
+        transform[4] = coordinates[0] - currentTransformation[4];
+
+      if (coordinates[1] !== undefined)
+        transform[5] = coordinates[1] - currentTransformation[5];
+
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
+
       if (coordinates[0] !== undefined || coordinates[1] !== undefined) {
-        this.#engine.ode.component_modifyLayer(
-          this.#component,
-          id,
-          transformationString,
-          parseError,
-        );
+        this.#engine.ode.component_transformLayer(this.#component, id, 2, {
+          matrix: transform,
+        });
         this.#engine.redraw();
         return true;
       }
