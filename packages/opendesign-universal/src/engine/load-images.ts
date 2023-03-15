@@ -17,26 +17,27 @@ export async function loadImages(
     (prev, image) => prev + image.data.data.byteLength,
     0,
   );
-  automaticScope((scope) => {
-    const ptr = engine.ode.raw._malloc(maxBytes);
-    if (ptr === 0) throw new Error("Failed to allocate memory");
-    scope(() => engine.ode.raw._free(ptr));
-    for (const { data, path } of images) {
-      engine.ode.raw.HEAPU8.set(data.data, ptr);
-      automaticScope((scope) => {
-        engine.ode.design_loadImagePixels(
-          engine.designImageBase,
-          createStringRef(engine.ode, scope, path),
-          {
-            pixels: ptr,
-            format: engine.ode.PIXEL_FORMAT_RGBA,
-            height: data.height,
-            width: data.width,
-          },
-        );
-      });
-    }
-  });
+  // FIXME: This is not working with recent builds of the engine (_malloc and _free are not exported)
+  // automaticScope((scope) => {
+  //   const ptr = engine.ode.raw._malloc(maxBytes);
+  //   if (ptr === 0) throw new Error("Failed to allocate memory");
+  //   scope(() => engine.ode.raw._free(ptr));
+  //   for (const { data, path } of images) {
+  //     engine.ode.raw.HEAPU8.set(data.data, ptr);
+  //     automaticScope((scope) => {
+  //       engine.ode.design_loadImagePixels(
+  //         engine.designImageBase,
+  //         createStringRef(engine.ode, scope, path),
+  //         {
+  //           pixels: ptr,
+  //           format: engine.ode.PIXEL_FORMAT_RGBA,
+  //           height: data.height,
+  //           width: data.width,
+  //         },
+  //       );
+  //     });
+  //   }
+  // });
 }
 
 export function loadPastedImages(engine: Engine, data: ImportedClipboardData) {

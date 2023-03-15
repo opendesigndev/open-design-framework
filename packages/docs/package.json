@@ -8,7 +8,7 @@
     "build": "typedoc && node json-cleanup.js"
   },
   "dependencies": {
-    "@opendesign/engine": "0.2.3-aa4ed28-20230313",
+    "@opendesign/engine": "0.2.3-50d7915-20230315",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "typedoc": "^0.23.21",
