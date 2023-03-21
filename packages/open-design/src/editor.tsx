@@ -27,18 +27,27 @@ import { useSearchParams } from "react-router-dom";
 import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
 import { ErrorBoundary } from "./error-boundary.js";
 
-async function convert(file: Blob) {
+export async function convert(file: Blob) {
   const data = new Uint8Array(await file.arrayBuffer());
   if (isOptimizedOctopusFile(data.buffer)) return data;
   return importFile(data);
 }
 
-export function Import() {
+export function EditorComponent({ file }: { file?: Uint8Array }) {
   const [data, setData] = useState<
     | null
     | { type: "file"; fileKey: number; data: Uint8Array; manifest: Manifest }
     | { type: "paste"; data: ImportedClipboardData }
-  >(null);
+  >(
+    file
+      ? () => ({
+          type: "file",
+          fileKey: 0,
+          data: file,
+          manifest: readManifest(file),
+        })
+      : null,
+  );
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop: (files) => {
       const file = files[0];
@@ -64,9 +73,7 @@ export function Import() {
     return (
       <div className="w-full h-full p-4" {...getRootProps()}>
         <input {...getInputProps()} />
-        <h1 className="text-2xl font-bold mb-2">
-          Open Design Framework playground
-        </h1>
+        <h1 className="text-2xl font-bold mb-2">Open Design</h1>
         {isDragActive ? (
           <p>Drop the file here ...</p>
         ) : (
@@ -100,7 +107,8 @@ export function Import() {
           evt.preventDefault();
           const data = new FormData(evt.currentTarget);
           const id = data.get("component");
-          if (typeof id === "string") setParams({ id });
+          if (typeof id === "string")
+            setParams({ ...Object.fromEntries(params.entries()), id });
         }}
       >
         <label className="flex flex-col">
@@ -121,7 +129,10 @@ export function Import() {
             manifest={data.manifest}
             value={id}
             onChange={(evt) => {
-              setParams({ id: evt.currentTarget.value });
+              setParams({
+                ...Object.fromEntries(params.entries()),
+                id: evt.currentTarget.value,
+              });
             }}
           />
         </div>
@@ -291,7 +302,7 @@ function Content({
         performPaste(editor, data.data);
       }
     },
-    unstable_fallbackFont: "/static/inter.ttf",
+    unstable_fallbackFont: new URL("/static/inter.ttf", import.meta.url).href,
   });
   const [selectedLayer, setSelectedLayer] = useState<LayerNode | null>(null);
 

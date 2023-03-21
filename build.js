@@ -12,8 +12,8 @@ console.info("Creating changesets...");
 run("yarn", ["changeset", "version", "--snapshot", "not-released-yet"]);
 console.info("Building docs...");
 run("yarn", ["workspace", "docs", "build"]);
-console.info("Building react-test-app...");
-run("yarn", ["workspace", "react-test-app", "vite", "build"]);
+console.info("Building open-design...");
+run("yarn", ["workspace", "open-design", "vite", "build"]);
 if (fs.existsSync(".git")) {
   console.info("Cleaning up changesets...");
   run("git", [
@@ -25,7 +25,7 @@ if (fs.existsSync(".git")) {
   ]);
 }
 
-const testApp = path.join(here, "packages", "react-test-app", "dist");
+const testApp = path.join(here, "packages", "open-design", "dist");
 const docs = path.join(here, "packages", "docs", "dist");
 const dist = path.join(here, "dist");
 console.info("Creating shared dist...");

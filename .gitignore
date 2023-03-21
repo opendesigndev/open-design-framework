@@ -42,3 +42,7 @@ node_modules
 !.yarn/releases
 .yarn/sdks
 !.yarn/versions
+
+# open-design cli
+/packages/open-design/cli-dist
+/packages/open-design/designs

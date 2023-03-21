@@ -10,5 +10,5 @@
   "snapshot": {
     "prereleaseTemplate": "{tag}-{commit}-{datetime}"
   },
-  "ignore": ["docs", "react-test-app"]
+  "ignore": ["docs"]
 }

@@ -114,7 +114,7 @@ export function usePaste(
         .catch((error) => void console.error(error));
     }
   });
-  if (!!navigator.clipboard.readText) {
+  if (!!navigator.clipboard?.readText) {
     return () => void importFromClipboard().then(handlePaste);
   }
   return null;
