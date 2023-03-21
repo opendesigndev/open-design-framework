@@ -17,7 +17,7 @@ function hackDefault<T>(v: { default: T }): T {
   return v as any;
 }
 
-const localDeps = Object.entries(packageJson.dependencies)
+const localDeps = Object.entries(packageJson.devDependencies)
   .filter(([k, v]) => v.startsWith("workspace:"))
   .map(([k]) => k);
 
