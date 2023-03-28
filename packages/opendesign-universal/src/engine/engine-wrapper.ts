@@ -7,6 +7,8 @@ import type {
   ParseError_Type,
   ParseError_Type_Map,
   Result_Map,
+  TransformationBasis,
+  TransformationBasis_Map,
 } from "@opendesign/engine/exports.js";
 import { warn } from "@opendesign/env";
 
@@ -55,6 +57,7 @@ type Enums = MakeSureWeHaveAllEnums<{
   Result: [Result_Map, Result];
   LayerType: [LayerType_Map, LayerType];
   ParseError_Type: [ParseError_Type_Map, ParseError_Type];
+  TransformationBasis: [TransformationBasis_Map, TransformationBasis];
 }>;
 
 ///
