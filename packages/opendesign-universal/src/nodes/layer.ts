@@ -52,21 +52,21 @@ export interface LayerNode extends BaseNode {
   readMetrics(): LayerMetrics;
 
   /**
-   * Move layer by x axis by given offset
+   * Move layer within Component (Artboard) by x axis by given offset
    * @param offset offset in px
    * @see transform
    */
   moveX(offset: number): void;
 
   /**
-   * Move layer by y axis by given offset
+   * Move layer within Component (Artboard) by y axis by given offset
    * @param offset offset in px
    * @see transform
    */
   moveY(offset: number): void;
 
   /**
-   * Set layer's position relative to canvas by x/y coordinates
+   * Set layer's position relative to Component (Artboard) by x/y coordinates
    * @param coordinates coordinates in px, an array of two numbers, each number is optional
    */
   setPosition(coordinates: [x?: number, y?: number]): void;
