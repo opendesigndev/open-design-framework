@@ -54,25 +54,22 @@ export interface LayerNode extends BaseNode {
   /**
    * Move layer by x axis by given offset
    * @param offset offset in px
-   * @returns true if transformation was applied, false if it was not applied
    * @see transform
    */
-  moveX(offset: number): boolean;
+  moveX(offset: number): void;
 
   /**
    * Move layer by y axis by given offset
    * @param offset offset in px
-   * @returns true if transformation was applied, false if it was not applied
    * @see transform
    */
-  moveY(offset: number): boolean;
+  moveY(offset: number): void;
 
   /**
    * Set layer's position relative to canvas by x/y coordinates
    * @param coordinates coordinates in px, an array of two numbers, each number is optional
-   * @returns true if transformation was applied, false if it was not applied
    */
-  setPosition(coordinates: [x?: number, y?: number]): boolean;
+  setPosition(coordinates: [x?: number, y?: number]): void;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -142,7 +139,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     });
   }
 
-  moveX(offset: number): boolean {
+  moveX(offset: number): void {
     return automaticScope((scope) => {
       // const parseError = this.#engine.ode.ParseError(scope);
       const currentTransformation = [...this.readMetrics().transformation];
@@ -157,11 +154,10 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         },
       );
       this.#engine.redraw();
-      return true;
     });
   }
 
-  moveY(offset: number): boolean {
+  moveY(offset: number): void {
     return automaticScope((scope) => {
       // const parseError = this.#engine.ode.ParseError(scope);
       const currentTransformation = [...this.readMetrics().transformation];
@@ -176,11 +172,10 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         },
       );
       this.#engine.redraw();
-      return true;
     });
   }
 
-  setPosition(coordinates: [x?: number, y?: number]): boolean {
+  setPosition(coordinates: [x?: number, y?: number]): void {
     return automaticScope((scope) => {
       // const parseError = this.#engine.ode.ParseError(scope);
       const currentTransformation = [...this.readMetrics().transformation];
@@ -204,9 +199,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
           },
         );
         this.#engine.redraw();
-        return true;
       }
-      return false;
     });
   }
 }
