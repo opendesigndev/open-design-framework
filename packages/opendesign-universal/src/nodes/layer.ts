@@ -1,15 +1,10 @@
-import type { ComponentHandle } from "@opendesign/engine";
+import type { ComponentHandle, Scalar_array_6 } from "@opendesign/engine";
 import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
-import {
-  matrixMultiply,
-  matrixToTransformation,
-  transformationToMatrix,
-} from "../utils.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
@@ -78,13 +73,6 @@ export interface LayerNode extends BaseNode {
    * @returns true if transformation was applied, false if it was not applied
    */
   setPosition(coordinates: [x?: number, y?: number]): boolean;
-
-  /**
-   * Transform layer by given transformation matrix
-   * @param transformation transformation matrix @see Transformation
-   * @returns true if transformation was applied, false if it was not applied
-   */
-  transform(transformation: Transformation): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -160,9 +148,14 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       const currentTransformation = [...this.readMetrics().transformation];
       currentTransformation[4] += offset;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      this.#engine.ode.component_transformLayer(this.#component, id, 2, {
-        matrix: [1, 0, 0, 1, offset, 0],
-      });
+      this.#engine.ode.component_transformLayer(
+        this.#component,
+        id,
+        this.#engine.ode.raw.TransformationBasis.PARENT_COMPONENT,
+        {
+          matrix: [1, 0, 0, 1, offset, 0],
+        },
+      );
       this.#engine.redraw();
       return true;
     });
@@ -174,9 +167,14 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       const currentTransformation = [...this.readMetrics().transformation];
       currentTransformation[5] += offset;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      this.#engine.ode.component_transformLayer(this.#component, id, 2, {
-        matrix: [1, 0, 0, 1, 0, offset],
-      });
+      this.#engine.ode.component_transformLayer(
+        this.#component,
+        id,
+        this.#engine.ode.raw.TransformationBasis.PARENT_COMPONENT,
+        {
+          matrix: [1, 0, 0, 1, 0, offset],
+        },
+      );
       this.#engine.redraw();
       return true;
     });
@@ -197,40 +195,18 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       const id = createStringRef(this.#engine.ode, scope, this.id);
 
       if (coordinates[0] !== undefined || coordinates[1] !== undefined) {
-        this.#engine.ode.component_transformLayer(this.#component, id, 2, {
-          matrix: transform,
-        });
+        this.#engine.ode.component_transformLayer(
+          this.#component,
+          id,
+          this.#engine.ode.raw.TransformationBasis.PARENT_COMPONENT,
+          {
+            matrix: transform as unknown as Scalar_array_6,
+          },
+        );
         this.#engine.redraw();
         return true;
       }
       return false;
-    });
-  }
-
-  transform(matrix: Transformation): boolean {
-    return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform: matrix,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      const id = createStringRef(this.#engine.ode, scope, this.id);
-      this.#engine.ode.component_modifyLayer(
-        this.#component,
-        id,
-        transformationString,
-        parseError,
-      );
-      this.#engine.redraw();
-      return true;
     });
   }
 }
