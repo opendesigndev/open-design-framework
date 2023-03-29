@@ -153,7 +153,7 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
       if (event.key === "ArrowRight") {
         selectedLayer.moveX(getDelta(event, 1));
       }
-      canvasContext?.requestFrame();
+      canvasContext?._requestFrame();
     }
 
     function pointerDownHandler(event: MouseEvent | PointerEvent | WheelEvent) {
@@ -193,7 +193,7 @@ export function EditorCanvas(props: EditorCanvasProps): JSX.Element {
         const moveX = movePosition[0] - cursorOffestX;
         const moveY = movePosition[1] - cursorOffestY;
         layer?.setPosition([moveX, moveY]);
-        canvasContext?.requestFrame();
+        canvasContext?._requestFrame();
       }
 
       document.addEventListener("pointermove", onPointerMove);
