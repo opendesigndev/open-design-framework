@@ -51,9 +51,10 @@ export type MountResult = {
   getViewport(): Viewport;
 
   /**
+   * **For internal use only** it's not the part of public API and may change
    * Forces rendering of the next frame
    */
-  requestFrame(): void;
+  _requestFrame(): void;
 };
 
 export type MountEventHandler<EventName extends keyof MountEventMap> = (
@@ -163,7 +164,7 @@ export function mount(
       if (event.key === "0") {
         offset = [0, 0];
         scale = 1;
-        requestFrame();
+        _requestFrame();
       }
     },
     { signal },
@@ -180,7 +181,7 @@ export function mount(
         if (!eventTarget.hasPointerCapture(event.pointerId)) return;
         offset[0] -= (event.movementX / scale) * window.devicePixelRatio;
         offset[1] -= (event.movementY / scale) * window.devicePixelRatio;
-        requestFrame();
+        _requestFrame();
       },
       { signal },
     );
@@ -198,7 +199,7 @@ export function mount(
         if (!eventTarget.hasPointerCapture(event.pointerId)) return;
         offset[0] -= (event.movementX / scale) * window.devicePixelRatio;
         offset[1] -= (event.movementY / scale) * window.devicePixelRatio;
-        requestFrame();
+        _requestFrame();
       },
       { signal },
     );
@@ -214,7 +215,7 @@ export function mount(
     extractEventPosition,
     subscribe,
     getViewport,
-    requestFrame,
+    _requestFrame: _requestFrame,
   };
 
   function subscribe<EventName extends keyof MountEventMap>(
@@ -257,7 +258,7 @@ export function mount(
     }
   }
 
-  function requestFrame() {
+  function _requestFrame() {
     if (frameRequested) return;
     requestAnimationFrame(draw);
     frameRequested = true;
@@ -277,17 +278,17 @@ export function mount(
         x - (1 / change) * (x - offset[0]),
         y - (1 / change) * (y - offset[1]),
       ];
-      requestFrame();
+      _requestFrame();
     } else if (event.shiftKey) {
       offset[0] += (scrollDelta[1] || scrollDelta[0]) / scale;
-      requestFrame();
+      _requestFrame();
     } else if (event.altKey) {
       offset[1] += scrollDelta[1] / scale;
-      requestFrame();
+      _requestFrame();
     } else {
       offset[0] += scrollDelta[0] / scale;
       offset[1] += scrollDelta[1] / scale;
-      requestFrame();
+      _requestFrame();
     }
   }
 
