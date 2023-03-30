@@ -404,8 +404,11 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
       <ResizeContainer
         onResize={changeDimensionsHandler}
         onResizeEnd={onResizeEnd}
+        style={{
+          border: "none",
+        }}
       >
-        <div className="border border-solid border-red-800" />
+        <div className="border border-solid border-red-800 inset-0 absolute" />
         <ResizeWidthHandle />
         <ResizeHeightHandle />
         <ResizeBothHandle />
