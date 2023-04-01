@@ -9,6 +9,10 @@ export type {
 } from "./src/editor.js";
 export type { EditorEvents } from "./src/editor.js";
 export { createEditor } from "./src/editor.js";
+export type {
+  WasmLocationSpecifier,
+  WasmLocationSpecifierSingle,
+} from "./src/engine/engine-wrapper.js";
 export type { ArtboardNode } from "./src/nodes/artboard.js";
 export type { DesignNode } from "./src/nodes/design.js";
 export type { LayerNode } from "./src/nodes/layer.js";

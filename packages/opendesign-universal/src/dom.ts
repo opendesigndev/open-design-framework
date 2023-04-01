@@ -174,15 +174,6 @@ export function mount(
     eventTarget.addEventListener("wheel", onWheel, { passive: false, signal });
 
     eventTarget.addEventListener(
-      "pointerdown",
-      (event: PointerEvent) => {
-        if (event.buttons === 4 || performance.now() - space < 1000)
-          eventTarget.setPointerCapture(event.pointerId);
-      },
-      { signal },
-    );
-
-    eventTarget.addEventListener(
       "pointermove",
       (event: PointerEvent) => {
         if (event.buttons === 4 || performance.now() - space < 1000)
