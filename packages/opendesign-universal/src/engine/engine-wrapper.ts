@@ -1,6 +1,6 @@
 import type { ODE } from "@opendesign/engine";
 import type { ParseError } from "@opendesign/engine";
-import createEngineWasm, { wasm } from "@opendesign/engine";
+import createEngine, { wasm } from "@opendesign/engine";
 import { fetch, warn } from "@opendesign/env";
 
 import { engineVersion } from "../../index.js";
@@ -57,36 +57,52 @@ const parsers: Pick<
 /// Following uses the configuration to generate memory-safe bindings
 ///
 
+export type WasmLocationSpecifierSingle =
+  | string
+  | ((spec: { version: string; package: string; filename: string }) => string);
+export type WasmLocationSpecifier =
+  | WasmLocationSpecifierSingle
+  | WasmLocationSpecifierSingle[];
+
 export async function loadEngine(
-  wasmLocation: string | undefined,
+  wasmLocation: WasmLocationSpecifier = ["local", "unpkg"],
 ): Promise<WrappedODE> {
+  const locations = [wasmLocation].flat();
+  if (locations.length < 1)
+    throw new Error("Must specify at least on location to load from");
   const controls = detachPromiseControls<never>();
-  const odePromise = createEngineWasm({
-    // I used instantiateWasm instead of locateFile to be able to respond to
+  const odePromise = createEngine({
+    // We use instantiateWasm instead of locateFile to be able to respond to
     // 404 on local requests.
     instantiateWasm(info: any, receiveInstance: (instance: any) => void) {
-      const unpkg =
-        "https://unpkg.com/@opendesign/engine-wasm@" +
-        engineVersion +
-        "/ode.wasm";
       (async () => {
-        if (!wasmLocation) {
+        for (let i = 0; i < locations.length; ++i) {
           try {
-            return await instantiateWasm(wasm, info);
+            const location = locations[i];
+            const spec = {
+              filename: "ode.wasm",
+              package: "@opendesign/engine-wasm",
+              version: engineVersion,
+            };
+            if (typeof location !== "string") {
+              return await instantiateWasm(location(spec), info);
+            } else if (location === "unpkg") {
+              const unpkg = `https://unpkg.com/${spec.package}@${spec.version}/${spec.filename}`;
+              return await instantiateWasm(unpkg, info);
+            } else if (location === "local") {
+              return await instantiateWasm(wasm, info);
+            } else {
+              return await instantiateWasm(location, info);
+            }
           } catch (e) {
+            if (i === locations.length - 1) throw e;
             warn(
               "Failed to load wasm from local server. See wasmLocation option docs for more info.",
             );
             warn(e);
-            return instantiateWasm(unpkg, info);
           }
-        } else if (wasmLocation === "unpkg") {
-          return instantiateWasm(unpkg, info);
-        } else if (wasmLocation === "local") {
-          return instantiateWasm(wasm, info);
-        } else {
-          return instantiateWasm(wasmLocation, info);
         }
+        throw new Error("Failed to load wasm");
       })().then(receiveInstance, controls.reject);
     },
   });

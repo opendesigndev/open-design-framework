@@ -1,5 +1,6 @@
 import * as env from "@opendesign/env";
 
+import type { WasmLocationSpecifier } from "../index.js";
 import type { Engine } from "./engine/engine.js";
 import { design_listMissingFonts } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
@@ -7,7 +8,6 @@ import { automaticScope, createStringRef } from "./engine/memory.js";
 import { todo } from "./internals.js";
 import { performance } from "./lib.js";
 import type { LayerListItem } from "./nodes/artboard.js";
-import { ArtboardNodeImpl } from "./nodes/artboard.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
 import type { Node } from "./nodes/node.js";
@@ -49,6 +49,7 @@ export type CreateEditorOptions = {
    *  - locally using new URL(..., import.meta.url) pattern
    *  - from unpkg
    *  - from any url you specify
+   *  - you can write a function which will produce the url
    *
    * The default behavior is to first try local, then if that fails use unpkg.
    *
@@ -58,6 +59,9 @@ export type CreateEditorOptions = {
    * Specify `'unpkg'` in case you know local does not work and want us to directly
    * fetch from unpkg.com.
    *
+   * You can also pass an array of options for which each will be tried in turn
+   * and the first one that succeeds will be used.
+   *
    * Considerations if you are specifying a location directly:
    *  - Make sure that you update the wasm file when you update engine.
    *  - If at any point we start using multiple wasm files (for eg. code-splitting
@@ -65,11 +69,13 @@ export type CreateEditorOptions = {
    *    considered a semver-major change, but we will try to issue a reasonable
    *    error if that happens, since it will require changing the signature of
    *    this option.
-   *  - In vite (and probably some other bundlers) you can use
-   *    `new URL('@opendesign/engine/ode.wasm', import.meta.url).href` as a value
-   *    for this option.
+   *  - In vite (and probably some other bundlers) local works in production but
+   *    not in development, which makes it loads from unpkg by default. If you
+   *    want to make sure that it never loads from external servers in production
+   *    but still works on local server you can specify something like
+   *    `import.meta.env.PROD ? 'local' : undefined`
    */
-  wasmLocation?: "unpkg" | "local" | string;
+  wasmLocation?: WasmLocationSpecifier | readonly WasmLocationSpecifier[];
   /**
    * Specifies URL pointing to font file in .ttf format, which will be used to
    * replace missing fonts. This is so that missing fonts at least show something.

@@ -4,7 +4,7 @@ import type {
   PR1_FrameView,
 } from "@opendesign/engine";
 
-import type { WrappedODE } from "./engine-wrapper.js";
+import type { WasmLocationSpecifier, WrappedODE } from "./engine-wrapper.js";
 import { loadEngine } from "./engine-wrapper.js";
 import type { Scope } from "./memory.js";
 import { readStringRef } from "./memory.js";
@@ -66,7 +66,7 @@ function createCanvasSelector(
 
 export async function initEngine(
   canvas: any /* HTMLCanvasElement */,
-  wasmLocation: string | undefined,
+  wasmLocation?: WasmLocationSpecifier,
 ) {
   const ode = await loadEngine(wasmLocation);
   const { scope, destroy: finish } = detachedScope();
