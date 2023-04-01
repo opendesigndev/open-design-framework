@@ -1,5 +1,5 @@
 ---
-"open-design": minor
+"opendesign": minor
 ---
 
-initial version of open-design CLI
+initial version of OpenDesign CLI

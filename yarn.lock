@@ -7167,9 +7167,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"open-design@workspace:packages/open-design":
+"open@npm:^9.1.0":
+  version: 9.1.0
+  resolution: "open@npm:9.1.0"
+  dependencies:
+    default-browser: ^4.0.0
+    define-lazy-prop: ^3.0.0
+    is-inside-container: ^1.0.0
+    is-wsl: ^2.2.0
+  checksum: 3993c0f61d51fed8ac290e99c9c3cf45d3b6cfb3e2aa2b74cafd312c3486c22fd81df16ac8f3ab91dd8a4e3e729a16fc2480cfc406c4833416cf908acf1ae7c9
+  languageName: node
+  linkType: hard
+
+"opendesign@workspace:packages/opendesign":
   version: 0.0.0-use.local
-  resolution: "open-design@workspace:packages/open-design"
+  resolution: "opendesign@workspace:packages/opendesign"
   dependencies:
     "@opendesign/engine": 0.3.0-2e747c9-20230401
     "@opendesign/engine-wasm": 0.3.0-2e747c9-20230401
@@ -7195,21 +7207,9 @@ __metadata:
     tailwindcss: ^3.2.4
     vite: ^3.2.4
   bin:
-    open-design: ./bin/open-design.js
+    opendesign: ./bin/opendesign.js
   languageName: unknown
   linkType: soft
-
-"open@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "open@npm:9.1.0"
-  dependencies:
-    default-browser: ^4.0.0
-    define-lazy-prop: ^3.0.0
-    is-inside-container: ^1.0.0
-    is-wsl: ^2.2.0
-  checksum: 3993c0f61d51fed8ac290e99c9c3cf45d3b6cfb3e2aa2b74cafd312c3486c22fd81df16ac8f3ab91dd8a4e3e729a16fc2480cfc406c4833416cf908acf1ae7c9
-  languageName: node
-  linkType: hard
 
 "optionator@npm:^0.9.1":
   version: 0.9.1

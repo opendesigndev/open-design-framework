@@ -9,7 +9,7 @@ COPY packages/opendesign-env/package.json packages/opendesign-env/
 COPY packages/opendesign-universal/package.json packages/opendesign-universal/
 COPY packages/opendesign-react/package.json packages/opendesign-react/
 COPY packages/docs/package.json packages/docs/
-COPY packages/open-design/package.json packages/open-design/
+COPY packages/opendesign/package.json packages/opendesign/
 
 # Install NPM packages
 RUN corepack enable yarn \
