@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { wasm } from "@opendesign/engine-wasm";
 import express from "express";
 import openUrl from "open";
 
@@ -8,6 +9,8 @@ export function open(params: string[]) {
   const dist = new URL("../dist/index.html", import.meta.url).pathname;
   app.use("/", (req, res, next) => {
     if (req.path === "/") res.sendFile(dist);
+    else if (req.path === "/engine/ode.wasm")
+      res.sendFile(new URL(wasm).pathname);
     else next();
   });
   app.use(
