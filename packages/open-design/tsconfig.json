@@ -6,6 +6,7 @@
   ],
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
+    "types": ["vite/client"],
     "emitDeclarationOnly": true,
     "outDir": "dist"
   },

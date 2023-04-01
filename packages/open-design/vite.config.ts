@@ -1,16 +1,11 @@
-// @ts-ignore
 import fs from "node:fs";
-// @ts-ignore
-import { createRequire } from "node:module";
-// @ts-ignore
-import path from "node:path";
+import { pipeline } from "node:stream/promises";
 
+import { wasm } from "@opendesign/engine-wasm";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 import packageJson from "./package.json";
-
-const require = createRequire(import.meta.url);
 
 // TODO: remove once usage starts giving errors (= vite fixes its typedefs)
 function hackDefault<T>(v: { default: T }): T {
@@ -33,11 +28,6 @@ const alias = Object.fromEntries(
   }),
 );
 
-const engineWrapper = path.join(require.resolve("@opendesign/engine"), "..");
-const engineDir = engineWrapper.endsWith("wrapper")
-  ? path.join(require.resolve("@opendesign/engine"), ...Array(6).fill(".."))
-  : null;
-
 export default defineConfig({
   optimizeDeps: {
     exclude: [...localDeps],
@@ -49,7 +39,7 @@ export default defineConfig({
   resolve: { alias },
   server: {
     fs: {
-      allow: ["../..", engineDir].filter(Boolean),
+      allow: ["../.."],
     },
   },
   plugins: [
@@ -77,5 +67,21 @@ export default defineConfig({
       },
     },
     hackDefault(react)(),
+    {
+      name: "fix-local-serve",
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (
+            new URL(req.url || "/", "file:///").pathname === "/engine/ode.wasm"
+          ) {
+            res.setHeader("content-type", "application/wasm");
+            pipeline(fs.createReadStream(new URL(wasm).pathname), res).then(
+              (v) => res.end(),
+              (err) => next(err),
+            );
+          } else next();
+        });
+      },
+    },
   ],
 });

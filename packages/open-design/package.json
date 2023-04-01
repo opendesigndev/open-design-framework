@@ -11,6 +11,9 @@
     "prepublishOnly": "yarn build"
   },
   "bin": "./bin/open-design.js",
+  "dependencies": {
+    "@opendesign/engine-wasm": "0.3.0-2e747c9-20230401"
+  },
   "devDependencies": {
     "@opendesign/engine": "0.3.0-2e747c9-20230401",
     "@opendesign/react": "workspace:*",
@@ -37,6 +40,7 @@
   },
   "files": [
     "dist",
+    "!/dist/**/*.wasm",
     "cli-dist"
   ]
 }

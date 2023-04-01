@@ -8,7 +8,7 @@ await esbuild.build({
   platform: "node",
   splitting: true,
   format: "esm",
-  external: builtin,
+  external: [...builtin, "@opendesign/engine-wasm"],
   banner: {
     js: `const require = (await import('module')).createRequire(import.meta.url);`,
   },

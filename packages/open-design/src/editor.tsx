@@ -302,6 +302,7 @@ function Content({
         performPaste(editor, data.data);
       }
     },
+    wasmLocation: "/engine/ode.wasm",
     unstable_fallbackFont: new URL("/static/inter.ttf", import.meta.url).href,
   });
   const [selectedLayer, setSelectedLayer] = useState<LayerNode | null>(null);
