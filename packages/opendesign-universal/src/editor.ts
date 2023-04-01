@@ -75,7 +75,7 @@ export type CreateEditorOptions = {
    *    but still works on local server you can specify something like
    *    `import.meta.env.PROD ? 'local' : undefined`
    */
-  wasmLocation?: WasmLocationSpecifier | readonly WasmLocationSpecifier[];
+  wasmLocation?: WasmLocationSpecifier;
   /**
    * Specifies URL pointing to font file in .ttf format, which will be used to
    * replace missing fonts. This is so that missing fonts at least show something.
