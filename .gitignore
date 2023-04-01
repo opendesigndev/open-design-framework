@@ -43,6 +43,6 @@ node_modules
 .yarn/sdks
 !.yarn/versions
 
-# open-design cli
-/packages/open-design/cli-dist
-/packages/open-design/designs
+# opendesign cli
+/packages/opendesign/cli-dist
+/packages/opendesign/designs

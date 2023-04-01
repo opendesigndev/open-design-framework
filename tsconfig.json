@@ -1,6 +1,6 @@
 {
   "references": [
-    { "path": "packages/open-design" },
+    { "path": "packages/opendesign" },
     { "path": "tsconfig-published.json" },
     { "path": "packages/docs/dom" },
     { "path": "packages/docs/external/engine" }

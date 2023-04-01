@@ -12,8 +12,8 @@ console.info("Creating changesets...");
 run("yarn", ["changeset", "version", "--snapshot", "not-released-yet"]);
 console.info("Building docs...");
 run("yarn", ["workspace", "docs", "build"]);
-console.info("Building open-design...");
-run("yarn", ["workspace", "open-design", "vite", "build"]);
+console.info("Building opendesign...");
+run("yarn", ["workspace", "opendesign", "vite", "build"]);
 if (fs.existsSync(".git")) {
   console.info("Cleaning up changesets...");
   run("git", [
@@ -25,7 +25,7 @@ if (fs.existsSync(".git")) {
   ]);
 }
 
-const testApp = path.join(here, "packages", "open-design", "dist");
+const cli = path.join(here, "packages", "opendesign", "dist");
 const docs = path.join(here, "packages", "docs", "dist");
 const dist = path.join(here, "dist");
 console.info("Creating shared dist...");
@@ -33,7 +33,7 @@ fs.rmSync(dist, { force: true, recursive: true });
 fs.mkdirSync(dist);
 copy(docs, dist);
 fs.renameSync(path.join(dist, "index.html"), path.join(dist, "changelog.html"));
-copy(testApp, dist);
+copy(cli, dist);
 
 /**
  * @param {string} from

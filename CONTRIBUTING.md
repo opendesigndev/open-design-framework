@@ -41,9 +41,9 @@ Then you'll want to switch to workspace's typescript version:
 
 ## Tips
 
-To develop OD CLI run `yarn workspace open-design vite`. You likely
+To develop OpenDesign CLI run `yarn workspace opendesign vite`. You likely
 want to use some local designs - just put them into `designs` folder in
-`open-design`, or put a symlink there. You can then append `?file=filename`
+`opendesign`, or put a symlink there. You can then append `?file=filename`
 parameter to vite's url to open it (eg. http://localhost:5173/?file=prototype.xd)
 
 ## Release process

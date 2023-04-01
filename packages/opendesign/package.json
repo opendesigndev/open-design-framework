@@ -1,8 +1,13 @@
 {
-  "name": "open-design",
-  "description": "CLI for working with opendesign .octopus files",
+  "name": "opendesign",
+  "description": "CLI for working with OpenDesign .octopus files",
   "version": "0.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "github:opendesigndev/open-design-framework",
+    "directory": "packages/opendesign"
+  },
   "scripts": {
     "dev:server": "vite",
     "build:frontend": "vite build",
@@ -10,7 +15,7 @@
     "build": "yarn build:cli && yarn build:frontend",
     "prepublishOnly": "yarn build"
   },
-  "bin": "./bin/open-design.js",
+  "bin": "./bin/opendesign.js",
   "dependencies": {
     "@opendesign/engine-wasm": "0.3.0-2e747c9-20230401"
   },
