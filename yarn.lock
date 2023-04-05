@@ -2343,15 +2343,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mir4a/resize-container-react@npm:1.0.2-pre3":
-  version: 1.0.2-pre3
-  resolution: "@mir4a/resize-container-react@npm:1.0.2-pre3"
-  peerDependencies:
-    react: ^18.2.0
-  checksum: 1bc00fef12eff2659829057950806d165e2e18d46b2d591f404624f32c318339c5d8652bb820c1b9e686c2d25ddffc79242e40898d4c3a45ed431cae87be25cd
-  languageName: node
-  linkType: hard
-
 "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1":
   version: 5.1.1-v1
   resolution: "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1"
