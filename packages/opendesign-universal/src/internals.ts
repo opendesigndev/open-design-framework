@@ -11,7 +11,3 @@ export type ToDo = unknown;
 export const queueMicrotask: (cb: () => void) => void =
   (globalThis as any).queueMicrotask ||
   ((cb) => void Promise.resolve().then(cb));
-
-export function generateUUID(): string {
-  return (globalThis as any).crypto.randomUUID();
-}

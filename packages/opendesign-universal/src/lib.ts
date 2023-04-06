@@ -71,3 +71,12 @@ export type AbortSignal = InstanceType<typeof AbortSignal>;
 
 export const performance: ExtractGlobal<"performance", { now(): number }> =
   global.performance;
+
+export const console: ExtractGlobal<
+  "console",
+  {
+    log(...args: unknown[]): undefined;
+    warn(...args: unknown[]): undefined;
+    error(...args: unknown[]): undefined;
+  }
+> = global.console;

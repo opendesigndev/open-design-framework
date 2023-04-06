@@ -6,7 +6,7 @@ import { design_listMissingFonts } from "./engine/engine.js";
 import { initEngine } from "./engine/engine.js";
 import { automaticScope, createStringRef } from "./engine/memory.js";
 import { todo } from "./internals.js";
-import { performance } from "./lib.js";
+import { console, performance } from "./lib.js";
 import type { LayerListItem } from "./nodes/artboard.js";
 import type { DesignNode } from "./nodes/design.js";
 import { DesignImplementation } from "./nodes/design.js";
@@ -292,7 +292,7 @@ export class EditorImplementation implements Editor {
           } catch (e) {
             // TODO: figure out better error handling story if this if becomes
             // permanent and not just temporary workaround
-            env.warn(e);
+            console.warn(e);
           }
         }
 

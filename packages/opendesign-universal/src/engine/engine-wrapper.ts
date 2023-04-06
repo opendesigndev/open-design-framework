@@ -1,9 +1,10 @@
 import type { ODE } from "@opendesign/engine";
 import type { ParseError } from "@opendesign/engine";
 import createEngine, { wasm } from "@opendesign/engine";
-import { fetch, warn } from "@opendesign/env";
+import { fetch } from "@opendesign/env";
 
 import { engineVersion } from "../../index.js";
+import { console } from "../lib.js";
 import { detachPromiseControls } from "../utils.js";
 import type { Scope } from "./memory.js";
 
@@ -96,10 +97,10 @@ export async function loadEngine(
             }
           } catch (e) {
             if (i === locations.length - 1) throw e;
-            warn(
+            console.warn(
               "Failed to load wasm from local server. See wasmLocation option docs for more info.",
             );
-            warn(e);
+            console.warn(e);
           }
         }
         throw new Error("Failed to load wasm");

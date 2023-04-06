@@ -44,5 +44,4 @@ node_modules
 !.yarn/versions
 
 # opendesign cli
-/packages/opendesign/cli-dist
 /packages/opendesign/designs

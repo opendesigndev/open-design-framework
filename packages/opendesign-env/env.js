@@ -2,8 +2,6 @@ export const createCanvas = () => {
   return document.createElement("canvas");
 };
 
-export const fetch = globalThis.fetch.bind(globalThis);
-
 /**
  *
  * @param {Uint8Array} data
@@ -40,7 +38,6 @@ export async function parseImage(data, signal) {
     URL.revokeObjectURL(url);
   }
 }
-export const warn = console.warn.bind(console);
 
 export const requestAnimationFrame =
   globalThis.requestAnimationFrame.bind(globalThis);
@@ -48,4 +45,5 @@ export const requestAnimationFrame =
 export const cancelAnimationFrame =
   globalThis.cancelAnimationFrame.bind(globalThis);
 
-export const performanceNow = performance.now.bind(performance);
+export const crypto = globalThis.crypto;
+export const fetch = globalThis.fetch.bind(globalThis);

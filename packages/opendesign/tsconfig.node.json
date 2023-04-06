@@ -1,15 +1,14 @@
 {
   "extends": "../config/tsconfig.json",
   "references": [
-    { "path": "./tsconfig.node.json" },
     { "path": "../opendesign-react" },
     { "path": "../opendesign-universal" }
   ],
   "compilerOptions": {
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "lib": ["ES2022"],
+    "types": ["@types/node"],
     "emitDeclarationOnly": true,
-    "outDir": "dist/editor-ts"
+    "outDir": "dist/cli-ts"
   },
-  "include": ["src"]
+  "include": ["cli", "vite.config.ts", "package.json"]
 }

@@ -4,7 +4,7 @@ import builtin from "builtin-modules/static.js";
 await esbuild.build({
   entryPoints: ["cli/cli.ts"],
   bundle: true,
-  outdir: "cli-dist",
+  outdir: "dist/cli",
   platform: "node",
   splitting: true,
   format: "esm",
