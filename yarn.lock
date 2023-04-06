@@ -2225,16 +2225,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/engine-darwin-arm64@npm:0.3.0-2e747c9-20230401":
-  version: 0.3.0-2e747c9-20230401
-  resolution: "@opendesign/engine-darwin-arm64@npm:0.3.0-2e747c9-20230401"
+"@opendesign/engine-darwin-arm64@npm:0.3.0-45382db-20230401":
+  version: 0.3.0-45382db-20230401
+  resolution: "@opendesign/engine-darwin-arm64@npm:0.3.0-45382db-20230401"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@opendesign/engine-darwin-x64@npm:0.3.0-2e747c9-20230401":
-  version: 0.3.0-2e747c9-20230401
-  resolution: "@opendesign/engine-darwin-x64@npm:0.3.0-2e747c9-20230401"
+"@opendesign/engine-darwin-x64@npm:0.3.0-45382db-20230401":
+  version: 0.3.0-45382db-20230401
+  resolution: "@opendesign/engine-darwin-x64@npm:0.3.0-45382db-20230401"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
@@ -2245,23 +2245,23 @@ __metadata:
   languageName: node
   linkType: soft
 
-"@opendesign/engine-wasm@npm:0.3.0-2e747c9-20230401":
-  version: 0.3.0-2e747c9-20230401
-  resolution: "@opendesign/engine-wasm@npm:0.3.0-2e747c9-20230401"
+"@opendesign/engine-wasm@npm:0.3.0-45382db-20230401":
+  version: 0.3.0-45382db-20230401
+  resolution: "@opendesign/engine-wasm@npm:0.3.0-45382db-20230401"
   dependencies:
     "@emnapi/runtime": ^0.32.2
-  checksum: c8c4206ee5e3e77ac25c57a66187a1f155a35dd15def61bbbe9083af104d0c55356ba4839040cd4d98d6b94e6fb35684b1db3af56be2ec061fc229fccdbea2f7
+  checksum: 21c601f32f2a29936d34a8fffae47c43ed0064c3f092830d22d76eb6363bb6abcc15ea2139f22038b823c9a86dfa8acc71a6f96d72ba477d70e57129cb5297db
   languageName: node
   linkType: hard
 
-"@opendesign/engine@npm:0.3.0-2e747c9-20230401":
-  version: 0.3.0-2e747c9-20230401
-  resolution: "@opendesign/engine@npm:0.3.0-2e747c9-20230401"
+"@opendesign/engine@npm:0.3.0-45382db-20230401":
+  version: 0.3.0-45382db-20230401
+  resolution: "@opendesign/engine@npm:0.3.0-45382db-20230401"
   dependencies:
-    "@opendesign/engine-darwin-arm64": 0.3.0-2e747c9-20230401
-    "@opendesign/engine-darwin-x64": 0.3.0-2e747c9-20230401
-    "@opendesign/engine-source": 0.3.0-2e747c9-20230401
-    "@opendesign/engine-wasm": 0.3.0-2e747c9-20230401
+    "@opendesign/engine-darwin-arm64": 0.3.0-45382db-20230401
+    "@opendesign/engine-darwin-x64": 0.3.0-45382db-20230401
+    "@opendesign/engine-source": 0.3.0-45382db-20230401
+    "@opendesign/engine-wasm": 0.3.0-45382db-20230401
   dependenciesMeta:
     "@opendesign/engine-darwin-arm64":
       optional: true
@@ -2269,7 +2269,7 @@ __metadata:
       optional: true
     "@opendesign/engine-source":
       optional: true
-  checksum: b748d1c1139706f6f85911c676bb644a96a4626b86c88dc904f4cfa2f98fec597020ec2bc8bd212928efdef52237d1135f6ec699018aba3fd6db2646f33dcb45
+  checksum: 85c38678980fb040fb54ef12db58a9ad01d20804efe3d989ff1a94ba356d7ccd2c371886b888264e5c419ae5b4dcad7dcc25e0c2c09107c5ec82dadbf432eb63
   languageName: node
   linkType: hard
 
@@ -2278,6 +2278,7 @@ __metadata:
   resolution: "@opendesign/env@workspace:packages/opendesign-env"
   dependencies:
     "@types/react": ^18.0.25
+    node-fetch: ^3.3.1
     react: ^18.2.0
   peerDependencies:
     react: ^18.1.0
@@ -2392,7 +2393,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
-    "@opendesign/engine": 0.3.0-2e747c9-20230401
+    "@opendesign/engine": 0.3.0-45382db-20230401
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.1
     "@opendesign/octopus-fig": 3.0.0-rc.30
@@ -2579,6 +2580,13 @@ __metadata:
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
   checksum: e4f86785f4092706e0d3b0edff8dca5a13b45627e4b36700acd8dfe6ad53db71928c8dee914d4276c7fd3b6ccd829aa919811c9eb708a2c8e4c6eb3701178c37
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^16.18.23":
+  version: 16.18.23
+  resolution: "@types/node@npm:16.18.23"
+  checksum: 00e51db28fc7a182747f37215b3f25400b1c7a8525e09fa14e55be5798891a118ebf636a49d3197335a3580fcb8222fd4ecc20c2ccff69f1c0d233fc5697465d
   languageName: node
   linkType: hard
 
@@ -3873,6 +3881,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"data-uri-to-buffer@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "data-uri-to-buffer@npm:4.0.1"
+  checksum: 0d0790b67ffec5302f204c2ccca4494f70b4e2d940fea3d36b09f0bb2b8539c2e86690429eb1f1dc4bcc9e4df0644193073e63d9ee48ac9fce79ec1506e4aa4c
+  languageName: node
+  linkType: hard
+
 "dateformat@npm:^4.5.1":
   version: 4.6.3
   resolution: "dateformat@npm:4.6.3"
@@ -4080,7 +4095,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:packages/docs"
   dependencies:
-    "@opendesign/engine": 0.3.0-2e747c9-20230401
+    "@opendesign/engine": 0.3.0-45382db-20230401
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     typedoc: ^0.23.21
@@ -5138,6 +5153,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
+  version: 3.2.0
+  resolution: "fetch-blob@npm:3.2.0"
+  dependencies:
+    node-domexception: ^1.0.0
+    web-streams-polyfill: ^3.0.3
+  checksum: f19bc28a2a0b9626e69fd7cf3a05798706db7f6c7548da657cbf5026a570945f5eeaedff52007ea35c8bcd3d237c58a20bf1543bc568ab2422411d762dd3d5bf
+  languageName: node
+  linkType: hard
+
 "fflate@npm:^0.7.1, fflate@npm:^0.7.4":
   version: 0.7.4
   resolution: "fflate@npm:0.7.4"
@@ -5245,6 +5270,15 @@ __metadata:
   version: 3.2.7
   resolution: "flatted@npm:3.2.7"
   checksum: 427633049d55bdb80201c68f7eb1cbd533e03eac541f97d3aecab8c5526f12a20ccecaeede08b57503e772c769e7f8680b37e8d482d1e5f8d7e2194687f9ea35
+  languageName: node
+  linkType: hard
+
+"formdata-polyfill@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "formdata-polyfill@npm:4.0.10"
+  dependencies:
+    fetch-blob: ^3.1.2
+  checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
   languageName: node
   linkType: hard
 
@@ -6751,6 +6785,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-domexception@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "node-domexception@npm:1.0.0"
+  checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "node-fetch@npm:3.3.1"
+  dependencies:
+    data-uri-to-buffer: ^4.0.0
+    fetch-blob: ^3.1.4
+    formdata-polyfill: ^4.0.10
+  checksum: 62145fd3ba4770a76110bc31fdc0054ab2f5442b5ce96e9c4b39fc9e94a3d305560eec76e1165d9259eab866e02a8eecf9301062bb5dfc9f08a4d08b69d223dd
+  languageName: node
+  linkType: hard
+
 "node-gyp@npm:latest":
   version: 9.2.0
   resolution: "node-gyp@npm:9.2.0"
@@ -7033,12 +7085,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "opendesign@workspace:packages/opendesign"
   dependencies:
-    "@opendesign/engine": 0.3.0-2e747c9-20230401
-    "@opendesign/engine-wasm": 0.3.0-2e747c9-20230401
+    "@opendesign/engine": 0.3.0-45382db-20230401
+    "@opendesign/engine-wasm": 0.3.0-45382db-20230401
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     "@types/express": ^4.17.17
     "@types/file-saver": ^2.0.5
+    "@types/node": ^16.18.23
     "@types/react": ^18.0.25
     "@types/react-dom": ^18.0.9
     "@vitejs/plugin-react": ^2.2.0
@@ -9015,6 +9068,13 @@ __metadata:
   dependencies:
     defaults: ^1.0.3
   checksum: 814e9d1ddcc9798f7377ffa448a5a3892232b9275ebb30a41b529607691c0491de47cba426e917a4d08ded3ee7e9ba2f3fe32e62ee3cd9c7d3bafb7754bd553c
+  languageName: node
+  linkType: hard
+
+"web-streams-polyfill@npm:^3.0.3":
+  version: 3.2.1
+  resolution: "web-streams-polyfill@npm:3.2.1"
+  checksum: b119c78574b6d65935e35098c2afdcd752b84268e18746606af149e3c424e15621b6f1ff0b42b2676dc012fc4f0d313f964b41a4b5031e525faa03997457da02
   languageName: node
   linkType: hard
 

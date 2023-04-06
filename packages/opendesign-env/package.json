@@ -31,5 +31,8 @@
   },
   "publishConfig": {
     "directory": "_release/package"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.1"
   }
 }

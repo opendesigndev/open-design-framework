@@ -17,14 +17,15 @@
   },
   "bin": "./bin/opendesign.js",
   "dependencies": {
-    "@opendesign/engine-wasm": "0.3.0-2e747c9-20230401"
+    "@opendesign/engine-wasm": "0.3.0-45382db-20230401"
   },
   "devDependencies": {
-    "@opendesign/engine": "0.3.0-2e747c9-20230401",
+    "@opendesign/engine": "0.3.0-45382db-20230401",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "@types/express": "^4.17.17",
     "@types/file-saver": "^2.0.5",
+    "@types/node": "^16.18.23",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "@vitejs/plugin-react": "^2.2.0",
@@ -44,8 +45,8 @@
     "vite": "^3.2.4"
   },
   "files": [
-    "dist",
-    "!/dist/**/*.wasm",
-    "cli-dist"
+    "dist/cli",
+    "dist/editor",
+    "!/dist/**/*.wasm"
   ]
 }

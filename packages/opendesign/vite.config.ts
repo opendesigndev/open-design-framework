@@ -36,6 +36,9 @@ export default defineConfig({
     // updating engine works without having to pass --force to vite.
     force: true,
   },
+  build: {
+    outDir: "dist/editor",
+  },
   resolve: { alias },
   server: {
     fs: {

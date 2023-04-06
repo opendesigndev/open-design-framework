@@ -1,6 +1,6 @@
+import { crypto } from "@opendesign/env";
 import * as fflate from "fflate";
 
-import { generateUUID } from "../internals.js";
 import type { DetachedPromiseControls } from "../utils.js";
 import { detachPromiseControls } from "../utils.js";
 import { headerContent, headerFile } from "./detect.js";
@@ -60,7 +60,7 @@ export class MemoryFileExporter {
         throw new Error("Octopus file must contain correct message");
       return name;
     }
-    const fullPath = typeof name === "string" ? name : generateUUID();
+    const fullPath = typeof name === "string" ? name : crypto.randomUUID();
 
     if (typeof body === "string") {
       const data = fflate.strToU8(body);

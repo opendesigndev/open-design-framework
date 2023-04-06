@@ -1,4 +1,5 @@
 import type { ComponentHandle, ComponentMetadata } from "@opendesign/engine";
+import { crypto } from "@opendesign/env";
 import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { EditorImplementation } from "../editor.js";
@@ -8,7 +9,7 @@ import {
   createStringRef,
   readStringRef,
 } from "../engine/memory.js";
-import { generateUUID, todo } from "../internals.js";
+import { todo } from "../internals.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import type { LayerNode } from "./layer.js";
 import { LayerNodeImpl } from "./layer.js";
@@ -132,7 +133,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 
   constructor(
     engine: Engine,
-    id: string = generateUUID(),
+    id: string = crypto.randomUUID(),
     octopus?: string,
     editor?: EditorImplementation,
   ) {
@@ -140,7 +141,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     this.#engine = engine;
     this.#editor = editor;
     if (!octopus) {
-      this.__rootLayerId = generateUUID();
+      this.__rootLayerId = crypto.randomUUID();
       this.dimensions = { width: 1920, height: 1080 };
       octopus = createEmptyArtboard(id, this.dimensions, this.__rootLayerId);
     } else {
@@ -201,7 +202,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     }
     // TODO: use ODE API to check for duplication when it's available
     if (this.#layersIds.has(data.id)) {
-      data.id = generateUUID();
+      data.id = crypto.randomUUID();
       this.#layersIds.add(data.id);
     }
 
@@ -345,7 +346,7 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
 function createEmptyArtboard(
   id: string,
   dimensions: { width: number; height: number },
-  rootLayerId: string = generateUUID(),
+  rootLayerId: string = crypto.randomUUID(),
 ) {
   return JSON.stringify({
     version: "3.0.0-odf",
