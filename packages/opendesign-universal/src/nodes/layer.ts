@@ -221,30 +221,29 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   setWidth(width: number): boolean {
     return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
       const metrix = this.readMetrics();
-      const widthRatio = width / metrix.graphicalBounds[1][0];
-      const transform = [...metrix.transformation];
-      // const scaleWidth = width / transform[0];
+      const currentTransformation = [
+        ...this.readMetrics().transformation,
+      ] satisfies Scalar_array_6;
+      const currentX = currentTransformation[4];
+      const layerWidth =
+        metrix.transformedGraphicalBounds[1][0] -
+        metrix.transformedGraphicalBounds[0][0];
+      const widthRatio = width / layerWidth;
+      const shiftedX = currentX * widthRatio;
+      const differenceX = currentX - shiftedX;
+      const transform = currentTransformation;
       transform[0] = widthRatio;
+      transform[4] = differenceX;
+      transform[5] = 0;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      this.#engine.ode.component_modifyLayer(
+      this.#engine.ode.component_transformLayer(
         this.#component,
         id,
-        transformationString,
-        parseError,
+        "PARENT_COMPONENT",
+        {
+          matrix: transform,
+        },
       );
       this.#engine.redraw();
       return true;
@@ -253,29 +252,18 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   setHeight(height: number): boolean {
     return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
       const metrix = this.readMetrics();
       const heightRatio = height / metrix.graphicalBounds[1][1];
-      const transform = [...metrix.transformation];
+      const transform = [1, 0, 0, 1, 0, 0] satisfies Scalar_array_6;
       transform[3] = heightRatio;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      this.#engine.ode.component_modifyLayer(
+      this.#engine.ode.component_transformLayer(
         this.#component,
         id,
-        transformationString,
-        parseError,
+        "PARENT_COMPONENT",
+        {
+          matrix: transform,
+        },
       );
       this.#engine.redraw();
       return true;
@@ -284,28 +272,17 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   setSize(width: number, height: number): boolean {
     return automaticScope((scope) => {
-      const parseError = this.#engine.ode.ParseError(scope);
-      const transform = [...this.readMetrics().transformation];
+      const transform = [1, 0, 0, 1, 0, 0] satisfies Scalar_array_6;
       transform[0] = width;
       transform[3] = height;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      const transformOctopus = {
-        subject: "LAYER",
-        op: "PROPERTY_CHANGE",
-        values: {
-          transform,
-        },
-      };
-      const transformationString = createStringRef(
-        this.#engine.ode,
-        scope,
-        JSON.stringify(transformOctopus),
-      );
-      this.#engine.ode.component_modifyLayer(
+      this.#engine.ode.component_transformLayer(
         this.#component,
         id,
-        transformationString,
-        parseError,
+        "PARENT_COMPONENT",
+        {
+          matrix: transform,
+        },
       );
       this.#engine.redraw();
       return true;

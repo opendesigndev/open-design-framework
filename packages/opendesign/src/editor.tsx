@@ -367,6 +367,13 @@ function Content({
 
 function LayerOutline({ layer }: { layer: LayerNode }) {
   console.log(layer.readMetrics().graphicalBounds);
+  const { graphicalBounds } = layer.readMetrics();
+  const initialWidth =
+    (graphicalBounds[1][0] - graphicalBounds[0][0]) *
+    (1 / window.devicePixelRatio);
+  const initialHeight =
+    (graphicalBounds[1][1] - graphicalBounds[0][1]) *
+    (1 / window.devicePixelRatio);
 
   const changeWidthHandler = useCallback(
     ({ width }: { width?: number }) => {
@@ -403,7 +410,9 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
     <RelativeMarker node={layer}>
       <ResizeContainer
         onResize={changeDimensionsHandler}
-        onResizeEnd={onResizeEnd}
+        // onResizeEnd={onResizeEnd}
+        initialHeight={initialHeight}
+        initialWidth={initialWidth}
         style={{
           border: "none",
         }}
