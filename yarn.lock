@@ -2225,17 +2225,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendesign/engine-darwin-arm64@npm:0.3.0-45382db-20230401":
-  version: 0.3.0-45382db-20230401
-  resolution: "@opendesign/engine-darwin-arm64@npm:0.3.0-45382db-20230401"
+"@opendesign/engine-darwin-arm64@npm:0.3.1-02dfd1c-20230413":
+  version: 0.3.1-02dfd1c-20230413
+  resolution: "@opendesign/engine-darwin-arm64@npm:0.3.1-02dfd1c-20230413"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@opendesign/engine-darwin-x64@npm:0.3.0-45382db-20230401":
-  version: 0.3.0-45382db-20230401
-  resolution: "@opendesign/engine-darwin-x64@npm:0.3.0-45382db-20230401"
+"@opendesign/engine-darwin-x64@npm:0.3.1-02dfd1c-20230413":
+  version: 0.3.1-02dfd1c-20230413
+  resolution: "@opendesign/engine-darwin-x64@npm:0.3.1-02dfd1c-20230413"
   conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@opendesign/engine-linux-x64@npm:0.3.1-02dfd1c-20230413":
+  version: 0.3.1-02dfd1c-20230413
+  resolution: "@opendesign/engine-linux-x64@npm:0.3.1-02dfd1c-20230413"
+  conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
@@ -2245,31 +2252,34 @@ __metadata:
   languageName: node
   linkType: soft
 
-"@opendesign/engine-wasm@npm:0.3.0-45382db-20230401":
-  version: 0.3.0-45382db-20230401
-  resolution: "@opendesign/engine-wasm@npm:0.3.0-45382db-20230401"
+"@opendesign/engine-wasm@npm:0.3.1-02dfd1c-20230413":
+  version: 0.3.1-02dfd1c-20230413
+  resolution: "@opendesign/engine-wasm@npm:0.3.1-02dfd1c-20230413"
   dependencies:
     "@emnapi/runtime": ^0.32.2
-  checksum: 21c601f32f2a29936d34a8fffae47c43ed0064c3f092830d22d76eb6363bb6abcc15ea2139f22038b823c9a86dfa8acc71a6f96d72ba477d70e57129cb5297db
+  checksum: 1cd336db3ae4e792be826a94173df1bbbce57ac8356501e03ee3372b7f087ca62dea64b9e26d1ca45010b8b4bdd92b915e3c85909f2b39968d8a42402fda8ed4
   languageName: node
   linkType: hard
 
-"@opendesign/engine@npm:0.3.0-45382db-20230401":
-  version: 0.3.0-45382db-20230401
-  resolution: "@opendesign/engine@npm:0.3.0-45382db-20230401"
+"@opendesign/engine@npm:0.3.1-02dfd1c-20230413":
+  version: 0.3.1-02dfd1c-20230413
+  resolution: "@opendesign/engine@npm:0.3.1-02dfd1c-20230413"
   dependencies:
-    "@opendesign/engine-darwin-arm64": 0.3.0-45382db-20230401
-    "@opendesign/engine-darwin-x64": 0.3.0-45382db-20230401
-    "@opendesign/engine-source": 0.3.0-45382db-20230401
-    "@opendesign/engine-wasm": 0.3.0-45382db-20230401
+    "@opendesign/engine-darwin-arm64": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine-darwin-x64": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine-linux-x64": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine-source": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine-wasm": 0.3.1-02dfd1c-20230413
   dependenciesMeta:
     "@opendesign/engine-darwin-arm64":
       optional: true
     "@opendesign/engine-darwin-x64":
       optional: true
+    "@opendesign/engine-linux-x64":
+      optional: true
     "@opendesign/engine-source":
       optional: true
-  checksum: 85c38678980fb040fb54ef12db58a9ad01d20804efe3d989ff1a94ba356d7ccd2c371886b888264e5c419ae5b4dcad7dcc25e0c2c09107c5ec82dadbf432eb63
+  checksum: 762ddaf1ba4eca933304acc93802f87d72a91906f3732f3c342b1496f86ebe90bd6b825a096c590303d6482e2c6cc67b1d2444baf3db07cc2bbe4b412e67fd33
   languageName: node
   linkType: hard
 
@@ -2393,7 +2403,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@opendesign/universal@workspace:packages/opendesign-universal"
   dependencies:
-    "@opendesign/engine": 0.3.0-45382db-20230401
+    "@opendesign/engine": 0.3.1-02dfd1c-20230413
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.1
     "@opendesign/octopus-fig": 3.0.0-rc.30
@@ -4095,7 +4105,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:packages/docs"
   dependencies:
-    "@opendesign/engine": 0.3.0-45382db-20230401
+    "@opendesign/engine": 0.3.1-02dfd1c-20230413
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     typedoc: ^0.23.21
@@ -7085,8 +7095,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "opendesign@workspace:packages/opendesign"
   dependencies:
-    "@opendesign/engine": 0.3.0-45382db-20230401
-    "@opendesign/engine-wasm": 0.3.0-45382db-20230401
+    "@opendesign/engine": 0.3.1-02dfd1c-20230413
+    "@opendesign/engine-wasm": 0.3.1-02dfd1c-20230413
     "@opendesign/react": "workspace:*"
     "@opendesign/universal": "workspace:*"
     "@types/express": ^4.17.17

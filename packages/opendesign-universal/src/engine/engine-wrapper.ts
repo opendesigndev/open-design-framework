@@ -23,6 +23,7 @@ const destroyers = mkDestroyers({
   component_listLayers: "destroyLayerList",
   makeString: "destroyString",
   makeMemoryBuffer: "destroyMemoryBuffer",
+  design_listComponents: "destroyComponentList",
 });
 function mkDestroyers<
   T extends Pick<
