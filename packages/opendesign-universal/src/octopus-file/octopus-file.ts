@@ -10,5 +10,8 @@ export type OctopusFile = {
   readText(filename: string): Promise<string>;
   readBinary(filename: string): Promise<Uint8Array>;
 
+  writeBinary(filename: string, data: Uint8Array): Promise<void>;
+  serialize(): Promise<Uint8Array>;
+
   readonly manifest: OctopusManifest;
 };

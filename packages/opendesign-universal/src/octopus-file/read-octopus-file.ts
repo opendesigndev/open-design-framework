@@ -2,9 +2,11 @@ import type { Octopus } from "@opendesign/octopus-ts";
 import * as fflate from "fflate";
 
 import { isOptimizedOctopusFile } from "./detect.js";
+import { MemoryFileExporter } from "./memory-file-exporter.js";
 import type { OctopusFile, OctopusManifest } from "./octopus-file.js";
 import { mergeUint8Arrays } from "./octopus-file-utils.js";
 
+type FileInMap = UnzipFile | Uint8Array;
 class InMemoryOctopusFile implements OctopusFile {
   #files;
   #manifest: OctopusManifest;
@@ -49,6 +51,21 @@ class InMemoryOctopusFile implements OctopusFile {
     return fflate.strFromU8(binary);
   }
 
+  async writeBinary(filename: string, data: Uint8Array): Promise<void> {
+    this.#files.set(filename, data);
+  }
+
+  async serialize(): Promise<Uint8Array> {
+    const exporter = new MemoryFileExporter();
+    await exporter.exportManifest({ manifest: this.#manifest });
+    for (const [filename, file] of this.#files) {
+      if (filename === "Octopus") continue;
+      exporter.save(filename, readFile(file));
+    }
+    exporter.finalizeExport();
+    return exporter.completed();
+  }
+
   get manifest(): OctopusManifest {
     return this.#manifest;
   }
@@ -65,7 +82,7 @@ type UnzipFile = fflate.UnzipFile & {
 };
 
 function readZipFiles(file: Uint8Array) {
-  const files = new Map<string, fflate.UnzipFile>();
+  const files = new Map<string, FileInMap>();
   const unzipper = new fflate.Unzip((file) => {
     files.set(file.name, file);
   });

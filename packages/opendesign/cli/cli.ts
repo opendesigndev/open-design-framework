@@ -32,7 +32,7 @@ if (cmd in commands) {
   const filteredArgs = args.filter((_, i) => i !== index);
   const mod = await commands[cmd]();
   try {
-    mod.execute(filteredArgs);
+    await mod.execute(filteredArgs);
   } catch (e) {
     if (isExpectedError(e)) {
       console.error(chalk.red(e.message));

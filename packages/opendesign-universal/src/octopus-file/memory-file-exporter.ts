@@ -10,8 +10,18 @@ import { mergeUint8Arrays } from "./octopus-file-utils.js";
 type ArtboardConversionResult = any;
 type DesignConversionResult = any;
 type SourceArtboard = unknown;
+interface IExporter {
+  getBasePath(): Promise<string>;
+  finalizeExport(): void;
+  exportArtboard(
+    _: SourceArtboard,
+    artboard: ArtboardConversionResult,
+  ): Promise<string | null>;
+  exportImage(name: string, data: Uint8Array): Promise<string>;
+  exportManifest(manifest: DesignConversionResult): Promise<string>;
+}
 
-export class MemoryFileExporter {
+export class MemoryFileExporter implements IExporter {
   private _zip: fflate.Zip;
   private _chunks: Uint8Array[] = [];
   private _completed: DetachedPromiseControls<Uint8Array>;
@@ -54,7 +64,7 @@ export class MemoryFileExporter {
     return JSON.stringify(value, null, "  ");
   }
 
-  private async _save(name: string | null, body: string | Uint8Array) {
+  async save(name: string | null, body: string | Uint8Array) {
     if (name === headerFile) {
       if (body !== headerContent)
         throw new Error("Octopus file must contain correct message");
@@ -94,21 +104,21 @@ export class MemoryFileExporter {
     artboard: ArtboardConversionResult,
   ): Promise<string | null> {
     if (!artboard.value) return Promise.resolve(null);
-    return this._save(
+    return this.save(
       `octopus-${artboard.id}.json`,
       this._stringify(artboard.value),
     );
   }
 
   exportImage(name: string, data: Uint8Array): Promise<string> {
-    return this._save(
+    return this.save(
       MemoryFileExporter.IMAGES_DIR_NAME + "/" + name.split("/").slice(-1)[0],
       data,
     );
   }
 
   async exportManifest(manifest: DesignConversionResult): Promise<string> {
-    return this._save(
+    return this.save(
       MemoryFileExporter.OCTOPUS_MANIFEST_NAME,
       this._stringify(manifest.manifest),
     );
