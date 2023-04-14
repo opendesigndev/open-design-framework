@@ -20,8 +20,11 @@ export type { BaseNode, Node, NodeFilter } from "./src/nodes/node.js";
 export type { PageNode } from "./src/nodes/page.js";
 export { isOptimizedOctopusFile } from "./src/octopus-file/detect.js";
 export { importFile } from "./src/octopus-file/importer.js";
-export type { Manifest } from "./src/octopus-file/load-file.js";
-export { readManifest } from "./src/octopus-file/load-file.js";
+export type {
+  OctopusFile,
+  OctopusManifest,
+} from "./src/octopus-file/octopus-file.js";
+export { readOctopusFile } from "./src/octopus-file/read-octopus-file.js";
 export type { ImportedClipboardData } from "./src/paste/import-from-clipboard-data.js";
 export { importFromClipboardData } from "./src/paste/import-from-clipboard-data.js";
 /**
