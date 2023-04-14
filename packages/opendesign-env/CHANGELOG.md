@@ -1,5 +1,15 @@
 # @opendesign/env
 
+## 0.2.0
+
+### Minor Changes
+
+- 42e03b0: proper node.js support
+
+  - **breaking** remove `warn` and `performanceNow` functions (they are not needed)
+  - add WebCrypto export
+  - export node-fetch as fetch in nodejs
+
 ## 0.1.1
 
 ### Patch Changes

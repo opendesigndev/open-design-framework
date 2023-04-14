@@ -1,5 +1,20 @@
 # @opendesign/react
 
+## 0.6.0
+
+### Minor Changes
+
+- e5082ca: Added transform layer methods and key/pointer handlers for react
+
+### Patch Changes
+
+- Updated dependencies [c2e71f1]
+- Updated dependencies [42e03b0]
+- Updated dependencies [38f84a4]
+- Updated dependencies [8737829]
+- Updated dependencies [e5082ca]
+  - @opendesign/universal@0.6.0
+
 ## 0.5.1
 
 ### Patch Changes
