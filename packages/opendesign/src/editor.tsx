@@ -11,12 +11,12 @@ import type {
   Editor,
   ImportedClipboardData,
   LayerNode,
-  Manifest,
+  OctopusManifest,
 } from "@opendesign/universal";
 import {
   importFile,
   isOptimizedOctopusFile,
-  readManifest,
+  readOctopusFile,
 } from "@opendesign/universal";
 import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
@@ -36,7 +36,12 @@ export async function convert(file: Blob) {
 export function EditorComponent({ file }: { file?: Uint8Array }) {
   const [data, setData] = useState<
     | null
-    | { type: "file"; fileKey: number; data: Uint8Array; manifest: Manifest }
+    | {
+        type: "file";
+        fileKey: number;
+        data: Uint8Array;
+        manifest: OctopusManifest;
+      }
     | { type: "paste"; data: ImportedClipboardData }
   >(
     file
@@ -44,7 +49,7 @@ export function EditorComponent({ file }: { file?: Uint8Array }) {
           type: "file",
           fileKey: 0,
           data: file,
-          manifest: readManifest(file),
+          manifest: readOctopusFile(file).manifest,
         })
       : null,
   );
@@ -58,7 +63,7 @@ export function EditorComponent({ file }: { file?: Uint8Array }) {
             type: "file",
             fileKey: (prev && prev.type === "file" ? prev.fileKey : 0) + 1,
             data,
-            manifest: readManifest(data),
+            manifest: readOctopusFile(data).manifest,
           })),
         )
         .catch((err) => {
@@ -98,7 +103,7 @@ export function EditorComponent({ file }: { file?: Uint8Array }) {
     (!id || !data.manifest.components.some((c) => c.id === id))
   ) {
     console.log(data.manifest.components.map((c) => c.id));
-    const components = new Map<string, Manifest["components"][0]>();
+    const components = new Map<string, OctopusManifest["components"][0]>();
     for (const c of data.manifest.components) components.set(c.id, c);
     return (
       <form
@@ -181,11 +186,11 @@ function ComponentSelect({
   value,
   onChange,
 }: {
-  manifest: Manifest;
+  manifest: OctopusManifest;
   value?: string;
   onChange?: (evt: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
-  const components = new Map<string, Manifest["components"][0]>();
+  const components = new Map<string, OctopusManifest["components"][0]>();
   for (const c of manifest.components) components.set(c.id, c);
   return (
     <select name="component" className="p-4" onChange={onChange} value={value}>

@@ -259,7 +259,7 @@ export class EditorImplementation implements Editor {
             data = options.design;
           }
           this[engineSymbol] = engine;
-          const loaded = loadFile(
+          const loaded = await loadFile(
             data,
             engine,
             this,
