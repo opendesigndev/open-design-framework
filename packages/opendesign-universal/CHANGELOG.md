@@ -1,5 +1,20 @@
 # @opendesign/universal
 
+## 0.6.0
+
+### Minor Changes
+
+- 38f84a4: Give more control over engine loading
+- e5082ca: Added transform layer methods and key/pointer handlers for react
+
+### Patch Changes
+
+- c2e71f1: Update Engine version
+- 42e03b0: Fix usages of browser-only APIs in nodejs context
+- 8737829: Update engine to a version which has linux build
+- Updated dependencies [42e03b0]
+  - @opendesign/env@0.2.0
+
 ## 0.5.1
 
 ### Patch Changes
