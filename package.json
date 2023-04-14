@@ -14,7 +14,9 @@
     "eslint": "eslint --cache",
     "foreachpublic": "yarn workspaces foreach --no-private --from '@opendesign/*'",
     "prepare-release": "tsc -b tsconfig-published.json && yarn foreachpublic exec \"rm -rf _release && yarn pack && mkdir _release && tar zxvf package.tgz --directory _release && rm package.tgz\"",
-    "release": "yarn prepare-release && changeset publish"
+    "release": "yarn prepare-release && changeset publish",
+    "test": "node --loader @esbuild-kit/esm-loader --test",
+    "test:all": "yarn test packages/**/*.spec.ts"
   },
   "devDependencies": {
     "eslint": "^8.28.0",
@@ -29,7 +31,8 @@
     "corepack": ">=0.12.0"
   },
   "dependencies": {
-    "@changesets/cli": "^2.25.2"
+    "@changesets/cli": "^2.25.2",
+    "@esbuild-kit/esm-loader": "^2.5.5"
   },
   "resolutions": {
     "@opendesign/engine-source": "link:./node_modules/.cache/null"

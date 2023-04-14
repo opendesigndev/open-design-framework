@@ -6,15 +6,28 @@ import { isExpectedError } from "./utils.js";
 
 const args = process.argv.slice(2);
 
-const commands = {
+const commands: {
+  [key: string]: () => Promise<{
+    execute(args: string[]): Promise<any> | void;
+    help?(): void;
+  }>;
+} = {
   open: () => import("./open.js"),
-  pack: () => import("./pack.js"),
-} as const;
+  convert: () => import("./convert.js"),
+};
+
+if (process.env.NODE_ENV !== "production") {
+  // Work in progress commands which are not enabled yet in build published to npm
+  Object.assign(commands, {
+    pack: () => import("./pack.js"),
+    "embed-fonts": () => import("./embed-fonts.js"),
+  });
+}
 
 // This makes sure that `opendesign -v cmd` is the same as `opendesign cmd -v`
 const looselyParsed = parseArgs({ args, strict: false });
 const cmd = looselyParsed.positionals[0];
-if (isValidCommand(cmd)) {
+if (cmd in commands) {
   const index = args.indexOf(cmd);
   const filteredArgs = args.filter((_, i) => i !== index);
   const mod = await commands[cmd]();
@@ -35,7 +48,7 @@ if (isValidCommand(cmd)) {
     throw new Error("Too many arguments");
   } else if (parsed.positionals.length <= 1) {
     printBasicHelp();
-  } else if (isValidCommand(cmd)) {
+  } else if (cmd in commands) {
     const mod = await commands[cmd]();
     const help =
       "help" in mod && typeof mod.help === "function" ? mod.help : null;
@@ -58,10 +71,6 @@ if (isValidCommand(cmd)) {
 } else if (cmd) {
   console.error("Unkown subcommand", cmd);
   process.exitCode = 1;
-}
-
-function isValidCommand(v: string): v is keyof typeof commands {
-  return v in commands;
 }
 
 function printBasicHelp() {

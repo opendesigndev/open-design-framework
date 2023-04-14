@@ -48,12 +48,11 @@ export function execute(args: string[]) {
 }
 
 export function help() {
+  console.log("Usage: opendesign open <path to design file>\n");
   console.log(
     reflow(
-      `opendesign open <path to design file>
-
-Opens file in Open Design Editor in your default browser. If the file is in a format
-other than .octopus, it'll get converted to octopus automatically.`,
+      `Opens file in Open Design Editor in your default browser. If the file is
+in a format other than .octopus, it'll get converted to octopus automatically.`,
     ),
   );
 }
