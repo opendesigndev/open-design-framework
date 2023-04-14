@@ -8,7 +8,14 @@ await esbuild.build({
   platform: "node",
   splitting: true,
   format: "esm",
-  external: [...builtin, "@opendesign/engine-wasm"],
+  minify: true,
+  define: { "process.env.NODE_ENV": '"production"' },
+  external: [
+    ...builtin,
+    "@opendesign/engine-wasm",
+    // jsdom is not a true external, but should not be needed
+    "jsdom",
+  ],
   banner: {
     js: `const require = (await import('module')).createRequire(import.meta.url);`,
   },

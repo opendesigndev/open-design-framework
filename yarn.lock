@@ -7341,6 +7341,7 @@ __metadata:
   resolution: "open-design-framework@workspace:."
   dependencies:
     "@changesets/cli": ^2.25.2
+    "@esbuild-kit/esm-loader": ^2.5.5
     eslint: ^8.28.0
     eslint-config-prettier: ^8.5.0
     eslint-config-react-app: ^7.0.1

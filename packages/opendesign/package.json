@@ -10,9 +10,7 @@
   },
   "scripts": {
     "dev:frontend": "vite",
-    "dev:cli": "node --watch --loader @esbuild-kit/esm-loader cli/cli.ts",
-    "test:cli": "node --loader @esbuild-kit/esm-loader --test",
-    "test": "yarn test:cli cli/*.spec.ts",
+    "dev:cli": "node --no-warnings=ExperimentalWarning --watch --loader @esbuild-kit/esm-loader cli/cli.ts",
     "build:frontend": "vite build",
     "build:cli": "node bundle-cli.js",
     "build": "yarn build:cli && yarn build:frontend",

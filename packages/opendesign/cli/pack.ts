@@ -5,7 +5,12 @@ export function execute(args: readonly string[]) {
 }
 
 export function help() {
-  console.log(
-    "opendesign pack --manifest path/to/manifest.json --output path/to/file.octopus",
-  );
+  console.log(`Usage: opendesign pack [options]
+
+Options:
+  -m, --manifest  Path to manifest file
+  -o, --output    Path to output file
+
+Packs a design specified by a manifest into a .octopus file.
+  `);
 }
