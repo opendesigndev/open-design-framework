@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
 import { simpleCli } from "./simple-cli.js";
@@ -48,8 +48,8 @@ describe("simple-cli", () => {
 
   it("should print help", async () => {
     await run(["help"]);
-    assert.strictEqual(error, "");
-    assert.strictEqual(
+    assert.equal(error, "");
+    assert.equal(
       log,
       "OpenDesign CLI. Available subcomands:\n  - help\n  - blah\n\nYou can also run opendesign help <subcommand> to see more info about it.\n",
     );
@@ -60,21 +60,21 @@ describe("simple-cli", () => {
     ...rest
   ]: readonly string[][]) {
     await run(args1);
-    assert.strictEqual(error, "");
+    assert.equal(error, "");
     const log1 = log;
     log = "";
     for (const args2 of rest) {
       await run(args2);
-      assert.strictEqual(error, "");
-      assert.strictEqual(log, log1);
+      assert.equal(error, "");
+      assert.equal(log, log1);
       log = "";
     }
   }
 
   it("basic help", async () => {
     await shouldOutputSameThingAndNoError([["help"], ["--help"], ["-h"], []]);
-    assert.strictEqual(blahHelp, 0);
-    assert.strictEqual(blahExecute, 0);
+    assert.equal(blahHelp, 0);
+    assert.equal(blahExecute, 0);
   });
   it("subcommand help", async () => {
     await shouldOutputSameThingAndNoError([
@@ -83,26 +83,26 @@ describe("simple-cli", () => {
       ["--help", "blah"],
       ["blah", "-h"],
     ]);
-    assert.strictEqual(blahHelp, 4);
-    assert.strictEqual(blahExecute, 0);
+    assert.equal(blahHelp, 4);
+    assert.equal(blahExecute, 0);
   });
 
   it("execute", async () => {
     await run(["blah"]);
-    assert.strictEqual(error, "");
-    assert.strictEqual(log, "blah execute\n\n");
+    assert.equal(error, "");
+    assert.equal(log, "blah execute\n\n");
   });
 
   it("execute with args", async () => {
     await run(["blah", "--abc"]);
-    assert.strictEqual(error, "");
-    assert.strictEqual(log, "blah execute\n--abc\n");
+    assert.equal(error, "");
+    assert.equal(log, "blah execute\n--abc\n");
   });
 
   it("execute with preceding option", async () => {
     await run(["-v", "blah"]);
-    assert.strictEqual(error, "");
-    assert.strictEqual(log, "blah execute\n-v\n");
+    assert.equal(error, "");
+    assert.equal(log, "blah execute\n-v\n");
   });
 
   // missing tests:
