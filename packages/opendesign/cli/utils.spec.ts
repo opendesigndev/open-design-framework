@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "node:assert/strict";
 import * as test from "node:test";
 
 import { reflow } from "./utils.js";
@@ -48,11 +48,11 @@ test.describe("flow", () => {
     "lorem ipsum verylongwordthing sit amet", //    39
   ];
   for (let i = 0; i < 40; i++) {
-    assert.strictEqual(reflow(input, i), testcases[i]);
+    assert.equal(reflow(input, i), testcases[i]);
   }
-  assert.strictEqual(reflow("have b bacon", 6), "have b\nbacon");
-  assert.strictEqual(reflow("have a bacon", 6), "have\na bacon");
-  assert.strictEqual(
+  assert.equal(reflow("have b bacon", 6), "have b\nbacon");
+  assert.equal(reflow("have a bacon", 6), "have\na bacon");
+  assert.equal(
     reflow("have an egg and a sandwich", 7),
     "have\nan egg\nand\na sandwich",
   );
