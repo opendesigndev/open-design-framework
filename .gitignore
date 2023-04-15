@@ -45,3 +45,8 @@ node_modules
 
 # opendesign cli
 /packages/opendesign/designs
+
+# usefull for working on the project
+tmp
+*.octopus
+*.zip
