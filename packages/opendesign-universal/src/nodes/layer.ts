@@ -253,9 +253,20 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
   setHeight(height: number): boolean {
     return automaticScope((scope) => {
       const metrix = this.readMetrics();
-      const heightRatio = height / metrix.graphicalBounds[1][1];
-      const transform = [1, 0, 0, 1, 0, 0] satisfies Scalar_array_6;
+      const currentTransformation = [
+        ...metrix.transformation,
+      ] satisfies Scalar_array_6;
+      const currentY = currentTransformation[5];
+      const layerHeight =
+        metrix.transformedGraphicalBounds[1][1] -
+        metrix.transformedGraphicalBounds[0][1];
+      const heightRatio = height / layerHeight;
+      const shiftedY = currentY * heightRatio;
+      const differenceY = currentY - shiftedY;
+      const transform = currentTransformation;
       transform[3] = heightRatio;
+      transform[4] = 0;
+      transform[5] = differenceY;
       const id = createStringRef(this.#engine.ode, scope, this.id);
       this.#engine.ode.component_transformLayer(
         this.#component,
@@ -272,9 +283,29 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
 
   setSize(width: number, height: number): boolean {
     return automaticScope((scope) => {
-      const transform = [1, 0, 0, 1, 0, 0] satisfies Scalar_array_6;
-      transform[0] = width;
-      transform[3] = height;
+      const metrix = this.readMetrics();
+      const currentTransformation = [
+        ...metrix.transformation,
+      ] satisfies Scalar_array_6;
+      const currentX = currentTransformation[4];
+      const currentY = currentTransformation[5];
+      const layerWidth =
+        metrix.transformedGraphicalBounds[1][0] -
+        metrix.transformedGraphicalBounds[0][0];
+      const layerHeight =
+        metrix.transformedGraphicalBounds[1][1] -
+        metrix.transformedGraphicalBounds[0][1];
+      const widthRatio = width / layerWidth;
+      const heightRatio = height / layerHeight;
+      const shiftedX = currentX * widthRatio;
+      const shiftedY = currentY * heightRatio;
+      const differenceX = currentX - shiftedX;
+      const differenceY = currentY - shiftedY;
+      const transform = currentTransformation;
+      transform[0] = widthRatio;
+      transform[3] = heightRatio;
+      transform[4] = differenceX;
+      transform[5] = differenceY;
       const id = createStringRef(this.#engine.ode, scope, this.id);
       this.#engine.ode.component_transformLayer(
         this.#component,

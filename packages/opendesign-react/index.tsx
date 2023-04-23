@@ -380,5 +380,8 @@ function getDelta(event: KeyboardEvent, delta: number): number {
   return delta;
 }
 
+export { LayerMask } from "./src/layer-mask/LayerMask.js";
+export { LayerMaskWrapper } from "./src/layer-mask/LayerMaskWrapper.js";
+export { useResizable } from "./src/layer-mask/use-resize.js";
 export { type PasteEvent, usePaste } from "./src/paste.js";
 export { useLayerList } from "./src/use-layer-list.js";

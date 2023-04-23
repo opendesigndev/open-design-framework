@@ -6,7 +6,7 @@ import {
 } from "@mir4a/resize-container-react";
 import type { PasteEvent } from "@opendesign/react";
 import { RelativeMarker } from "@opendesign/react";
-import { useLayerList } from "@opendesign/react";
+import { LayerMaskWrapper, useLayerList } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
@@ -25,8 +25,9 @@ import {
   readOctopusFile,
 } from "@opendesign/universal";
 import saveAs from "file-saver";
-import type { PropsWithChildren, Ref } from "react";
+import type { PropsWithChildren } from "react";
 import { useRef } from "react";
+import { Ref, useEffect } from "react";
 import { useCallback } from "react";
 import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -375,42 +376,27 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
     (graphicalBounds[1][1] - graphicalBounds[0][1]) *
     (1 / window.devicePixelRatio);
 
-  const changeWidthHandler = useCallback(
-    ({ width }: { width?: number }) => {
-      width && layer.setWidth(width);
-    },
-    [layer],
-  );
-
-  const changeHeightHandler = useCallback(
-    ({ height }: { height?: number }) => {
-      height && layer.setHeight(height);
-    },
-    [layer],
-  );
-
   const changeDimensionsHandler = useCallback(
     ({ width, height }: { width?: number; height?: number }) => {
       console.log(width, height);
-      width && layer.setWidth(width);
-      height && layer.setHeight(height);
+      if (width && !height) {
+        console.log("setting width, ", width);
+        layer.setWidth(width);
+      } else if (height && !width) {
+        console.log("setting height, ", height);
+        layer.setHeight(height);
+      } else if (width && height) {
+        console.log("setting both, ", width, height);
+        layer.setSize(width, height);
+      }
     },
     [layer],
   );
-
-  const onResizeEnd = useCallback((_: any, ref: Ref<HTMLDivElement>) => {
-    if (ref?.current) {
-      ref.current.style.width = "";
-      ref.current.style.height = "";
-    }
-    console.log("resize end");
-  }, []);
 
   return (
     <RelativeMarker node={layer}>
       <ResizeContainer
         onResize={changeDimensionsHandler}
-        // onResizeEnd={onResizeEnd}
         initialHeight={initialHeight}
         initialWidth={initialWidth}
         style={{
@@ -422,6 +408,33 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
         <ResizeHeightHandle />
         <ResizeBothHandle />
       </ResizeContainer>
+    </RelativeMarker>
+  );
+}
+
+function LayerOutlineNew({ layer }: { layer: LayerNode }) {
+  console.log(layer.readMetrics().graphicalBounds);
+  const { graphicalBounds } = layer.readMetrics();
+  const initialWidth =
+    (graphicalBounds[1][0] - graphicalBounds[0][0]) *
+    (1 / window.devicePixelRatio);
+  const initialHeight =
+    (graphicalBounds[1][1] - graphicalBounds[0][1]) *
+    (1 / window.devicePixelRatio);
+
+  const changeDimensionsHandler = useCallback(
+    (width, height) => {
+      console.log("width, height", width, height);
+      // width && layer.setWidth(width);
+      // height && layer.setHeight(height);
+      layer.setSize(width, height);
+    },
+    [layer],
+  );
+
+  return (
+    <RelativeMarker node={layer}>
+      <LayerMaskWrapper onResize={changeDimensionsHandler} />
     </RelativeMarker>
   );
 }
