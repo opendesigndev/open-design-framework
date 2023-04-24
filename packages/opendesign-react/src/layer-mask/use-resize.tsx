@@ -5,7 +5,7 @@ import { LayerMaskContext } from "./context.js";
 import { VertexHandleType } from "./VertexHandle.js";
 
 export function useResizable(type: VertexHandleType) {
-  const { state, dispatch } = useContext(LayerMaskContext);
+  const { dispatch } = useContext(LayerMaskContext);
   const ref = useRef<HTMLDivElement>(null);
 
   const handlePointerUp = useCallback(() => {
@@ -19,7 +19,6 @@ export function useResizable(type: VertexHandleType) {
       event.stopPropagation();
       const handle = event.target;
       event.preventDefault();
-      console.log("offsetWidth: ", state?.containerRef?.current?.offsetWidth);
       dispatch({
         type: "startResize",
         resizingHandle: handle,
@@ -75,7 +74,7 @@ export function useResizable(type: VertexHandleType) {
         handlePointerUp();
       };
     },
-    [dispatch, handlePointerUp, state?.containerRef, type],
+    [dispatch, handlePointerUp, type],
   );
 
   useLayoutEffect(() => {
