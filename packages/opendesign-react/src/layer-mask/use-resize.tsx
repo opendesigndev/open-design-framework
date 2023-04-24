@@ -32,12 +32,6 @@ export function useResizable(type: VertexHandleType) {
           (moveEvent.pageX - event.pageX) * (1 / window.devicePixelRatio);
         const deltaY =
           (moveEvent.pageY - event.pageY) * (1 / window.devicePixelRatio);
-        console.log(
-          "handleMouseMove, event.pageX - state.start: ",
-          deltaX,
-          deltaY,
-          state,
-        );
 
         switch (type) {
           case VertexHandleType.TopLeft:

@@ -119,3 +119,17 @@ export function matrixToTransformation(
     matrix[1][2],
   ];
 }
+
+/**
+ * Check if value is a number and not NaN/null/undefined
+ * @param value value to check
+ * @returns true if value is a number
+ */
+export function isDefinedNumber(value: unknown): value is number {
+  return (
+    value !== undefined &&
+    value !== null &&
+    typeof value === "number" &&
+    !isNaN(value)
+  );
+}

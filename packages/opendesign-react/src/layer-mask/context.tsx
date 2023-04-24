@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 export type LayerMaskState = {
   containerRef: React.RefObject<HTMLDivElement> | null;
-  resizingHandle: HTMLElement | null;
+  resizingHandle: EventTarget | null;
   startX: number;
   startY: number;
   deltaX: number;
@@ -17,7 +17,7 @@ export type LayerMaskAction =
     }
   | {
       type: "startResize";
-      resizingHandle: HTMLElement;
+      resizingHandle: EventTarget | null;
       startX: number;
       startY: number;
     }
@@ -40,16 +40,17 @@ export const initialState = {
   resizing: false,
 };
 
-export function reducer(state: LayerMaskState, action: LayerMaskAction) {
+export function reducer(
+  state: LayerMaskState,
+  action: LayerMaskAction,
+): LayerMaskState {
   switch (action.type) {
     case "setRef":
-      console.log("action", action);
       return {
         ...state,
         containerRef: action.containerRef,
       };
     case "startResize":
-      console.log("action", action, state);
       return {
         ...state,
         resizingHandle: action.resizingHandle,
@@ -57,7 +58,6 @@ export function reducer(state: LayerMaskState, action: LayerMaskAction) {
         startY: action.startY,
       };
     case "resize":
-      console.log("action", action, state);
       return {
         ...state,
         deltaX: action.deltaX,
@@ -65,16 +65,17 @@ export function reducer(state: LayerMaskState, action: LayerMaskAction) {
         resizing: true,
       };
     case "stopResize":
-      console.log("action", action);
       return initialState;
     default:
-      throw new Error(`Unhandled action type: ${action.type}`);
+      throw new Error(
+        `Unhandled action type: ${(action as LayerMaskAction).type}`,
+      );
   }
 }
 
 export const LayerMaskContext = createContext<{
   state: LayerMaskState;
-  dispatch: (action: any) => void;
+  dispatch: (action: LayerMaskAction) => void;
 }>({
   state: initialState,
   dispatch: () => null,

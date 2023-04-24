@@ -6,6 +6,7 @@ import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import { isDefinedNumber } from "../utils.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
@@ -78,7 +79,7 @@ export interface LayerNode extends BaseNode {
    * @param height height in px
    * @returns true if transformation was applied, false if it was not applied
    */
-  setSize(width: number, height: number): boolean;
+  setSize(width?: number, height?: number): boolean;
 
   /**
    * Change layer's width by given width
@@ -281,7 +282,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     });
   }
 
-  setSize(width: number, height: number): boolean {
+  setSize(width?: number, height?: number): boolean {
     return automaticScope((scope) => {
       const metrix = this.readMetrics();
       const currentTransformation = [
@@ -295,8 +296,8 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       const layerHeight =
         metrix.transformedGraphicalBounds[1][1] -
         metrix.transformedGraphicalBounds[0][1];
-      const widthRatio = width / layerWidth;
-      const heightRatio = height / layerHeight;
+      const widthRatio = isDefinedNumber(width) ? width / layerWidth : 1;
+      const heightRatio = isDefinedNumber(height) ? height / layerHeight : 1;
       const shiftedX = currentX * widthRatio;
       const shiftedY = currentY * heightRatio;
       const differenceX = currentX - shiftedX;

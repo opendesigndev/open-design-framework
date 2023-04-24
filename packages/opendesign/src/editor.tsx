@@ -423,7 +423,7 @@ function LayerOutlineNew({ layer }: { layer: LayerNode }) {
     (1 / window.devicePixelRatio);
 
   const changeDimensionsHandler = useCallback(
-    (width, height) => {
+    (width?: number, height?: number) => {
       console.log("width, height", width, height);
       // width && layer.setWidth(width);
       // height && layer.setHeight(height);

@@ -20,7 +20,7 @@ export function LayerMask({ onResize }: ILayerMaskProps = {}) {
   }, [containerRef, dispatch]);
 
   useEffect(() => {
-    if (state.resizing) {
+    if (state.resizing && containerRef.current) {
       const currentHeight =
         containerRef.current?.offsetHeight * window.devicePixelRatio;
       const currentWidth =
