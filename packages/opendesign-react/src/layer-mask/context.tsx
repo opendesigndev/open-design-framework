@@ -7,8 +7,17 @@ export type LayerMaskState = {
   startY: number;
   deltaX: number;
   deltaY: number;
+  originX: LayerOriginPositions;
+  originY: LayerOriginPositions;
   resizing: boolean;
 };
+
+export type LayerOriginPositions =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "center";
 
 export type LayerMaskAction =
   | {
@@ -25,18 +34,22 @@ export type LayerMaskAction =
       type: "resize";
       deltaX: number;
       deltaY: number;
+      originX: LayerOriginPositions;
+      originY: LayerOriginPositions;
     }
   | {
       type: "stopResize";
     };
 
-export const initialState = {
+export const initialState: LayerMaskState = {
   containerRef: null,
   resizingHandle: null,
   startX: 0,
   startY: 0,
   deltaX: 0,
   deltaY: 0,
+  originX: "center",
+  originY: "center",
   resizing: false,
 };
 
@@ -62,6 +75,8 @@ export function reducer(
         ...state,
         deltaX: action.deltaX,
         deltaY: action.deltaY,
+        originX: action.originX,
+        originY: action.originY,
         resizing: true,
       };
     case "stopResize":

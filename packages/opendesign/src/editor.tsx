@@ -1,9 +1,3 @@
-import {
-  ResizeBothHandle,
-  ResizeContainer,
-  ResizeHeightHandle,
-  ResizeWidthHandle,
-} from "@mir4a/resize-container-react";
 import type { PasteEvent } from "@opendesign/react";
 import { RelativeMarker } from "@opendesign/react";
 import { LayerMaskWrapper, useLayerList } from "@opendesign/react";
@@ -26,8 +20,6 @@ import {
 } from "@opendesign/universal";
 import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
-import { useRef } from "react";
-import { Ref, useEffect } from "react";
 import { useCallback } from "react";
 import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";

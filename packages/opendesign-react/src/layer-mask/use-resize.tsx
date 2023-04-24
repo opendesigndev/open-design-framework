@@ -38,6 +38,8 @@ export function useResizable(type: VertexHandleType) {
               type: "resize",
               deltaX: -deltaX,
               deltaY: -deltaY,
+              originX: "right",
+              originY: "bottom",
             });
             break;
           case VertexHandleType.TopRight:
@@ -45,6 +47,8 @@ export function useResizable(type: VertexHandleType) {
               type: "resize",
               deltaX,
               deltaY: -deltaY,
+              originX: "left",
+              originY: "bottom",
             });
             break;
           case VertexHandleType.BottomLeft:
@@ -52,6 +56,8 @@ export function useResizable(type: VertexHandleType) {
               type: "resize",
               deltaX: -deltaX,
               deltaY: deltaY,
+              originX: "right",
+              originY: "top",
             });
             break;
           case VertexHandleType.BottomRight:
@@ -59,6 +65,8 @@ export function useResizable(type: VertexHandleType) {
               type: "resize",
               deltaX,
               deltaY,
+              originX: "left",
+              originY: "top",
             });
             break;
         }
