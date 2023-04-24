@@ -367,66 +367,8 @@ function Content({
 }
 
 function LayerOutline({ layer }: { layer: LayerNode }) {
-  console.log(layer.readMetrics().graphicalBounds);
-  const { graphicalBounds } = layer.readMetrics();
-  const initialWidth =
-    (graphicalBounds[1][0] - graphicalBounds[0][0]) *
-    (1 / window.devicePixelRatio);
-  const initialHeight =
-    (graphicalBounds[1][1] - graphicalBounds[0][1]) *
-    (1 / window.devicePixelRatio);
-
-  const changeDimensionsHandler = useCallback(
-    ({ width, height }: { width?: number; height?: number }) => {
-      console.log(width, height);
-      if (width && !height) {
-        console.log("setting width, ", width);
-        layer.setWidth(width);
-      } else if (height && !width) {
-        console.log("setting height, ", height);
-        layer.setHeight(height);
-      } else if (width && height) {
-        console.log("setting both, ", width, height);
-        layer.setSize(width, height);
-      }
-    },
-    [layer],
-  );
-
-  return (
-    <RelativeMarker node={layer}>
-      <ResizeContainer
-        onResize={changeDimensionsHandler}
-        initialHeight={initialHeight}
-        initialWidth={initialWidth}
-        style={{
-          border: "none",
-        }}
-      >
-        <div className="border border-solid border-red-800 inset-0 absolute" />
-        <ResizeWidthHandle />
-        <ResizeHeightHandle />
-        <ResizeBothHandle />
-      </ResizeContainer>
-    </RelativeMarker>
-  );
-}
-
-function LayerOutlineNew({ layer }: { layer: LayerNode }) {
-  console.log(layer.readMetrics().graphicalBounds);
-  const { graphicalBounds } = layer.readMetrics();
-  const initialWidth =
-    (graphicalBounds[1][0] - graphicalBounds[0][0]) *
-    (1 / window.devicePixelRatio);
-  const initialHeight =
-    (graphicalBounds[1][1] - graphicalBounds[0][1]) *
-    (1 / window.devicePixelRatio);
-
   const changeDimensionsHandler = useCallback(
     (width?: number, height?: number) => {
-      console.log("width, height", width, height);
-      // width && layer.setWidth(width);
-      // height && layer.setHeight(height);
       layer.setSize(width, height);
     },
     [layer],

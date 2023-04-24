@@ -2343,15 +2343,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mir4a/resize-container-react@npm:^1.0.2-pre3":
-  version: 1.0.2
-  resolution: "@mir4a/resize-container-react@npm:1.0.2"
-  peerDependencies:
-    react: ^18.2.0
-  checksum: 103934ee97bc86bbaad7e366ef77e001a986e99c149c203deb0d6d6e8eec2ff07bb67d1d011251c6a6763a514ac51b7997faa5d9439a3d3977fbe1f07cc4147d
-  languageName: node
-  linkType: hard
-
 "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1":
   version: 5.1.1-v1
   resolution: "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1"
@@ -7378,7 +7369,6 @@ __metadata:
   resolution: "opendesign@workspace:packages/opendesign"
   dependencies:
     "@esbuild-kit/esm-loader": ^2.5.5
-    "@mir4a/resize-container-react": ^1.0.2-pre3
     "@opendesign/engine": 0.3.1-02dfd1c-20230413
     "@opendesign/engine-wasm": 0.3.1-02dfd1c-20230413
     "@opendesign/react": "workspace:*"
