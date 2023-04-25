@@ -31,10 +31,29 @@ export type LayerMetrics = {
   transformedGraphicalBounds: Rectangle;
 };
 
+export type LayerChangeType = "SCALE" | "ROTATE" | "TRANSLATE" | "TRANSFORM";
+
+export type LayerEvents = {
+  changed: LayerChangeType;
+  removed: void;
+};
+
 export interface LayerNode extends BaseNode {
   type: "SHAPE" | "TEXT" | "COMPONENT_REFERENCE" | "GROUP" | "MASK_GROUP";
 
   id: string;
+
+  /**
+   * Similar to addEventListener but returns function which removes the event
+   * listener.
+   *
+   * @param event
+   * @param listener
+   */
+  listen<T extends keyof LayerEvents>(
+    event: T,
+    listener: (event: LayerEvents[T]) => void,
+  ): () => void;
 
   /**
    * Adds data which was previously read from clipboard into this layer.
@@ -101,6 +120,7 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
   #component: ComponentHandle;
   id: string;
   #engine: Engine;
+  #events = new Map<keyof LayerEvents, Set<(event: any) => void>>();
 
   constructor(
     type: LayerNode["type"],
@@ -317,7 +337,37 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         },
       );
       this.#engine.redraw();
+      this.#dispatch("changed", "SCALE");
       return true;
     });
+  }
+
+  #dispatch<T extends keyof LayerEvents>(type: T, data: LayerEvents[T]) {
+    const listeners = this.#events.get(type);
+    if (listeners) {
+      for (const listener of listeners.values()) {
+        listener(data);
+      }
+    }
+  }
+
+  listen<T extends keyof LayerEvents>(
+    type: T,
+    listener: (event: LayerEvents[T]) => void,
+  ): () => void {
+    // create a copy so that you can use same listener twice. IDK why you would
+    // want it, but :shrug:
+    const cb = (data: any) => void listener(data);
+    let set = this.#events.get(type);
+    if (!set) {
+      set = new Set();
+      this.#events.set(type, set);
+    }
+    set.add(cb);
+    return () => {
+      // typescript can't analyze this properly but if you read previous lines
+      // you can see that this cant be undefined
+      set!.delete(cb);
+    };
   }
 }

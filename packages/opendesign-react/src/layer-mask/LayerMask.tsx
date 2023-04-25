@@ -45,8 +45,8 @@ export function LayerMask({ onResize }: ILayerMaskProps = {}) {
       className="layer-mask"
       style={{
         border: "1px solid red",
-        transformOrigin: `${state.originX} ${state.originY}`,
-        scale: `${widthRatio} ${heightRatio}`,
+        // transformOrigin: `${state.originX} ${state.originY}`,
+        // scale: `${widthRatio} ${heightRatio}`,
       }}
       ref={containerRef}
     >

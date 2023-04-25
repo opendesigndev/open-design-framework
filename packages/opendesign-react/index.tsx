@@ -278,14 +278,17 @@ export function RelativeMarker(
       if (!div) return;
 
       const metrics = props.node.readMetrics();
+      console.log("metrics updated?", metrics, props.node.id);
 
       div.style.width =
-        (metrics.graphicalBounds[1][0] - metrics.graphicalBounds[0][0]) *
+        (metrics.transformedGraphicalBounds[1][0] -
+          metrics.transformedGraphicalBounds[0][0]) *
           (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) * 2 +
         "px";
       div.style.height =
-        (metrics.graphicalBounds[1][1] - metrics.graphicalBounds[0][1]) *
+        (metrics.transformedGraphicalBounds[1][1] -
+          metrics.transformedGraphicalBounds[0][1]) *
           (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) * 2 +
         "px";
@@ -308,13 +311,27 @@ export function RelativeMarker(
     },
     [props.inset, props.node],
   );
+
+  const handleLayerChange = useCallback(
+    (type: any) => {
+      console.log("handleLayerChange", type);
+      handler({ viewport: canvas.getViewport() });
+    },
+    [canvas, handler],
+  );
+
   useLayoutEffect(() => {
     const div = ref.current;
     if (!div) return;
 
     handler({ viewport: canvas.getViewport() });
-    return canvas.subscribe("viewportChange", handler);
-  }, [canvas, handler, props.inset, props.node]);
+    const unsubChanged = props.node.listen("changed", handleLayerChange);
+    const unsubViewportChnage = canvas.subscribe("viewportChange", handler);
+    return () => {
+      unsubChanged();
+      unsubViewportChnage();
+    };
+  }, [canvas, handleLayerChange, handler, props.inset, props.node]);
 
   return (
     <div

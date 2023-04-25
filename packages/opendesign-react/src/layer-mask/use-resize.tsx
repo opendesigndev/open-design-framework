@@ -72,12 +72,12 @@ export function useResizable(type: VertexHandleType) {
         }
       }
 
-      const throttledHandlePointerMove = throttle(handlePointerMove, 20);
+      const throttledHandlePointerMove = throttle(handlePointerMove, 60);
 
-      document.addEventListener("pointermove", throttledHandlePointerMove);
+      document.addEventListener("pointermove", handlePointerMove);
 
       document.onpointerup = () => {
-        document.removeEventListener("pointermove", throttledHandlePointerMove);
+        document.removeEventListener("pointermove", handlePointerMove);
         document.onpointerup = null;
         handlePointerUp();
       };
