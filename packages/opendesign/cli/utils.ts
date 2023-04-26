@@ -62,3 +62,9 @@ export function expectedError(message: string, cause?: Error) {
 export function isExpectedError(error: any): error is Error {
   return typeof error === "object" && error && expected in error;
 }
+
+export function packageRoot() {
+  if (import.meta.url.endsWith(".ts"))
+    return new URL("..", import.meta.url).href;
+  return new URL("../..", import.meta.url).href;
+}
