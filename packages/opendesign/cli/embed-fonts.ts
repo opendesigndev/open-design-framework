@@ -10,6 +10,7 @@ import { expectedError } from "./utils.js";
 export async function embedFonts(file: OctopusFile): Promise<boolean> {
   const systemFonts = await listSystemFonts();
   let fontChanged = false;
+  const reported = new Set<string>();
   for (const components of file.manifest.components) {
     if (!components?.assets?.fonts) continue;
     for (const font of components.assets.fonts) {
@@ -30,7 +31,10 @@ export async function embedFonts(file: OctopusFile): Promise<boolean> {
 
       const systemFont = systemFonts.get(font.name.toLowerCase());
       if (!systemFont) {
-        console.warn(`⚠ Font ${font.name} not found on the system`);
+        if (!reported.has(font.name)) {
+          reported.add(font.name);
+          console.warn(`⚠ Font ${font.name} not found on the system`);
+        }
         // TODO: try and find the font on fontsource.org
         continue;
       }
