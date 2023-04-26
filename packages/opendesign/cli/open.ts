@@ -5,9 +5,9 @@ import { wasm } from "@opendesign/engine-wasm";
 import express from "express";
 import openUrl from "open";
 
-import { expectedError, reflow } from "./utils.js";
+import { expectedError, packageRoot, reflow } from "./utils.js";
 
-const editorDist = new URL("../../dist/editor/", import.meta.url);
+const editorDist = new URL("dist/editor/", packageRoot());
 
 export function execute(args: string[]) {
   const { positionals } = parseArgs({ args, allowPositionals: true });
@@ -38,7 +38,7 @@ export function execute(args: string[]) {
     const filename = path.basename(file);
     url.searchParams.set("file", filename);
     app.get("/designs/" + filename, (req, res) => {
-      res.sendFile(file);
+      res.sendFile(path.join(process.cwd(), file));
     });
   }
   app.listen(url.port, () => {
