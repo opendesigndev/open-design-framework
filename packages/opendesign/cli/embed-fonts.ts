@@ -1,23 +1,13 @@
 import fs from "node:fs/promises";
 import { parseArgs } from "node:util";
 
+import type { OctopusFile } from "@opendesign/universal";
 import { readOctopusFile } from "@opendesign/universal";
 
 import { listSystemFonts } from "./fonts/list-system-fonts.js";
 import { expectedError } from "./utils.js";
 
-export async function execute(args: string[]) {
-  const { values: options } = parseArgs({
-    args,
-    options: {
-      input: { type: "string", short: "i" },
-      output: { type: "string", short: "o" },
-    },
-  });
-  if (!options.input || !options.output) {
-    throw expectedError("Missing input or output file");
-  }
-  const file = readOctopusFile(await fs.readFile(options.input));
+export async function embedFonts(file: OctopusFile): Promise<boolean> {
   const systemFonts = await listSystemFonts();
   let fontChanged = false;
   for (const components of file.manifest.components) {
@@ -59,8 +49,23 @@ export async function execute(args: string[]) {
       fontChanged = true;
     }
   }
+  return fontChanged;
+}
 
-  if (fontChanged) {
+export async function execute(args: string[]) {
+  const { values: options } = parseArgs({
+    args,
+    options: {
+      input: { type: "string", short: "i" },
+      output: { type: "string", short: "o" },
+    },
+  });
+  if (!options.input || !options.output) {
+    throw expectedError("Missing input or output file");
+  }
+  const file = readOctopusFile(await fs.readFile(options.input));
+
+  if (await embedFonts(file)) {
     await fs.writeFile(options.output, await file.serialize());
   } else {
     await fs.copyFile(options.input, options.output);

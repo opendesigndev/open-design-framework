@@ -1,9 +1,31 @@
 import * as fs from "node:fs/promises";
 import { parseArgs } from "node:util";
 
-import { importFile } from "@opendesign/universal";
+import { importFile, readOctopusFile } from "@opendesign/universal";
 
+import { embedFonts } from "./embed-fonts.js";
 import { expectedError } from "./utils.js";
+
+export const convertOptions = {
+  "skip-font-embed": { type: "boolean" },
+} as const;
+
+export async function convert(
+  input: Uint8Array,
+  options: { "skip-font-embed"?: boolean },
+) {
+  const output = await importFile(input);
+  if (!options["skip-font-embed"]) {
+    await embedFonts(readOctopusFile(output));
+  }
+  return output;
+}
+
+export function convertOptionsHelp() {
+  return Object.keys(convertOptions)
+    .map((v) => `--${v}`)
+    .join("\n  ");
+}
 
 export async function execute(args: string[]) {
   const { values: options } = parseArgs({
@@ -11,12 +33,14 @@ export async function execute(args: string[]) {
     options: {
       input: { type: "string", short: "i" },
       output: { type: "string", short: "o" },
+      ...convertOptions,
     },
   });
   if (!options.input || !options.output) {
     throw expectedError("Missing input or output file");
   }
-  const output = await importFile(await fs.readFile(options.input));
+  const input = await fs.readFile(options.input);
+  const output = await convert(input, options);
   await fs.writeFile(options.output, output);
 }
 
@@ -24,8 +48,9 @@ export function help() {
   console.log(`Usage: opendesign convert [options]
 
 Options:
-  -i, --input   Input file
-  -o, --output  Output file
+  -i, --input        Input file
+  -o, --output       Output file
+  ${convertOptionsHelp()}
 
 Converts a design file to .octopus format.
 `);
