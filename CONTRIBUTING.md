@@ -60,6 +60,8 @@ names. This same workflow can also be triggered manually using following command
 gh workflow run "Experimental Release" --ref branch-name
 ```
 
+Lastly, it can be also triggered from [this page](https://github.com/opendesigndev/open-design-framework/actions/workflows/experimental-release.yml). You can then open the workflow summary to see instructions on how to use the experimental packages in product or via `npx` (for CLI).
+
 You should not use those experimental releases in product, but they are good way
 to test the changes *before* you cut a stable release.
 
