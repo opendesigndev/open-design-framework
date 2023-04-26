@@ -59,7 +59,8 @@ class InMemoryOctopusFile implements OctopusFile {
     const exporter = new MemoryFileExporter();
     await exporter.exportManifest({ manifest: this.#manifest });
     for (const [filename, file] of this.#files) {
-      if (filename === "Octopus") continue;
+      if (filename === "Octopus" || filename === "octopus-manifest.json")
+        continue;
       exporter.save(filename, readFile(file));
     }
     exporter.finalizeExport();
