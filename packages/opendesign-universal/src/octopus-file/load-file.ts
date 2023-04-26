@@ -1,6 +1,7 @@
 import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { loadImages } from "../engine/load-images.js";
+import { automaticScope, createStringRef } from "../engine/memory.js";
 import { ArtboardNodeImpl } from "../nodes/artboard.js";
 import type { PageNodeImpl } from "../nodes/page.js";
 import { readOctopusFile } from "./read-octopus-file.js";
@@ -39,6 +40,23 @@ export async function loadFile(
     editor,
   );
   (editor.currentPage as PageNodeImpl).__artboard = artboard;
+
+  for (const { name, location } of componentManifest.assets?.fonts || []) {
+    if (name && location?.type === "RELATIVE" && location.path) {
+      const data = await file.readBinary(location.path);
+      automaticScope((scope) => {
+        const psNameRef = createStringRef(engine.ode, scope, name);
+        const faceNameRef = createStringRef(engine.ode, scope, "");
+
+        engine.ode.design_loadFontBytes(
+          engine.design,
+          psNameRef,
+          engine.ode.makeMemoryBuffer(scope, data.buffer),
+          faceNameRef,
+        );
+      });
+    }
+  }
 
   return {
     async loadImages() {

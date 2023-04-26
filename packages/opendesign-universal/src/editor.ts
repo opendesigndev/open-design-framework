@@ -287,6 +287,12 @@ export class EditorImplementation implements Editor {
               engine.design,
             );
             for (const fontName of missingFonts) {
+              console.info(
+                'Replacing font "%c%s%c" with fallback font.',
+                "font-weight:bold",
+                fontName,
+                "font-weight:normal",
+              );
               this.setFont(fontName, font);
             }
           } catch (e) {

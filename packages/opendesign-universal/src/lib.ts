@@ -77,6 +77,7 @@ export const console: ExtractGlobal<
   {
     log(...args: unknown[]): undefined;
     warn(...args: unknown[]): undefined;
+    info(...args: unknown[]): undefined;
     error(...args: unknown[]): undefined;
   }
 > = global.console;
