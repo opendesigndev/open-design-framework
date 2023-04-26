@@ -30,6 +30,8 @@ jobs:
           yarn changeset publish --no-git-tag --tag experimental | tee $RUNNER_TEMP/rel.log
           printf "## Published\n\n**tag:** experimental\n\n" > $GITHUB_STEP_SUMMARY
           grep -R Publishing $RUNNER_TEMP/rel.log | sed 's/🦋  info Publishing /- /' | sed 's/"/`/g' >> $GITHUB_STEP_SUMMARY
+          printf "\n## OpenDesign CLI\n" >> $GITHUB_STEP_SUMMARY
+          grep -R 'Publishing "opendesign"' $RUNNER_TEMP/rel.log | sed 's/🦋  info Publishing "/\n```\nnpx --package /' | sed 's/" at "/@/' | sed 's/"/ opendesign\n```/' >> $GITHUB_STEP_SUMMARY
           printf "\n## Update commands\n"  >> $GITHUB_STEP_SUMMARY
           grep -R Publishing $RUNNER_TEMP/rel.log | sed 's/🦋  info Publishing "/\n```\nyarn add /' | sed 's/" at "/@/' | sed 's/"/\n```/' >> $GITHUB_STEP_SUMMARY
           printf '## Not published\n' >> $GITHUB_STEP_SUMMARY
