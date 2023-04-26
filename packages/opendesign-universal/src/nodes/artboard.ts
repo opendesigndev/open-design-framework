@@ -327,13 +327,13 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
   }
 
   identifyLayer(position: readonly [number, number], radius = 1) {
-    return this.#engine.ode.getString(
-      this.#engine.ode.component_identifyLayer(
-        this.__component,
-        position,
-        radius,
-      ),
+    const layer = this.#engine.ode.component_identifyLayer(
+      this.__component,
+      position,
+      radius,
     );
+    if (layer.length === 0) return null;
+    return this.#engine.ode.getString(layer);
   }
 
   getLayerById(id: string): LayerNode | null {
