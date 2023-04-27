@@ -261,6 +261,7 @@ export function RelativeMarker(
      * Can be negative.
      */
     inset?: number;
+    stale?: boolean;
   } /* TODO:
     | {
         children: React.ReactNode;
@@ -325,13 +326,20 @@ export function RelativeMarker(
     if (!div) return;
 
     handler({ viewport: canvas.getViewport() });
-    const unsubChanged = props.node.listen("changed", handleLayerChange);
+    // const unsubChanged = props.node.listen("changed", handleLayerChange);
     const unsubViewportChnage = canvas.subscribe("viewportChange", handler);
     return () => {
-      unsubChanged();
+      // unsubChanged();
       unsubViewportChnage();
     };
-  }, [canvas, handleLayerChange, handler, props.inset, props.node]);
+  }, [
+    canvas,
+    handleLayerChange,
+    handler,
+    props.inset,
+    props.node,
+    props.stale,
+  ]);
 
   return (
     <div

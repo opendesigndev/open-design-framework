@@ -362,13 +362,23 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
   const changeDimensionsHandler = useCallback(
     (width?: number, height?: number) => {
       layer.setSize(width, height);
+      console.log(width, height);
+    },
+    [layer],
+  );
+  const scaleHandler = useCallback(
+    (scaleX: number, scaleY: number) => {
+      // layer.scale(scaleX, scaleY);
+      console.log(scaleX, scaleY, layer);
     },
     [layer],
   );
 
   return (
-    <RelativeMarker node={layer}>
-      <LayerMaskWrapper onResize={changeDimensionsHandler} />
-    </RelativeMarker>
+    <LayerMaskWrapper
+      onResize={changeDimensionsHandler}
+      onScale={scaleHandler}
+      node={layer}
+    />
   );
 }

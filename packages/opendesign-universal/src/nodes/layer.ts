@@ -113,6 +113,19 @@ export interface LayerNode extends BaseNode {
    * @returns true if transformation was applied, false if it was not applied
    */
   setHeight(height: number): boolean;
+
+  /**
+   * Scale layer by given x and y factors and optional origin
+   * @param xFactor x factor
+   * @param yFactor y factor
+   * @param origin origin in px, an array of two numbers, each number is optional
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  scale(
+    xFactor: number,
+    yFactor: number,
+    origin?: [x?: number, y?: number],
+  ): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -328,6 +341,39 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       transform[4] = differenceX;
       transform[5] = differenceY;
       const id = createStringRef(this.#engine.ode, scope, this.id);
+      this.#engine.ode.component_transformLayer(
+        this.#component,
+        id,
+        "PARENT_COMPONENT",
+        {
+          matrix: transform,
+        },
+      );
+      this.#engine.redraw();
+      this.#dispatch("changed", "SCALE");
+      return true;
+    });
+  }
+
+  scale(xFactor: number, yFactor: number, origin?: [x?: number, y?: number]) {
+    return automaticScope((scope) => {
+      const metrix = this.readMetrics();
+      const [a, b, c, d, e, f] = [...metrix.transformation];
+      const x = origin?.[0] ? origin[0] : metrix.transformation[4];
+      const y = origin?.[1] ? origin[1] : metrix.transformation[5];
+      const tx = x * (1 - xFactor);
+      const ty = y * (1 - yFactor);
+
+      const transform = [
+        a * xFactor,
+        b * yFactor,
+        c * xFactor,
+        d * yFactor,
+        e + tx,
+        f + ty,
+      ] satisfies Scalar_array_6;
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+
       this.#engine.ode.component_transformLayer(
         this.#component,
         id,
