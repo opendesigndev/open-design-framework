@@ -1,5 +1,20 @@
 # @opendesign/universal
 
+## 0.7.0
+
+### Minor Changes
+
+- 13e0af4: add function to make changes to .octopus files
+- 784c3c9: **breaking** removed readManifest and made loadManifest async
+- 044ed89: implement loading of fonts embedded in octopus file
+- 784c3c9: **breaking** renamed Manifest type export to OctopusManifest
+- 784c3c9: added `readOctopusFile` which simplifies reading .octopus files
+
+### Patch Changes
+
+- 6b9fb58: Fixed identifyLayers crashing when no layer could be identified. Now it returns null intead.
+- 2d688f4: prevent octopus-manifest.json from being written twice
+
 ## 0.6.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @opendesign/react
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [6b9fb58]
+- Updated dependencies [13e0af4]
+- Updated dependencies [784c3c9]
+- Updated dependencies [044ed89]
+- Updated dependencies [2d688f4]
+- Updated dependencies [784c3c9]
+- Updated dependencies [784c3c9]
+  - @opendesign/universal@0.7.0
+
 ## 0.6.0
 
 ### Minor Changes
