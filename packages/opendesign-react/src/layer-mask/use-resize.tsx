@@ -3,9 +3,19 @@ import { useCallback, useContext, useLayoutEffect, useRef } from "react";
 import { useCanvasContext } from "../context.js";
 import { throttle } from "../throttle.js";
 import { LayerMaskContext } from "./context.js";
-import { VertexHandleType } from "./VertexHandle.js";
 
-export function useResizable(type: VertexHandleType) {
+export enum ResizeHandleType {
+  TopLeft = "top-left",
+  TopRight = "top-right",
+  BottomLeft = "bottom-left",
+  BottomRight = "bottom-right",
+  Top = "top",
+  Right = "right",
+  Bottom = "bottom",
+  Left = "left",
+}
+
+export function useResizable(type: ResizeHandleType) {
   const { dispatch } = useContext(LayerMaskContext);
   const ref = useRef<HTMLDivElement>(null);
   const canvas = useCanvasContext();
@@ -40,7 +50,7 @@ export function useResizable(type: VertexHandleType) {
           (1 / viewport.scale);
 
         switch (type) {
-          case VertexHandleType.TopLeft:
+          case ResizeHandleType.TopLeft:
             dispatch({
               type: "resize",
               shiftKey: moveEvent.shiftKey,
@@ -51,7 +61,7 @@ export function useResizable(type: VertexHandleType) {
               originY: "bottom",
             });
             break;
-          case VertexHandleType.TopRight:
+          case ResizeHandleType.TopRight:
             dispatch({
               type: "resize",
               shiftKey: moveEvent.shiftKey,
@@ -62,7 +72,7 @@ export function useResizable(type: VertexHandleType) {
               originY: "bottom",
             });
             break;
-          case VertexHandleType.BottomLeft:
+          case ResizeHandleType.BottomLeft:
             dispatch({
               type: "resize",
               shiftKey: moveEvent.shiftKey,
@@ -73,7 +83,7 @@ export function useResizable(type: VertexHandleType) {
               originY: "top",
             });
             break;
-          case VertexHandleType.BottomRight:
+          case ResizeHandleType.BottomRight:
             dispatch({
               type: "resize",
               shiftKey: moveEvent.shiftKey,
@@ -82,6 +92,50 @@ export function useResizable(type: VertexHandleType) {
               deltaY,
               originX: "left",
               originY: "top",
+            });
+            break;
+          case ResizeHandleType.Top:
+            dispatch({
+              type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
+              deltaX: 0,
+              deltaY: -deltaY,
+              originX: "center",
+              originY: "bottom",
+            });
+            break;
+          case ResizeHandleType.Right:
+            dispatch({
+              type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
+              deltaX,
+              deltaY: 0,
+              originX: "left",
+              originY: "center",
+            });
+            break;
+          case ResizeHandleType.Bottom:
+            dispatch({
+              type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
+              deltaX: 0,
+              deltaY,
+              originX: "center",
+              originY: "top",
+            });
+            break;
+          case ResizeHandleType.Left:
+            dispatch({
+              type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
+              deltaX: -deltaX,
+              deltaY: 0,
+              originX: "right",
+              originY: "center",
             });
             break;
         }

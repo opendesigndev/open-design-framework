@@ -2,7 +2,9 @@ import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 
 import type { Origin } from "./context.js";
 import { LayerMaskContext } from "./context.js";
-import { VertexHandle, VertexHandleType } from "./VertexHandle.js";
+import { EdgeHandle } from "./EdgeHandle.js";
+import { ResizeHandleType } from "./use-resize.js";
+import { VertexHandle } from "./VertexHandle.js";
 
 export interface ILayerMaskProps {
   onResize?: (width: number, height: number, origin?: Origin) => void;
@@ -49,10 +51,14 @@ export function LayerMask({ onResize, onScale }: ILayerMaskProps) {
       }}
       ref={containerRef}
     >
-      <VertexHandle type={VertexHandleType.TopLeft} />
-      <VertexHandle type={VertexHandleType.TopRight} />
-      <VertexHandle type={VertexHandleType.BottomRight} />
-      <VertexHandle type={VertexHandleType.BottomLeft} />
+      <VertexHandle type={ResizeHandleType.TopLeft} />
+      <VertexHandle type={ResizeHandleType.TopRight} />
+      <VertexHandle type={ResizeHandleType.BottomRight} />
+      <VertexHandle type={ResizeHandleType.BottomLeft} />
+      <EdgeHandle type={ResizeHandleType.Top} />
+      <EdgeHandle type={ResizeHandleType.Right} />
+      <EdgeHandle type={ResizeHandleType.Bottom} />
+      <EdgeHandle type={ResizeHandleType.Left} />
     </div>
   );
 }
