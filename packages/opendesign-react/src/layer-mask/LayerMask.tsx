@@ -1,5 +1,6 @@
 import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 
+import { useCanvasContext } from "../context.js";
 import type { Origin } from "./context.js";
 import { LayerMaskContext } from "./context.js";
 import { EdgeHandle } from "./EdgeHandle.js";
@@ -13,6 +14,7 @@ export interface ILayerMaskProps {
 
 export function LayerMask({ onResize, onScale }: ILayerMaskProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvas = useCanvasContext();
   const { state, dispatch } = useContext(LayerMaskContext);
 
   useLayoutEffect(() => {
@@ -24,16 +26,20 @@ export function LayerMask({ onResize, onScale }: ILayerMaskProps) {
 
   useEffect(() => {
     if (state.resizing && containerRef.current) {
+      const viewport = canvas.getViewport();
       const currentHeight =
-        containerRef.current?.offsetHeight * window.devicePixelRatio;
+        (containerRef.current?.offsetHeight * window.devicePixelRatio) /
+        viewport.scale;
       const currentWidth =
-        containerRef.current?.offsetWidth * window.devicePixelRatio;
+        (containerRef.current?.offsetWidth * window.devicePixelRatio) /
+        viewport.scale;
       const newHeight = currentHeight + state.deltaY;
       const newWidth = currentWidth + state.deltaX;
       onResize?.(newWidth, newHeight, state.origin);
       onScale?.(newWidth / currentWidth, newHeight / currentHeight);
     }
   }, [
+    canvas,
     onResize,
     onScale,
     state.deltaX,
