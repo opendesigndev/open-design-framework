@@ -16,10 +16,11 @@ export function LayerMaskWrapper({
   node,
 }: ILayerMaskWrapperProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const stale = state.resizingStarted && !state.resizingEnded;
 
   return (
     <LayerMaskContext.Provider value={{ state, dispatch }}>
-      <RelativeMarker node={node} stale={state.resizing}>
+      <RelativeMarker node={node} stale={stale}>
         <LayerMask onResize={onResize} onScale={onScale} />
       </RelativeMarker>
     </LayerMaskContext.Provider>

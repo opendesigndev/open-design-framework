@@ -1,10 +1,11 @@
 import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 
+import type { Origin } from "./context.js";
 import { LayerMaskContext } from "./context.js";
 import { VertexHandle, VertexHandleType } from "./VertexHandle.js";
 
 export interface ILayerMaskProps {
-  onResize?: (width: number, height: number) => void;
+  onResize?: (width: number, height: number, origin?: Origin) => void;
   onScale: (scaleX: number, scaleY: number) => void;
 }
 
@@ -27,10 +28,17 @@ export function LayerMask({ onResize, onScale }: ILayerMaskProps) {
         containerRef.current?.offsetWidth * window.devicePixelRatio;
       const newHeight = currentHeight + state.deltaY;
       const newWidth = currentWidth + state.deltaX;
-      onResize?.(newWidth, newHeight);
+      onResize?.(newWidth, newHeight, state.origin);
       onScale?.(newWidth / currentWidth, newHeight / currentHeight);
     }
-  }, [onResize, onScale, state.deltaX, state.deltaY, state.resizing]);
+  }, [
+    onResize,
+    onScale,
+    state.deltaX,
+    state.deltaY,
+    state.origin,
+    state.resizing,
+  ]);
 
   return (
     <div

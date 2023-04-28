@@ -1,5 +1,6 @@
 import { useCallback, useContext, useLayoutEffect, useRef } from "react";
 
+import { useCanvasContext } from "../context.js";
 import { throttle } from "../throttle.js";
 import { LayerMaskContext } from "./context.js";
 import { VertexHandleType } from "./VertexHandle.js";
@@ -7,6 +8,7 @@ import { VertexHandleType } from "./VertexHandle.js";
 export function useResizable(type: VertexHandleType) {
   const { dispatch } = useContext(LayerMaskContext);
   const ref = useRef<HTMLDivElement>(null);
+  const canvas = useCanvasContext();
 
   const handlePointerUp = useCallback(() => {
     dispatch({
@@ -19,6 +21,7 @@ export function useResizable(type: VertexHandleType) {
       event.stopPropagation();
       const handle = event.target;
       event.preventDefault();
+      const viewport = canvas.getViewport();
       dispatch({
         type: "startResize",
         resizingHandle: handle,
@@ -28,14 +31,20 @@ export function useResizable(type: VertexHandleType) {
 
       function handlePointerMove(moveEvent: PointerEvent) {
         const deltaX =
-          (moveEvent.pageX - event.pageX) * (1 / window.devicePixelRatio);
+          (moveEvent.pageX - event.pageX) *
+          window.devicePixelRatio *
+          (1 / viewport.scale);
         const deltaY =
-          (moveEvent.pageY - event.pageY) * (1 / window.devicePixelRatio);
+          (moveEvent.pageY - event.pageY) *
+          window.devicePixelRatio *
+          (1 / viewport.scale);
 
         switch (type) {
           case VertexHandleType.TopLeft:
             dispatch({
               type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
               deltaX: -deltaX,
               deltaY: -deltaY,
               originX: "right",
@@ -45,6 +54,8 @@ export function useResizable(type: VertexHandleType) {
           case VertexHandleType.TopRight:
             dispatch({
               type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
               deltaX,
               deltaY: -deltaY,
               originX: "left",
@@ -54,6 +65,8 @@ export function useResizable(type: VertexHandleType) {
           case VertexHandleType.BottomLeft:
             dispatch({
               type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
               deltaX: -deltaX,
               deltaY: deltaY,
               originX: "right",
@@ -63,6 +76,8 @@ export function useResizable(type: VertexHandleType) {
           case VertexHandleType.BottomRight:
             dispatch({
               type: "resize",
+              shiftKey: moveEvent.shiftKey,
+              altKey: moveEvent.altKey,
               deltaX,
               deltaY,
               originX: "left",
@@ -82,7 +97,7 @@ export function useResizable(type: VertexHandleType) {
         handlePointerUp();
       };
     },
-    [dispatch, handlePointerUp, type],
+    [canvas, dispatch, handlePointerUp, type],
   );
 
   useLayoutEffect(() => {

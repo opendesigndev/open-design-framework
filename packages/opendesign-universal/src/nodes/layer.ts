@@ -24,6 +24,10 @@ export type Transformation = readonly [
   f: number, // translate y
 ];
 
+export type OriginValues = "top" | "left" | "right" | "bottom" | "center";
+
+export type Origin = OriginValues | readonly [OriginValues, OriginValues];
+
 export type LayerMetrics = {
   transformation: Transformation;
   logicalBounds: Rectangle;
@@ -96,9 +100,10 @@ export interface LayerNode extends BaseNode {
    * Change layer's size by given width and height
    * @param width width in px
    * @param height height in px
+   * @param origin origin represented by string (center) or an array of two strings (sides)
    * @returns true if transformation was applied, false if it was not applied
    */
-  setSize(width?: number, height?: number): boolean;
+  setSize(width?: number, height?: number, origin?: Origin): boolean;
 
   /**
    * Change layer's width by given width
@@ -315,14 +320,13 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     });
   }
 
-  setSize(width?: number, height?: number): boolean {
+  setSize(width?: number, height?: number, origin?: Origin): boolean {
     return automaticScope((scope) => {
+      const calculatedOrigin = this.#calculateOrigin(origin);
       const metrix = this.readMetrics();
       const currentTransformation = [
         ...metrix.transformation,
       ] satisfies Scalar_array_6;
-      const currentX = currentTransformation[4];
-      const currentY = currentTransformation[5];
       const layerWidth =
         metrix.transformedGraphicalBounds[1][0] -
         metrix.transformedGraphicalBounds[0][0];
@@ -331,10 +335,10 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         metrix.transformedGraphicalBounds[0][1];
       const widthRatio = isDefinedNumber(width) ? width / layerWidth : 1;
       const heightRatio = isDefinedNumber(height) ? height / layerHeight : 1;
-      const shiftedX = currentX * widthRatio;
-      const shiftedY = currentY * heightRatio;
-      const differenceX = currentX - shiftedX;
-      const differenceY = currentY - shiftedY;
+      const shiftedX = calculatedOrigin[0] * widthRatio;
+      const shiftedY = calculatedOrigin[1] * heightRatio;
+      const differenceX = calculatedOrigin[0] - shiftedX;
+      const differenceY = calculatedOrigin[1] - shiftedY;
       const transform = currentTransformation;
       transform[0] = widthRatio;
       transform[3] = heightRatio;
@@ -363,14 +367,18 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       const y = origin?.[1] ? origin[1] : metrix.transformation[5];
       const tx = x * (1 - xFactor);
       const ty = y * (1 - yFactor);
+      const shiftedX = e * xFactor;
+      const shiftedY = f * yFactor;
+      const differenceX = e - shiftedX;
+      const differenceY = f - shiftedY;
 
       const transform = [
-        a * xFactor,
-        b * yFactor,
-        c * xFactor,
-        d * yFactor,
-        e + tx,
-        f + ty,
+        xFactor,
+        b,
+        c,
+        yFactor,
+        differenceX,
+        differenceY,
       ] satisfies Scalar_array_6;
       const id = createStringRef(this.#engine.ode, scope, this.id);
 
@@ -386,6 +394,49 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       this.#dispatch("changed", "SCALE");
       return true;
     });
+  }
+
+  #calculateOrigin(origin?: Origin): [number, number] {
+    const metrix = this.readMetrics();
+    const [, , , , e, f] = [...metrix.transformation];
+    // Default origin is top left
+    let result: [number, number] = [e, f];
+
+    if (!origin) {
+      return result;
+    }
+
+    const layerWidth =
+      metrix.transformedGraphicalBounds[1][0] -
+      metrix.transformedGraphicalBounds[0][0];
+    const layerHeight =
+      metrix.transformedGraphicalBounds[1][1] -
+      metrix.transformedGraphicalBounds[0][1];
+
+    if (Array.isArray(origin)) {
+      const [x, y] = origin;
+
+      if (x === "left") {
+        result[0] = e;
+      } else if (x === "center") {
+        result[0] = e + layerWidth / 2;
+      } else if (x === "right") {
+        result[0] = e + layerWidth;
+      }
+
+      if (y === "top") {
+        result[1] = f;
+      } else if (y === "center") {
+        result[1] = f + layerHeight / 2;
+      } else if (y === "bottom") {
+        result[1] = f + layerHeight;
+      }
+    }
+    if (typeof origin === "string" && origin === "center") {
+      result = [e + layerWidth / 2, f + layerHeight / 2];
+    }
+
+    return result;
   }
 
   #dispatch<T extends keyof LayerEvents>(type: T, data: LayerEvents[T]) {

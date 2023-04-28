@@ -26,6 +26,7 @@ import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
 import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
+import type { Origin } from "../../opendesign-universal/src/nodes/layer.js";
 import { ErrorBoundary } from "./error-boundary.js";
 
 export async function convert(file: Blob) {
@@ -360,8 +361,8 @@ function Content({
 
 function LayerOutline({ layer }: { layer: LayerNode }) {
   const changeDimensionsHandler = useCallback(
-    (width?: number, height?: number) => {
-      layer.setSize(width, height);
+    (width?: number, height?: number, origin?: Origin) => {
+      layer.setSize(width, height, origin);
       console.log(width, height);
     },
     [layer],
