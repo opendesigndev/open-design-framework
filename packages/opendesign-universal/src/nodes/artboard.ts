@@ -10,7 +10,7 @@ import {
   readStringRef,
 } from "../engine/memory.js";
 import { todo } from "../internals.js";
-import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import type { OctopusFile } from "../octopus-file/octopus-file.js";
 import type { LayerNode } from "./layer.js";
 import { LayerNodeImpl } from "./layer.js";
 import type { BaseNode } from "./node.js";
@@ -78,7 +78,7 @@ export interface ArtboardNode extends BaseNode {
    *
    * @param data
    */
-  paste(data: ImportedClipboardData): Promise<void>;
+  paste(data: OctopusFile): Promise<void>;
 
   /**
    * Returns node representing root layer of this artboard.
@@ -217,30 +217,13 @@ export class ArtboardNodeImpl extends BaseNodeImpl implements ArtboardNode {
     return data;
   }
 
-  paste(data: ImportedClipboardData): Promise<void> {
-    const transformedData = {
-      ...data,
-      files: data.files.map((f) =>
-        f.type !== "JSON"
-          ? f
-          : {
-              ...f,
-              data: {
-                ...f.data,
-                content: this._updateLayerIds(f.data.content),
-              },
-            },
-      ),
-    };
-
-    return this.getRootLayer()
-      .paste(transformedData)
-      .then(() => {
-        this.#editor?._notify(this, "PASTE_SUCCESS");
-      })
-      .catch((e) => {
-        this.#editor?._notify(this, "PASTE_FAILURE", e);
-      });
+  async paste(data: OctopusFile): Promise<void> {
+    try {
+      await this.getRootLayer().paste(data);
+      this.#editor?._notify(this, "PASTE_SUCCESS");
+    } catch (e) {
+      this.#editor?._notify(this, "PASTE_FAILURE", e);
+    }
   }
 
   getRootLayer(): LayerNode {

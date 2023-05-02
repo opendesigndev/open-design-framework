@@ -25,7 +25,6 @@ export type {
   OctopusManifest,
 } from "./src/octopus-file/octopus-file.js";
 export { readOctopusFile } from "./src/octopus-file/read-octopus-file.js";
-export type { ImportedClipboardData } from "./src/paste/import-from-clipboard-data.js";
 export { importFromClipboardData } from "./src/paste/import-from-clipboard-data.js";
 /**
  * Underlying Open Design Engine version used in this version of the framework.

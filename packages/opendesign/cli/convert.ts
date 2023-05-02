@@ -1,7 +1,11 @@
 import * as fs from "node:fs/promises";
 import { parseArgs } from "node:util";
 
-import { importFile, readOctopusFile } from "@opendesign/universal";
+import {
+  importFile,
+  importFromClipboardData,
+  readOctopusFile,
+} from "@opendesign/universal";
 import {
   importIllustratorFile,
   importPhotoshopFile,
@@ -23,8 +27,13 @@ export async function convertFile(
     output = await importIllustratorFile(path);
   } else if (path.endsWith(".psd")) {
     output = await importPhotoshopFile(path);
+  } else if (path.endsWith(".clipboard")) {
+    const input = await fs.readFile(path, "utf-8");
+    let res = await (await importFromClipboardData(input))?.serialize();
+    if (!res) throw expectedError("Failed to import from clipboard data");
+    output = res;
   } else {
-    let input = await fs.readFile(path);
+    const input = await fs.readFile(path);
     output = await importFile(input);
   }
   if (!options["skip-font-embed"]) {

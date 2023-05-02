@@ -1,31 +1,28 @@
 import type { Manifest } from "@opendesign/manifest-ts";
 
+import type { OctopusFile } from "../octopus-file/octopus-file.js";
+import { InMemoryOctopusFile } from "../octopus-file/read-octopus-file.js";
 import type { DetachedPromiseControls } from "../utils.js";
 import { detachPromiseControls } from "../utils.js";
-import type { ImportedClipboardData } from "./import-from-clipboard-data.js";
 
 // TODO: import from octopus
 type ComponentConversionResult = any;
 
 export class MemoryExporter {
-  private _completed: DetachedPromiseControls<ImportedClipboardData> =
+  private _completed: DetachedPromiseControls<OctopusFile> =
     detachPromiseControls();
-  private _manifest?: Manifest["schemas"]["OctopusManifest"];
-  private _files: ImportedClipboardData["files"] = [];
+  private _file: OctopusFile = new InMemoryOctopusFile();
+  private _hasManifest = false;
 
   async completed() {
     return this._completed.promise;
   }
 
   finalizeExport(): void {
-    const manifest = this._manifest;
-    if (!manifest) {
+    if (!this._hasManifest) {
       this._completed.reject(new Error("Missing manifest"));
     } else {
-      this._completed.resolve({
-        manifest,
-        files: this._files,
-      });
+      this._completed.resolve(this._file);
     }
   }
 
@@ -34,19 +31,20 @@ export class MemoryExporter {
   ): Promise<string | null> {
     if (!artboard.value) return Promise.resolve(null);
     const path = `octopus-${artboard.id}.json`;
-    this._files.push({ type: "JSON", path, data: artboard.value });
+    this._file.writeText(path, JSON.stringify(artboard.value));
     return path;
   }
 
   async exportImage(name: string, data: Uint8Array): Promise<string> {
     const path = "images/" + name;
-    this._files.push({ type: "BINARY", path, data: data });
+    this._file.writeBinary(path, data);
     return path;
   }
 
   async exportManifest(
     manifest: Manifest["schemas"]["OctopusManifest"],
   ): Promise<void> {
-    this._manifest = manifest;
+    this._hasManifest = true;
+    this._file.writeManifest(manifest);
   }
 }

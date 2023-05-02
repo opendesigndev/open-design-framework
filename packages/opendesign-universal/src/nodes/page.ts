@@ -2,7 +2,7 @@ import type { EditorImplementation } from "../editor.js";
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { todo } from "../internals.js";
-import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import type { OctopusFile } from "../octopus-file/octopus-file.js";
 import type { ArtboardNode, LayerListItem } from "./artboard.js";
 import { ArtboardNodeImpl } from "./artboard.js";
 import type { BaseNode, NodeFilter } from "./node.js";
@@ -25,7 +25,7 @@ export interface PageNode extends BaseNode {
    *
    * @param data
    */
-  paste(data: ImportedClipboardData): Promise<void>;
+  paste(data: OctopusFile): Promise<void>;
 }
 
 type AbortSignal = any;
@@ -60,12 +60,13 @@ export class PageNodeImpl extends BaseNodeImpl implements PageNode {
     return this.__artboard ?? null;
   }
 
-  async paste(data: ImportedClipboardData) {
+  async paste(data: OctopusFile) {
     let artboard = this.__artboard;
     if (!artboard) {
-      const octopus = data.files.find((f) => f.type === "JSON");
-      if (!octopus || octopus.type !== "JSON" || !octopus.data.content)
-        throw new Error("Pasted data do not contain octopus");
+      const octopusPath = data.manifest.components[0]?.location.path;
+      if (!octopusPath)
+        throw new Error("Pasted data do not contain any design component");
+      const octopus = JSON.parse(await data.readText(octopusPath));
       const id = octopus.data.id;
       artboard = new ArtboardNodeImpl(
         this.#engine,

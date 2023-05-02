@@ -6,8 +6,8 @@ import { mat2d } from "gl-matrix";
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
-import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
 import { isDefinedNumber } from "../utils.js";
+import type { OctopusFile } from "../octopus-file/octopus-file.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
@@ -53,7 +53,7 @@ export interface LayerNode extends BaseNode {
    *
    * @param data
    */
-  paste(data: ImportedClipboardData): Promise<void>;
+  paste(data: OctopusFile): Promise<void>;
 
   /**
    * Creates layer from octopus data
@@ -122,13 +122,13 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     this.#engine = engine;
   }
 
-  async paste(data: ImportedClipboardData): Promise<void> {
-    // TODO: the same filtering is in page if no artboard is present. Do we need this?
-    const octopus = data.files.find((f) => f.type === "JSON");
-    if (!octopus || octopus.type !== "JSON" || !octopus.data.content)
-      throw new Error("Pasted data do not contain octopus");
-    // TODO: figure out if we can use octopus.source so that parse errors have
-    // correct position
+  async paste(data: OctopusFile): Promise<void> {
+    const octopusPath = data.manifest.components[0]?.location.path;
+    if (!octopusPath)
+      throw new Error("Pasted data do not contain any design component");
+    // TODO: figure out if we can pass the source string directly so that parse
+    // errors have correct location
+    const octopus = JSON.parse(await data.readText(octopusPath));
     this.createLayer(octopus.data.content);
 
     await loadPastedImages(this.#engine, data);
