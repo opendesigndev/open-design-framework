@@ -2,7 +2,10 @@ import * as fs from "node:fs/promises";
 import { parseArgs } from "node:util";
 
 import { importFile, readOctopusFile } from "@opendesign/universal";
-import { importIllustratorFile } from "@opendesign/universal/node";
+import {
+  importIllustratorFile,
+  importPhotoshopFile,
+} from "@opendesign/universal/node";
 
 import { embedFonts } from "./embed-fonts.js";
 import { expectedError } from "./utils.js";
@@ -18,6 +21,8 @@ export async function convertFile(
   let output: Uint8Array;
   if (path.endsWith(".ai")) {
     output = await importIllustratorFile(path);
+  } else if (path.endsWith(".psd")) {
+    output = await importPhotoshopFile(path);
   } else {
     let input = await fs.readFile(path);
     output = await importFile(input);
@@ -47,7 +52,7 @@ export async function execute(args: string[]) {
     throw expectedError("Missing input or output file");
   }
 
-  const output = await convert(options.input, options);
+  const output = await convertFile(options.input, options);
   await fs.writeFile(options.output, output);
 }
 
