@@ -18,9 +18,8 @@ import {
   isOptimizedOctopusFile,
   readOctopusFile,
 } from "@opendesign/universal";
-import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
-import React, { Suspense, useState } from "react";
+import React, { Fragment, Suspense, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
@@ -102,7 +101,6 @@ export function EditorComponent({ file }: { file?: Uint8Array }) {
     data.type === "file" &&
     (!id || !data.manifest.components.some((c) => c.id === id))
   ) {
-    console.log(data.manifest.components.map((c) => c.id));
     const components = new Map<string, OctopusManifest["components"][0]>();
     for (const c of data.manifest.components) components.set(c.id, c);
     return (
@@ -128,23 +126,9 @@ export function EditorComponent({ file }: { file?: Uint8Array }) {
     <div className="w-full h-full flex flex-col" {...getRootProps()}>
       <input {...getInputProps()} />
 
-      {data.type === "file" && id ? (
-        <div className="align-left">
-          <ComponentSelect
-            manifest={data.manifest}
-            value={id}
-            onChange={(evt) => {
-              setParams({
-                ...Object.fromEntries(params.entries()),
-                id: evt.currentTarget.value,
-              });
-            }}
-          />
-        </div>
-      ) : null}
       <Content
         data={data}
-        key={data.type === "file" ? data.fileKey : 0}
+        key={data.type === "file" ? data.fileKey + (id ?? "") : 0}
         componentId={id}
       />
     </div>
@@ -242,52 +226,39 @@ function Layers({
   if (!layers || layers?.length === 0) return null;
 
   return (
-    <ol className="[counter-reset:section] ml-2">
-      {layers.map(
-        (layer) =>
-          layer && (
+    <ol>
+      {layers.map((layer) =>
+        layer ? (
+          <Fragment key={layer.id}>
             <li
               key={layer.id}
-              className={`[counter-increment:section] marker:[content:counters(section,'.')] pl-4 ${
-                layer.id === selected && "bg-violet-300"
-              }`}
+              className={`${
+                layer.id === selected
+                  ? "bg-blue-700 text-white"
+                  : "hover:border hover:border-blue-700 hover:mx-[-1px] hover:bg-blue-200"
+              } h-9  flex items-center rounded cursor-not-allowed`}
+              style={{ paddingLeft: `${level * 0.5}rem` }}
             >
               {layer.name}
-              {layer.layers.length > 0 && (
-                <Layers
-                  layers={layer.layers}
-                  level={level + 1}
-                  selected={selected}
-                />
-              )}
             </li>
-          ),
+            <Layers
+              layers={layer.layers}
+              level={level + 1}
+              selected={selected}
+            />
+          </Fragment>
+        ) : null,
       )}
     </ol>
   );
 }
 
 function LayerList({ selected }: { selected?: string }) {
-  const [isReverse, setIsReverse] = useState(false);
-  const layers = useLayerList({ naturalOrder: !isReverse });
-
-  if (!layers) return null;
-
-  return (
-    <>
-      <Button onClick={() => setIsReverse(!isReverse)}>
-        Change order to {!isReverse ? "Reverse" : "Normal"}
-      </Button>
-      <Layers layers={layers.layers} selected={selected} />
-    </>
-  );
-}
-
-function SecondLayerList() {
   const layers = useLayerList();
+
   if (!layers) return null;
 
-  return <Layers layers={layers.layers} />;
+  return <Layers layers={layers.layers} selected={selected} />;
 }
 
 function Content({
@@ -311,66 +282,44 @@ function Content({
     unstable_fallbackFont: new URL("/static/inter.ttf", import.meta.url).href,
   });
   const [selectedLayer, setSelectedLayer] = useState<LayerNode | null>(null);
+  usePaste((evt) => {
+    evt.preventDefault();
+    performPaste(editor, evt.data);
+  }, editor);
 
   return (
-    <>
-      <EditorProvider editor={editor}>
-        <PasteButton
-          onPaste={(evt) => {
-            evt.preventDefault();
-            performPaste(editor, evt.data);
-          }}
-        />
-        <div className="flex flex-row py-2 grow">
-          <div className="basis-1/5">
+    <EditorProvider editor={editor}>
+      <div className="flex flex-row grow">
+        <div className="basis-1/5 min-w-[200px] p-2">
+          <div className="h-14 flex items-center p-1">
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
-            <Suspense>
-              <LayerList selected={selectedLayer?.id} />
-            </Suspense>
-            <hr />
-            <h2 className="text-lg font-semibold mb-2">
-              Second layer list (without naturalOrder parameter)
-            </h2>
-            <Suspense>
-              <SecondLayerList />
-            </Suspense>
           </div>
-          <div className="basis-4/5 border border-dashed">
-            <Suspense>
-              <EditorCanvas
-                editor={editor}
-                onClick={({ target }) => {
-                  if (
-                    target &&
-                    target?.type !== "ARTBOARD" &&
-                    target.type !== "PAGE"
-                  ) {
-                    setSelectedLayer(target);
-                  }
-                }}
-              >
-                <ErrorBoundary>
-                  {selectedLayer ? (
-                    <LayerOutline layer={selectedLayer} />
-                  ) : null}
-                </ErrorBoundary>
-              </EditorCanvas>
-            </Suspense>
-            {data.type === "file" ? (
-              <div className="absolute top-4 right-4">
-                <Button
-                  onClick={() =>
-                    void saveAs(new Blob([data.data]), "file.octopus")
-                  }
-                >
-                  Download .octopus
-                </Button>
-              </div>
-            ) : null}
-          </div>
+          <Suspense>
+            <LayerList selected={selectedLayer?.id} />
+          </Suspense>
         </div>
-      </EditorProvider>
-    </>
+        <div className="basis-4/5 border-l min-w-[300px] border-dashed">
+          <Suspense>
+            <EditorCanvas
+              editor={editor}
+              onClick={({ target }) => {
+                if (
+                  target &&
+                  target?.type !== "ARTBOARD" &&
+                  target.type !== "PAGE"
+                ) {
+                  setSelectedLayer(target);
+                }
+              }}
+            >
+              <ErrorBoundary>
+                {selectedLayer ? <LayerOutline layer={selectedLayer} /> : null}
+              </ErrorBoundary>
+            </EditorCanvas>
+          </Suspense>
+        </div>
+      </div>
+    </EditorProvider>
   );
 }
 
