@@ -2,6 +2,7 @@ import * as fs from "node:fs/promises";
 import { parseArgs } from "node:util";
 
 import { importFile, readOctopusFile } from "@opendesign/universal";
+import { importIllustratorFile } from "@opendesign/universal/node";
 
 import { embedFonts } from "./embed-fonts.js";
 import { expectedError } from "./utils.js";
@@ -10,11 +11,17 @@ export const convertOptions = {
   "skip-font-embed": { type: "boolean" },
 } as const;
 
-export async function convert(
-  input: Uint8Array,
+export async function convertFile(
+  path: string,
   options: { "skip-font-embed"?: boolean },
 ) {
-  const output = await importFile(input);
+  let output: Uint8Array;
+  if (path.endsWith(".ai")) {
+    output = await importIllustratorFile(path);
+  } else {
+    let input = await fs.readFile(path);
+    output = await importFile(input);
+  }
   if (!options["skip-font-embed"]) {
     await embedFonts(readOctopusFile(output));
   }
@@ -39,8 +46,8 @@ export async function execute(args: string[]) {
   if (!options.input || !options.output) {
     throw expectedError("Missing input or output file");
   }
-  const input = await fs.readFile(options.input);
-  const output = await convert(input, options);
+
+  const output = await convert(options.input, options);
   await fs.writeFile(options.output, output);
 }
 

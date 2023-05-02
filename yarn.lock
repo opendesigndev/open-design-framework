@@ -2487,10 +2487,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opendesign/illustrator-parser-pdfcpu@npm:1.1.2":
+  version: 1.1.2
+  resolution: "@opendesign/illustrator-parser-pdfcpu@npm:1.1.2"
+  dependencies:
+    gl-matrix: ^3.4.3
+    immutable: ^4.1.0
+    marky: ^1.2.4
+  checksum: fdcc80ca47959f8fc44ac363a378059abf6430bf77704456686c33673719a289cf1c5de55c6fc60bf595e87856c4add03ad831f1dd440aa3e9b66515c392d9e8
+  languageName: node
+  linkType: hard
+
 "@opendesign/manifest-ts@npm:3.0.1, @opendesign/manifest-ts@npm:^3.0.1":
   version: 3.0.1
   resolution: "@opendesign/manifest-ts@npm:3.0.1"
   checksum: 6b28cc0c223d3af061298d3c5273820713fe1fad87579ce624e98e932def04d750bbd6e5bcdc27e0743368f8c4ad2864f3c55f9e4955b73094a774f63400ccce
+  languageName: node
+  linkType: hard
+
+"@opendesign/octopus-ai@npm:3.0.0-rc-experimental-13":
+  version: 3.0.0-rc-experimental-13
+  resolution: "@opendesign/octopus-ai@npm:3.0.0-rc-experimental-13"
+  dependencies:
+    "@opendesign/illustrator-parser-pdfcpu": 1.1.2
+    "@opendesign/manifest-ts": 3.0.1
+    "@opendesign/octopus-common": 3.0.0-rc.32
+    "@opendesign/octopus-ts": 3.0.1
+    "@types/node": "*"
+    dotenv: 16.0.0
+    lodash: ^4.17.21
+    paper: ^0.12.15
+    pino: ^6.7.0
+    pino-pretty: ^4.3.0
+    time-stamp: ^2.2.0
+    uuid: ^8.3.2
+  checksum: 9f2bbfb25eecf6add8760f48aaaf52b89d6e9e7978a938c51a2a15dae7692de73caa74275dbd10f5c5743b6d7ad257e5a635556a6f056e5b43b839fffb93f2d6
   languageName: node
   linkType: hard
 
@@ -2505,6 +2536,20 @@ __metadata:
     lodash: ^4.17.21
     uuid: ^8.3.2
   checksum: cda4bde60792081a0162adff7f97ade90133f31691b19aa6f5446a6e9a743ab62046c322885e858c8d7cbc35ea45bc2be8e88bce80c689e0ed26876bb9acd4d8
+  languageName: node
+  linkType: hard
+
+"@opendesign/octopus-common@npm:3.0.0-rc.32":
+  version: 3.0.0-rc.32
+  resolution: "@opendesign/octopus-common@npm:3.0.0-rc.32"
+  dependencies:
+    "@opendesign/octopus-ts": 3.0.1
+    "@types/lodash": ^4.14.178
+    "@types/uuid": ^8.3.1
+    crc-32: ^1.2.2
+    lodash: ^4.17.21
+    uuid: ^8.3.2
+  checksum: c3c15c2499be0d38e877fbd2cf6c0d0c1b3f81720f8ecff5e3d7173d1f304f167d37a76da4086aa9de216a3063729a3d9573f9cf9bb05c818451ce841a564025
   languageName: node
   linkType: hard
 
@@ -2580,6 +2625,7 @@ __metadata:
     "@opendesign/engine": 0.3.1-f64e572-20230510
     "@opendesign/env": "workspace:*"
     "@opendesign/manifest-ts": ^3.0.1
+    "@opendesign/octopus-ai": 3.0.0-rc-experimental-13
     "@opendesign/octopus-fig": 3.0.0-rc.30
     "@opendesign/octopus-ts": ^3.0.1
     "@opendesign/octopus-xd": 3.0.0-rc.20
@@ -6058,6 +6104,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immutable@npm:^4.1.0":
+  version: 4.3.0
+  resolution: "immutable@npm:4.3.0"
+  checksum: bbd7ea99e2752e053323543d6ff1cc71a4b4614fa6121f321ca766db2bd2092f3f1e0a90784c5431350b7344a4f792fa002eac227062d59b9377b6c09063b58b
+  languageName: node
+  linkType: hard
+
 "import-fresh@npm:^3.0.0, import-fresh@npm:^3.2.1":
   version: 3.3.0
   resolution: "import-fresh@npm:3.3.0"
@@ -6775,6 +6828,13 @@ __metadata:
   bin:
     marked: bin/marked.js
   checksum: 717e3357952ee53de831bf0eb110ed075bebca2376c58bcdf7ee523ef540d45308ad6d51b2c933da0968832ea4386f31c142ca65443e77c098e84f6cce73e418
+  languageName: node
+  linkType: hard
+
+"marky@npm:^1.2.4":
+  version: 1.2.5
+  resolution: "marky@npm:1.2.5"
+  checksum: 823b946677749551cdfc3b5221685478b5d1b9cc0dc03eff977c6f9a615fb05c67559f9556cb3c0fcb941a9ea0e195e37befd83026443396ccee8b724f54f4c5
   languageName: node
   linkType: hard
 
@@ -7522,6 +7582,13 @@ __metadata:
   version: 0.12.4
   resolution: "paper@npm:0.12.4"
   checksum: 66333743c621f821aa567954c5afc3209d32a615fef075c6effe2ad14764aa145c4a81db7e08938c0fe37c1ce5490405de17ca3623f373c0ba6f00d250acee05
+  languageName: node
+  linkType: hard
+
+"paper@npm:^0.12.15":
+  version: 0.12.17
+  resolution: "paper@npm:0.12.17"
+  checksum: 755c45adf8fa63b5572fe043669dca8c5178fe8d8de2c5cca72ba5c376e1647cd79786d8239de8294174965ebe157aa2af65f9227334cf555620c599e9e51485
   languageName: node
   linkType: hard
 

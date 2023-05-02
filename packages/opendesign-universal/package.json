@@ -17,6 +17,7 @@
     "@opendesign/engine": "0.3.1-f64e572-20230510",
     "@opendesign/env": "workspace:*",
     "@opendesign/manifest-ts": "^3.0.1",
+    "@opendesign/octopus-ai": "3.0.0-rc-experimental-13",
     "@opendesign/octopus-fig": "3.0.0-rc.30",
     "@opendesign/octopus-ts": "^3.0.1",
     "@opendesign/octopus-xd": "3.0.0-rc.20",
@@ -26,7 +27,8 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./dom": "./dist/src/dom.js"
+    "./dom": "./dist/src/dom.js",
+    "./node": "./dist/src/node.js"
   },
   "scripts": {
     "build": "yarn run -T tsc"

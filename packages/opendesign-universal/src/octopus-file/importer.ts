@@ -1,17 +1,7 @@
-import { createConverter, XDFileReader } from "@opendesign/octopus-xd";
-
-import { MemoryFileExporter } from "./memory-file-exporter.js";
+import { importIllustratorFile } from "./importer-ai.js";
+import { importXDFile } from "./importer-xd.js";
 
 export async function importFile(data: Uint8Array) {
-  const reader = new XDFileReader({ file: data });
-  const sourceDesign = await reader.sourceDesign;
-  if (sourceDesign === null) {
-    throw Error("Creating SourceDesign Failed");
-  }
-  const converter = createConverter({ sourceDesign });
-  const exporter = new MemoryFileExporter();
-  await converter.convertDesign({ exporter });
-  const dir = await exporter.completed();
-  await reader.cleanup();
-  return dir;
+  // return importIllustratorFile(data);
+  return importXDFile(data);
 }
