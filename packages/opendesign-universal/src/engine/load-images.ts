@@ -1,6 +1,6 @@
 import { parseImage } from "@opendesign/env";
 
-import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import type { OctopusFile } from "../octopus-file/octopus-file.js";
 import type { Engine } from "./engine.js";
 import { automaticScope, createStringRef } from "./memory.js";
 
@@ -32,10 +32,26 @@ export async function loadImages(
   });
 }
 
-export function loadPastedImages(engine: Engine, data: ImportedClipboardData) {
-  return loadImages(
+export async function loadPastedImages(engine: Engine, data: OctopusFile) {
+  const images = data.manifest.components[0].assets?.images;
+  if (!images) return;
+
+  return await loadImages(
     engine,
-    data.files.map((f) => (f.type === "BINARY" ? f : null)).filter(notNull),
+    (
+      await Promise.all(
+        images.map(async (image) => {
+          if (image.location.type === "EXTERNAL") {
+            console.warn("External images are not supported yet");
+            return null;
+          }
+          return {
+            path: image.location.path,
+            data: await data.readBinary(image.location.path),
+          };
+        }),
+      )
+    ).filter(notNull),
   );
 }
 

@@ -1,4 +1,4 @@
-import type { ImportedClipboardData } from "../index.js";
+import type { OctopusFile } from "../index.js";
 import { importFromClipboardData } from "../index.js";
 import type { Editor } from "./editor.js";
 import { editorGetEngine } from "./editor.js";
@@ -336,7 +336,7 @@ function parseScrollDelta(event: WheelEvent): [number, number] {
  */
 export function importFromClipboard(
   input?: ClipboardEvent | string,
-): Promise<ImportedClipboardData | string | null> {
+): Promise<OctopusFile | string | null> {
   // NOTE: do not convert this to async function due to differences in user activation criteria
   const dataMaybePromise =
     typeof input === "string"

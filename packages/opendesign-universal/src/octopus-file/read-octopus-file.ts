@@ -7,10 +7,25 @@ import type { OctopusFile, OctopusManifest } from "./octopus-file.js";
 import { mergeUint8Arrays } from "./octopus-file-utils.js";
 
 type FileInMap = UnzipFile | Uint8Array;
-class InMemoryOctopusFile implements OctopusFile {
+/**
+ * @internal, only export OctopusFile and functions that create it
+ */
+export class InMemoryOctopusFile implements OctopusFile {
   #files;
   #manifest: OctopusManifest;
-  constructor(file: Uint8Array) {
+  constructor(file?: Uint8Array) {
+    if (!file) {
+      this.#files = new Map();
+      this.#manifest = {
+        chunks: [],
+        components: [],
+        libraries: [],
+        origin: { name: "Octopus", version: "@opendesign/universal@unknown" },
+        pages: [],
+        version: "3.0.1",
+      };
+      return;
+    }
     if (!isOptimizedOctopusFile(file.buffer))
       throw new Error("File must be octopus file");
 
@@ -23,6 +38,9 @@ class InMemoryOctopusFile implements OctopusFile {
   }
 
   async readBinary(filename: string): Promise<Uint8Array> {
+    if (filename === "octopus-manifest.json")
+      throw new Error("Cannot read manifest. Use .manifest property instead");
+
     const file = this.#files.get(filename);
     if (!file) throw new Error(`File ${filename} not found`);
     return readFile(file);
@@ -52,7 +70,18 @@ class InMemoryOctopusFile implements OctopusFile {
   }
 
   async writeBinary(filename: string, data: Uint8Array): Promise<void> {
+    if (filename === "octopus-manifest.json")
+      throw new Error("Cannot overwrite manifest, use writeManifest instead");
+
     this.#files.set(filename, data);
+  }
+
+  async writeText(filename: string, data: string): Promise<void> {
+    await this.writeBinary(filename, fflate.strToU8(data));
+  }
+
+  async writeManifest(manifest: OctopusManifest): Promise<void> {
+    this.#manifest = manifest;
   }
 
   async serialize(): Promise<Uint8Array> {

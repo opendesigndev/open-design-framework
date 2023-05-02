@@ -1,11 +1,11 @@
-import type { Editor, ImportedClipboardData } from "@opendesign/universal";
+import type { Editor, OctopusFile } from "@opendesign/universal";
 import { importFromClipboard } from "@opendesign/universal/dom";
 import { useCallback, useEffect } from "react";
 
 import { useEditorContextOptional } from "./context.js";
 
 export type PasteEvent = {
-  data: ImportedClipboardData | string | null;
+  data: OctopusFile | string | null;
   event: ClipboardEvent | null;
   preventDefault(this: PasteEvent): void;
   defaultPrevented: boolean;
@@ -84,7 +84,7 @@ export function usePaste(
 
   const handlePaste = useCallback(
     (
-      data: ImportedClipboardData | string | null,
+      data: OctopusFile | string | null,
       event: ClipboardEvent | null = null,
     ) => {
       if (data) {
