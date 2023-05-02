@@ -7,7 +7,7 @@ import { isOptimizedOctopusFile } from "@opendesign/universal";
 import express from "express";
 import openUrl from "open";
 
-import { convert, convertOptions, convertOptionsHelp } from "./convert.js";
+import { convertFile, convertOptions, convertOptionsHelp } from "./convert.js";
 import { expectedError, packageRoot, reflow } from "./utils.js";
 
 const editorDist = new URL("dist/editor/", packageRoot());
@@ -46,7 +46,7 @@ export async function execute(args: string[]) {
     const data = await fs.readFile(positionals[0]);
     const converted = isOptimizedOctopusFile(data.buffer)
       ? data
-      : await convert(data, values);
+      : await convertFile(positionals[0], values);
 
     const ext = path.extname(file);
     const filename = path.basename(file, ext) + ".octopus";
