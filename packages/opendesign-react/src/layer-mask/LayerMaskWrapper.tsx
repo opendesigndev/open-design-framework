@@ -16,7 +16,7 @@ export function LayerMaskWrapper({
   node,
 }: ILayerMaskWrapperProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const stale = state.resizingStarted && !state.resizingEnded;
+  const stale = state.resizingStarted;
 
   return (
     <LayerMaskContext.Provider value={{ state, dispatch }}>

@@ -13,6 +13,7 @@ import type {
 import { mount } from "@opendesign/universal/dom";
 import {
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -25,6 +26,7 @@ import {
   useCanvasContext,
   useEditorContext,
 } from "./src/context.js";
+import { LayerMaskContext } from "./src/layer-mask/context.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 
@@ -271,6 +273,7 @@ export function RelativeMarker(
 ): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const canvas = useCanvasContext();
+  const { state } = useContext(LayerMaskContext);
 
   const handler: MountEventHandler<"viewportChange"> = useCallback(
     ({ viewport }) => {
@@ -279,38 +282,67 @@ export function RelativeMarker(
       if (!div) return;
 
       const metrics = props.node.readMetrics();
-      console.log("metrics updated?", metrics, props.node.id);
+      console.log(
+        "metrics updated?",
+        metrics,
+        props.node.id,
+        "; is it stale?",
+        props.stale,
+        state.resizing,
+        state.resizingEnded,
+        state.resizingStarted,
+      );
+
+      const deltaWidth =
+        metrics.transformedGraphicalBounds[1][0] -
+        metrics.transformedGraphicalBounds[0][0];
+      const deltaHeight =
+        metrics.transformedGraphicalBounds[1][1] -
+        metrics.transformedGraphicalBounds[0][1];
+
+      const left =
+        deltaWidth > 0
+          ? metrics.transformation[4] + metrics.graphicalBounds[0][0]
+          : metrics.transformation[4] +
+            metrics.graphicalBounds[0][0] +
+            deltaWidth;
+
+      const top =
+        deltaHeight > 0
+          ? metrics.transformation[5] + metrics.graphicalBounds[0][1]
+          : metrics.transformation[5] +
+            metrics.graphicalBounds[0][1] +
+            deltaHeight;
 
       div.style.width =
-        (metrics.transformedGraphicalBounds[1][0] -
-          metrics.transformedGraphicalBounds[0][0]) *
-          (viewport.scale / window.devicePixelRatio) -
+        Math.abs(deltaWidth) * (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) * 2 +
         "px";
       div.style.height =
-        (metrics.transformedGraphicalBounds[1][1] -
-          metrics.transformedGraphicalBounds[0][1]) *
-          (viewport.scale / window.devicePixelRatio) -
+        Math.abs(deltaHeight) * (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) * 2 +
         "px";
       div.style.left =
-        (metrics.transformation[4] +
-          metrics.graphicalBounds[0][0] -
-          viewport.offset[0]) *
+        (left - viewport.offset[0]) *
           (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) +
         "px";
       div.style.top =
-        (metrics.transformation[5] +
-          metrics.graphicalBounds[0][1] -
-          viewport.offset[1]) *
+        (top - viewport.offset[1]) *
           (viewport.scale / window.devicePixelRatio) -
         (props.inset ?? 0) +
         "px";
 
       div.style.position = "absolute";
     },
-    [props.inset, props.node],
+    [
+      props.inset,
+      props.node,
+      props.stale,
+      state.resizing,
+      state.resizingEnded,
+      state.resizingStarted,
+    ],
   );
 
   const handleLayerChange = useCallback(
@@ -320,6 +352,12 @@ export function RelativeMarker(
     },
     [canvas, handler],
   );
+
+  useEffect(() => {
+    const metrics = props.node.readMetrics();
+    console.log("stale changed ", props.stale, "; metrics:", metrics);
+    handler({ viewport: canvas.getViewport() });
+  }, [canvas, handler, props.node, props.stale]);
 
   useLayoutEffect(() => {
     const div = ref.current;
@@ -332,14 +370,7 @@ export function RelativeMarker(
       // unsubChanged();
       unsubViewportChnage();
     };
-  }, [
-    canvas,
-    handleLayerChange,
-    handler,
-    props.inset,
-    props.node,
-    props.stale,
-  ]);
+  }, [canvas, handleLayerChange, handler, props.inset, props.node]);
 
   return (
     <div

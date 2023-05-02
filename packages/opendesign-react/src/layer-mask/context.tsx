@@ -90,6 +90,8 @@ export function reducer(
         deltaX: deltaX,
         deltaY: deltaY,
         origin: action.altKey ? "center" : [action.originX, action.originY],
+        resizingStarted: true,
+        resizingEnded: false,
         resizing: true,
       };
     case "stopResize":
