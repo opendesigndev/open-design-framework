@@ -25,7 +25,7 @@ if (fs.existsSync(".git")) {
   ]);
 }
 
-const cli = path.join(here, "packages", "opendesign", "dist");
+const editor = path.join(here, "packages", "opendesign", "dist", "editor");
 const docs = path.join(here, "packages", "docs", "dist");
 const dist = path.join(here, "dist");
 console.info("Creating shared dist...");
@@ -33,7 +33,7 @@ fs.rmSync(dist, { force: true, recursive: true });
 fs.mkdirSync(dist);
 copy(docs, dist);
 fs.renameSync(path.join(dist, "index.html"), path.join(dist, "changelog.html"));
-copy(cli, dist);
+copy(editor, dist);
 
 /**
  * @param {string} from

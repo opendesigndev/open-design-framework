@@ -29,3 +29,6 @@ COPY --from=deps /app/dist /usr/share/nginx/html
 # dokku letsencrypt:enable odf
 # dokku proxy:ports-add odf https:443:80
 # dokku proxy:ports-remove odf https:443:5000
+
+# docker build . --tag odf
+# docker run --rm -it -p 3000:80 odf

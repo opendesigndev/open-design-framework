@@ -3,6 +3,7 @@
 !/.yarn/plugins
 !/docs
 !/packages
+/packages/*/dist
 
 !/.yarnrc.yml
 !/package.json
