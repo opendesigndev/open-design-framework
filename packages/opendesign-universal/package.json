@@ -18,7 +18,7 @@
     "@opendesign/env": "workspace:*",
     "@opendesign/manifest-ts": "^3.0.1",
     "@opendesign/octopus-ai": "3.0.0-rc-experimental-13",
-    "@opendesign/octopus-fig": "^3.0.0-rc.40",
+    "@opendesign/octopus-fig": "3.0.0-rc.42",
     "@opendesign/octopus-psd": "3.1.0-rc.5",
     "@opendesign/octopus-ts": "^3.0.1",
     "@opendesign/octopus-xd": "3.0.0-rc.20",
