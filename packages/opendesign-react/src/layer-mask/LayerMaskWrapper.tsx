@@ -1,5 +1,5 @@
 import type { LayerNode } from "@opendesign/universal";
-import { useReducer } from "react";
+import { useLayoutEffect, useReducer } from "react";
 
 import { RelativeMarker } from "../../index.js";
 import type { ILayerMaskProps } from "./LayerMask.js";
@@ -13,6 +13,15 @@ export interface ILayerMaskWrapperProps extends ILayerMaskProps {
 export function LayerMaskWrapper({ onResize, node }: ILayerMaskWrapperProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const stale = state.resizingStarted;
+
+  useLayoutEffect(() => {
+    const metrics = node.readMetrics();
+    dispatch({
+      type: "setOriginalSize",
+      originalWidth: metrics.graphicalBounds[1][0],
+      originalHeight: metrics.graphicalBounds[1][1],
+    });
+  }, [node]);
 
   return (
     <LayerMaskContext.Provider value={{ state, dispatch }}>

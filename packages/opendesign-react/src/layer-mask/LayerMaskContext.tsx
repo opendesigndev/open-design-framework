@@ -5,21 +5,28 @@ export type OriginValues = "top" | "left" | "right" | "bottom" | "center";
 export type Origin = OriginValues | readonly [OriginValues, OriginValues];
 
 export type LayerMaskState = {
-  containerRef: React.RefObject<HTMLDivElement> | null;
-  resizingHandle: EventTarget | null;
-  shiftKey: boolean;
   altKey: boolean;
-  startX: number;
-  startY: number;
+  containerRef: React.RefObject<HTMLDivElement> | null;
   deltaX: number;
   deltaY: number;
   origin: Origin;
+  originalHeight: number;
+  originalWidth: number;
   resizing: boolean;
   resizingEnded: boolean;
+  resizingHandle: EventTarget | null;
   resizingStarted: boolean;
+  shiftKey: boolean;
+  startX: number;
+  startY: number;
 };
 
 export type LayerMaskAction =
+  | {
+      type: "setOriginalSize";
+      originalWidth: number;
+      originalHeight: number;
+    }
   | {
       type: "setRef";
       containerRef: React.RefObject<HTMLDivElement>;
@@ -44,18 +51,20 @@ export type LayerMaskAction =
     };
 
 export const initialState: LayerMaskState = {
-  containerRef: null,
-  resizingHandle: null,
-  shiftKey: false,
   altKey: false,
-  startX: 0,
-  startY: 0,
+  containerRef: null,
   deltaX: 0,
   deltaY: 0,
   origin: ["left", "top"],
+  originalHeight: 0,
+  originalWidth: 0,
   resizing: false,
   resizingEnded: true,
+  resizingHandle: null,
   resizingStarted: false,
+  shiftKey: false,
+  startX: 0,
+  startY: 0,
 };
 
 export function reducer(
@@ -63,6 +72,12 @@ export function reducer(
   action: LayerMaskAction,
 ): LayerMaskState {
   switch (action.type) {
+    case "setOriginalSize":
+      return {
+        ...state,
+        originalWidth: action.originalWidth,
+        originalHeight: action.originalHeight,
+      };
     case "setRef":
       return {
         ...state,
