@@ -1,7 +1,6 @@
 import { useCallback, useContext, useLayoutEffect, useRef } from "react";
 
 import { useCanvasContext } from "../context.js";
-import { throttle } from "../throttle.js";
 import { LayerMaskContext } from "./context.js";
 
 export enum ResizeHandleType {
@@ -140,8 +139,6 @@ export function useResizable(type: ResizeHandleType) {
             break;
         }
       }
-
-      const throttledHandlePointerMove = throttle(handlePointerMove, 60);
 
       document.addEventListener("pointermove", handlePointerMove);
 

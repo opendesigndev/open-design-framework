@@ -273,7 +273,6 @@ export function RelativeMarker(
 ): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const canvas = useCanvasContext();
-  const { state } = useContext(LayerMaskContext);
 
   const handler: MountEventHandler<"viewportChange"> = useCallback(
     ({ viewport }) => {
@@ -282,16 +281,6 @@ export function RelativeMarker(
       if (!div) return;
 
       const metrics = props.node.readMetrics();
-      console.log(
-        "metrics updated?",
-        metrics,
-        props.node.id,
-        "; is it stale?",
-        props.stale,
-        state.resizing,
-        state.resizingEnded,
-        state.resizingStarted,
-      );
 
       const deltaWidth =
         metrics.transformedGraphicalBounds[1][0] -
@@ -335,14 +324,7 @@ export function RelativeMarker(
 
       div.style.position = "absolute";
     },
-    [
-      props.inset,
-      props.node,
-      props.stale,
-      state.resizing,
-      state.resizingEnded,
-      state.resizingStarted,
-    ],
+    [props.inset, props.node],
   );
 
   const handleLayerChange = useCallback(
@@ -354,8 +336,6 @@ export function RelativeMarker(
   );
 
   useEffect(() => {
-    const metrics = props.node.readMetrics();
-    console.log("stale changed ", props.stale, "; metrics:", metrics);
     handler({ viewport: canvas.getViewport() });
   }, [canvas, handler, props.node, props.stale]);
 
@@ -364,10 +344,8 @@ export function RelativeMarker(
     if (!div) return;
 
     handler({ viewport: canvas.getViewport() });
-    // const unsubChanged = props.node.listen("changed", handleLayerChange);
     const unsubViewportChnage = canvas.subscribe("viewportChange", handler);
     return () => {
-      // unsubChanged();
       unsubViewportChnage();
     };
   }, [canvas, handleLayerChange, handler, props.inset, props.node]);

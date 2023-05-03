@@ -104,33 +104,6 @@ export interface LayerNode extends BaseNode {
    * @returns true if transformation was applied, false if it was not applied
    */
   setSize(width?: number, height?: number, origin?: Origin): boolean;
-
-  /**
-   * Change layer's width by given width
-   * @param width width in px
-   * @returns true if transformation was applied, false if it was not applied
-   */
-  setWidth(width: number): boolean;
-
-  /**
-   * Change layer's height by given height
-   * @param height height in px
-   * @returns true if transformation was applied, false if it was not applied
-   */
-  setHeight(height: number): boolean;
-
-  /**
-   * Scale layer by given x and y factors and optional origin
-   * @param xFactor x factor
-   * @param yFactor y factor
-   * @param origin origin in px, an array of two numbers, each number is optional
-   * @returns true if transformation was applied, false if it was not applied
-   */
-  scale(
-    xFactor: number,
-    yFactor: number,
-    origin?: [x?: number, y?: number],
-  ): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -258,68 +231,6 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
     });
   }
 
-  setWidth(width: number): boolean {
-    return automaticScope((scope) => {
-      const metrix = this.readMetrics();
-      const currentTransformation = [
-        ...this.readMetrics().transformation,
-      ] satisfies Scalar_array_6;
-      const currentX = currentTransformation[4];
-      const layerWidth =
-        metrix.transformedGraphicalBounds[1][0] -
-        metrix.transformedGraphicalBounds[0][0];
-      const widthRatio = width / layerWidth;
-      const shiftedX = currentX * widthRatio;
-      const differenceX = currentX - shiftedX;
-      const transform = currentTransformation;
-      transform[0] = widthRatio;
-      transform[4] = differenceX;
-      transform[5] = 0;
-      const id = createStringRef(this.#engine.ode, scope, this.id);
-      this.#engine.ode.component_transformLayer(
-        this.#component,
-        id,
-        "PARENT_COMPONENT",
-        {
-          matrix: transform,
-        },
-      );
-      this.#engine.redraw();
-      return true;
-    });
-  }
-
-  setHeight(height: number): boolean {
-    return automaticScope((scope) => {
-      const metrix = this.readMetrics();
-      const currentTransformation = [
-        ...metrix.transformation,
-      ] satisfies Scalar_array_6;
-      const currentY = currentTransformation[5];
-      const layerHeight =
-        metrix.transformedGraphicalBounds[1][1] -
-        metrix.transformedGraphicalBounds[0][1];
-      const heightRatio = height / layerHeight;
-      const shiftedY = currentY * heightRatio;
-      const differenceY = currentY - shiftedY;
-      const transform = currentTransformation;
-      transform[3] = heightRatio;
-      transform[4] = 0;
-      transform[5] = differenceY;
-      const id = createStringRef(this.#engine.ode, scope, this.id);
-      this.#engine.ode.component_transformLayer(
-        this.#component,
-        id,
-        "PARENT_COMPONENT",
-        {
-          matrix: transform,
-        },
-      );
-      this.#engine.redraw();
-      return true;
-    });
-  }
-
   setSize(width?: number, height?: number, origin?: Origin): boolean {
     return automaticScope((scope) => {
       const calculatedOrigin = this.#calculateOrigin(origin);
@@ -345,43 +256,6 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
       transform[4] = differenceX;
       transform[5] = differenceY;
       const id = createStringRef(this.#engine.ode, scope, this.id);
-      this.#engine.ode.component_transformLayer(
-        this.#component,
-        id,
-        "PARENT_COMPONENT",
-        {
-          matrix: transform,
-        },
-      );
-      this.#engine.redraw();
-      this.#dispatch("changed", "SCALE");
-      return true;
-    });
-  }
-
-  scale(xFactor: number, yFactor: number, origin?: [x?: number, y?: number]) {
-    return automaticScope((scope) => {
-      const metrix = this.readMetrics();
-      const [a, b, c, d, e, f] = [...metrix.transformation];
-      const x = origin?.[0] ? origin[0] : metrix.transformation[4];
-      const y = origin?.[1] ? origin[1] : metrix.transformation[5];
-      const tx = x * (1 - xFactor);
-      const ty = y * (1 - yFactor);
-      const shiftedX = e * xFactor;
-      const shiftedY = f * yFactor;
-      const differenceX = e - shiftedX;
-      const differenceY = f - shiftedY;
-
-      const transform = [
-        xFactor,
-        b,
-        c,
-        yFactor,
-        differenceX,
-        differenceY,
-      ] satisfies Scalar_array_6;
-      const id = createStringRef(this.#engine.ode, scope, this.id);
-
       this.#engine.ode.component_transformLayer(
         this.#component,
         id,

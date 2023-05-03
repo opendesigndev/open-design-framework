@@ -224,7 +224,6 @@ export function mount(
   }
 
   function draw() {
-    console.log("draw");
     frameRequested = false;
 
     renderer.frameView.width = width;

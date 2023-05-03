@@ -367,19 +367,6 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
     },
     [layer],
   );
-  const scaleHandler = useCallback(
-    (scaleX: number, scaleY: number) => {
-      // layer.scale(scaleX, scaleY);
-      console.log(scaleX, scaleY, layer);
-    },
-    [layer],
-  );
 
-  return (
-    <LayerMaskWrapper
-      onResize={changeDimensionsHandler}
-      onScale={scaleHandler}
-      node={layer}
-    />
-  );
+  return <LayerMaskWrapper onResize={changeDimensionsHandler} node={layer} />;
 }

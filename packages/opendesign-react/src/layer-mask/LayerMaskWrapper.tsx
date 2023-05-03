@@ -10,18 +10,14 @@ export interface ILayerMaskWrapperProps extends ILayerMaskProps {
   node: LayerNode;
 }
 
-export function LayerMaskWrapper({
-  onResize,
-  onScale,
-  node,
-}: ILayerMaskWrapperProps) {
+export function LayerMaskWrapper({ onResize, node }: ILayerMaskWrapperProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const stale = state.resizingStarted;
 
   return (
     <LayerMaskContext.Provider value={{ state, dispatch }}>
       <RelativeMarker node={node} stale={stale}>
-        <LayerMask onResize={onResize} onScale={onScale} />
+        <LayerMask onResize={onResize} />
       </RelativeMarker>
     </LayerMaskContext.Provider>
   );

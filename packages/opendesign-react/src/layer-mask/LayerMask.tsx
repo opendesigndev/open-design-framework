@@ -9,10 +9,9 @@ import { VertexHandle } from "./VertexHandle.js";
 
 export interface ILayerMaskProps {
   onResize?: (width: number, height: number, origin?: Origin) => void;
-  onScale: (scaleX: number, scaleY: number) => void;
 }
 
-export function LayerMask({ onResize, onScale }: ILayerMaskProps) {
+export function LayerMask({ onResize }: ILayerMaskProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvas = useCanvasContext();
   const { state, dispatch } = useContext(LayerMaskContext);
@@ -36,12 +35,10 @@ export function LayerMask({ onResize, onScale }: ILayerMaskProps) {
       const newHeight = currentHeight + state.deltaY;
       const newWidth = currentWidth + state.deltaX;
       onResize?.(newWidth, newHeight, state.origin);
-      onScale?.(newWidth / currentWidth, newHeight / currentHeight);
     }
   }, [
     canvas,
     onResize,
-    onScale,
     state.deltaX,
     state.deltaY,
     state.origin,
