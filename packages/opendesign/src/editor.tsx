@@ -19,7 +19,7 @@ import {
   readOctopusFile,
 } from "@opendesign/universal";
 import type { PropsWithChildren } from "react";
-import React, { Fragment, Suspense, useState } from "react";
+import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
@@ -218,10 +218,12 @@ function Layers({
   layers,
   level = 1,
   selected,
+  onLayerSelect,
 }: {
   layers: LayerListItem[];
   level?: number;
   selected?: string;
+  onLayerSelect: (id: string) => void;
 }) {
   if (!layers || layers?.length === 0) return null;
 
@@ -232,11 +234,16 @@ function Layers({
           <Fragment key={layer.id}>
             <li
               key={layer.id}
+              onClick={
+                layer.layers.length ? undefined : () => onLayerSelect(layer.id)
+              }
               className={`${
                 layer.id === selected
                   ? "bg-blue-700 text-white"
+                  : layer.layers.length
+                  ? ""
                   : "hover:border hover:border-blue-700 hover:mx-[-1px] hover:bg-blue-200"
-              } h-9  flex items-center rounded cursor-not-allowed`}
+              } h-9 flex items-center rounded`}
               style={{ paddingLeft: `${level * 0.5}rem` }}
             >
               {layer.name}
@@ -245,6 +252,7 @@ function Layers({
               layers={layer.layers}
               level={level + 1}
               selected={selected}
+              onLayerSelect={onLayerSelect}
             />
           </Fragment>
         ) : null,
@@ -253,12 +261,24 @@ function Layers({
   );
 }
 
-function LayerList({ selected }: { selected?: string }) {
+function LayerList({
+  selected,
+  onLayerSelect,
+}: {
+  selected?: string;
+  onLayerSelect: (id: string) => void;
+}) {
   const layers = useLayerList();
 
   if (!layers) return null;
 
-  return <Layers layers={layers.layers} selected={selected} />;
+  return (
+    <Layers
+      layers={layers.layers}
+      selected={selected}
+      onLayerSelect={onLayerSelect}
+    />
+  );
 }
 
 function Content({
@@ -281,11 +301,21 @@ function Content({
     wasmLocation: "/engine/ode.wasm",
     unstable_fallbackFont: new URL("/static/inter.ttf", import.meta.url).href,
   });
-  const [selectedLayer, setSelectedLayer] = useState<LayerNode | null>(null);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   usePaste((evt) => {
     evt.preventDefault();
     performPaste(editor, evt.data);
   }, editor);
+  const selectedLayer = useMemo(
+    () =>
+      selectedLayerId
+        ? editor.currentPage.findArtboard()?.getLayerById(selectedLayerId)
+        : null,
+    [editor, selectedLayerId],
+  );
+  useEffect(() => {
+    console.log(selectedLayer?.readMetrics());
+  }, [selectedLayer]);
 
   return (
     <EditorProvider editor={editor}>
@@ -295,7 +325,10 @@ function Content({
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
           </div>
           <Suspense>
-            <LayerList selected={selectedLayer?.id} />
+            <LayerList
+              selected={selectedLayer?.id}
+              onLayerSelect={setSelectedLayerId}
+            />
           </Suspense>
         </div>
         <div className="basis-4/5 border-l min-w-[300px] border-dashed">
@@ -308,7 +341,7 @@ function Content({
                   target?.type !== "ARTBOARD" &&
                   target.type !== "PAGE"
                 ) {
-                  setSelectedLayer(target);
+                  setSelectedLayerId(target.id);
                 }
               }}
             >
