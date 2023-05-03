@@ -1,9 +1,9 @@
 import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useCanvasContext } from "../context.js";
-import type { Origin } from "./context.js";
-import { LayerMaskContext } from "./context.js";
 import { EdgeHandle } from "./EdgeHandle.js";
+import type { Origin } from "./LayerMaskContext.js";
+import { LayerMaskContext } from "./LayerMaskContext.js";
 import { ResizeHandleType } from "./use-resize.js";
 import { VertexHandle } from "./VertexHandle.js";
 

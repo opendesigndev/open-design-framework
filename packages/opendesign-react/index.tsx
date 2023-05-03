@@ -26,7 +26,7 @@ import {
   useCanvasContext,
   useEditorContext,
 } from "./src/context.js";
-import { LayerMaskContext } from "./src/layer-mask/context.js";
+import { LayerMaskContext } from "./src/layer-mask/LayerMaskContext.js";
 
 export { EditorProvider, useEditorContext } from "./src/context.js";
 

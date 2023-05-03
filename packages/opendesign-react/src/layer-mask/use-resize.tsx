@@ -1,7 +1,7 @@
 import { useCallback, useContext, useLayoutEffect, useRef } from "react";
 
 import { useCanvasContext } from "../context.js";
-import { LayerMaskContext } from "./context.js";
+import { LayerMaskContext } from "./LayerMaskContext.js";
 
 export enum ResizeHandleType {
   TopLeft = "top-left",

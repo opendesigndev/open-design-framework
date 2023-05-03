@@ -2,9 +2,9 @@ import type { LayerNode } from "@opendesign/universal";
 import { useReducer } from "react";
 
 import { RelativeMarker } from "../../index.js";
-import { initialState, LayerMaskContext, reducer } from "./context.js";
 import type { ILayerMaskProps } from "./LayerMask.js";
 import { LayerMask } from "./LayerMask.js";
+import { initialState, LayerMaskContext, reducer } from "./LayerMaskContext.js";
 
 export interface ILayerMaskWrapperProps extends ILayerMaskProps {
   node: LayerNode;
