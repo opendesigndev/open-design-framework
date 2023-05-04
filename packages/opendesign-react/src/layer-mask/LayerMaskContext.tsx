@@ -47,8 +47,6 @@ export type LayerMaskAction =
       deltaY: number;
       originX: OriginValues;
       originY: OriginValues;
-      newWidth: number;
-      newHeight: number;
     }
   | {
       type: "stopResize";
