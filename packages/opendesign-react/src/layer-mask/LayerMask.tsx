@@ -34,15 +34,23 @@ export function LayerMask({ onResize }: ILayerMaskProps) {
         viewport.scale;
       const newHeight = currentHeight + state.deltaY;
       const newWidth = currentWidth + state.deltaX;
-      onResize?.(newWidth, newHeight, state.origin);
+      // TODO: move all width/height calculations to LayerMaskContext
+      if (state.shiftKey) {
+        onResize?.(state.newWidth, state.newHeight, state.origin);
+      } else {
+        onResize?.(newWidth, newHeight, state.origin);
+      }
     }
   }, [
     canvas,
     onResize,
     state.deltaX,
     state.deltaY,
+    state.newHeight,
+    state.newWidth,
     state.origin,
     state.resizing,
+    state.shiftKey,
   ]);
 
   return (

@@ -9,6 +9,8 @@ export type LayerMaskState = {
   containerRef: React.RefObject<HTMLDivElement> | null;
   deltaX: number;
   deltaY: number;
+  newHeight: number;
+  newWidth: number;
   origin: Origin;
   originalHeight: number;
   originalWidth: number;
@@ -45,6 +47,8 @@ export type LayerMaskAction =
       deltaY: number;
       originX: OriginValues;
       originY: OriginValues;
+      newWidth: number;
+      newHeight: number;
     }
   | {
       type: "stopResize";
@@ -55,6 +59,8 @@ export const initialState: LayerMaskState = {
   containerRef: null,
   deltaX: 0,
   deltaY: 0,
+  newHeight: 0,
+  newWidth: 0,
   origin: ["left", "top"],
   originalHeight: 0,
   originalWidth: 0,
@@ -94,14 +100,18 @@ export function reducer(
       };
     case "resize":
       // TODO: make sure original proportions are kept and restored on shiftKey
-      const [deltaX, deltaY] = getBalancedDelta(
-        action.deltaX,
-        action.deltaY,
-        action.shiftKey,
-      );
+      const [deltaX, deltaY] = getBalancedDelta({
+        deltaX: action.deltaX,
+        deltaY: action.deltaY,
+        shiftKey: action.shiftKey,
+        originalWidth: state.originalWidth,
+        originalHeight: state.originalHeight,
+      });
       return {
         ...state,
         shiftKey: action.shiftKey,
+        newWidth: state.originalWidth + deltaX,
+        newHeight: state.originalHeight + deltaY,
         deltaX: deltaX,
         deltaY: deltaY,
         origin: action.altKey ? "center" : [action.originX, action.originY],
@@ -121,16 +131,25 @@ export function reducer(
   }
 }
 
-function getBalancedDelta(
-  deltaX: number,
-  deltaY: number,
-  shiftKey: boolean,
-): [number, number] {
+type GetBalancedDeltaArgs = {
+  deltaX: number;
+  deltaY: number;
+  shiftKey: boolean;
+  originalWidth: number;
+  originalHeight: number;
+};
+
+function getBalancedDelta({
+  deltaX,
+  deltaY,
+  shiftKey,
+  originalWidth,
+  originalHeight,
+}: GetBalancedDeltaArgs): [number, number] {
   if (shiftKey) {
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      return [deltaX, deltaX];
-    }
-    return [deltaY, deltaY];
+    const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+    const ratio = originalWidth / originalHeight;
+    return [delta, delta / ratio];
   }
 
   return [deltaX, deltaY];
