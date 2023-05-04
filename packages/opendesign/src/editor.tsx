@@ -242,8 +242,8 @@ function Layers({
                   ? "bg-blue-700 text-white"
                   : layer.layers.length
                   ? ""
-                  : "hover:border hover:border-blue-700 hover:mx-[-1px] hover:bg-blue-200"
-              } h-9 flex items-center rounded`}
+                  : "hover:border hover:border-blue-700 hover:bg-blue-200"
+              } flex items-center rounded py-1 border border-transparent`}
               style={{ paddingLeft: `${level * 0.5}rem` }}
             >
               {layer.name}
