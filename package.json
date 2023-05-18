@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "repository": "github:opendesigndev/open-design-framework",
   "author": "Open Design Contributors",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "packageManager": "yarn@3.3.1+sha256.1d2760eb5c0e525abe9c5306fac5fe0b5628c0955072a0da2f4043524497526a",

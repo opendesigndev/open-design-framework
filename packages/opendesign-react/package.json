@@ -9,7 +9,7 @@
     "directory": "packages/opendesign-react"
   },
   "author": "Open Design Contributors",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "typedoc": {
     "entryPoint": "index.tsx"
   },
