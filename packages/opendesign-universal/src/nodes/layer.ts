@@ -1,11 +1,13 @@
 import type { ComponentHandle } from "@opendesign/engine";
 import { Scalar_array_6 } from "@opendesign/engine";
 import type { Octopus } from "@opendesign/octopus-ts";
+import { mat2d } from "gl-matrix";
 
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
 import type { ImportedClipboardData } from "../paste/import-from-clipboard-data.js";
+import { isDefinedNumber } from "../utils.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
@@ -23,11 +25,22 @@ export type Transformation = readonly [
   f: number, // translate y
 ];
 
+export type OriginValues = "top" | "left" | "right" | "bottom" | "center";
+
+export type Origin = OriginValues | readonly [OriginValues, OriginValues];
+
 export type LayerMetrics = {
   transformation: Transformation;
   logicalBounds: Rectangle;
   graphicalBounds: Rectangle;
   transformedGraphicalBounds: Rectangle;
+};
+
+export type LayerChangeType = "SCALE" | "ROTATE" | "TRANSLATE" | "TRANSFORM";
+
+export type LayerEvents = {
+  changed: LayerChangeType;
+  removed: void;
 };
 
 export interface LayerNode extends BaseNode {
@@ -71,6 +84,23 @@ export interface LayerNode extends BaseNode {
    * @param coordinates coordinates in px, an array of two numbers, each number is optional
    */
   setPosition(coordinates: [x?: number, y?: number]): void;
+
+  /**
+   * Change layer's size to given width and height
+   * @param width width in px
+   * @param height height in px
+   * @param origin origin represented by string (center) or an array of two strings (sides)
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  setSize(width?: number, height?: number, origin?: Origin): boolean;
+
+  // /**
+  //  * Rotate layer by given angle
+  //  * @param angle angle in degrees
+  //  * @param origin origin represented by string (center) or an array of two strings (sides), default is center
+  //  * @returns true if transformation was applied, false if it was not applied
+  //  */
+  // rotate(angle: number, origin?: Origin): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -195,5 +225,112 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         this.#engine.redraw();
       }
     });
+  }
+
+  setSize(width?: number, height?: number, origin?: Origin): boolean {
+    return automaticScope((scope) => {
+      const calculatedOrigin = this.#calculateOrigin(origin);
+      const metrics = this.readMetrics();
+      const transformMatrix = mat2d.create();
+      const layerWidth =
+        metrics.transformedGraphicalBounds[1][0] -
+        metrics.transformedGraphicalBounds[0][0];
+      const layerHeight =
+        metrics.transformedGraphicalBounds[1][1] -
+        metrics.transformedGraphicalBounds[0][1];
+      const widthRatio = isDefinedNumber(width) ? width / layerWidth : 1;
+      const heightRatio = isDefinedNumber(height) ? height / layerHeight : 1;
+      const shiftedX = calculatedOrigin[0] * widthRatio;
+      const shiftedY = calculatedOrigin[1] * heightRatio;
+      const differenceX = calculatedOrigin[0] - shiftedX;
+      const differenceY = calculatedOrigin[1] - shiftedY;
+
+      const originTranslationMatrix = mat2d.fromTranslation(mat2d.create(), [
+        1 - widthRatio,
+        1 - heightRatio,
+      ]);
+      mat2d.multiply(transformMatrix, originTranslationMatrix, transformMatrix);
+
+      const scalingMatrix = mat2d.fromScaling(mat2d.create(), [
+        widthRatio,
+        heightRatio,
+      ]);
+      mat2d.multiply(transformMatrix, scalingMatrix, transformMatrix);
+
+      // Translate the object back to its original position
+      const inverseOriginTranslationMatrix = mat2d.invert(
+        mat2d.create(),
+        originTranslationMatrix,
+      );
+      mat2d.multiply(
+        transformMatrix,
+        inverseOriginTranslationMatrix,
+        transformMatrix,
+      );
+
+      const updatedTransformation = [
+        transformMatrix[0],
+        transformMatrix[1],
+        transformMatrix[2],
+        transformMatrix[3],
+        differenceX,
+        differenceY,
+      ] satisfies Scalar_array_6;
+
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      this.#engine.ode.component_transformLayer(
+        this.#component,
+        id,
+        "PARENT_COMPONENT",
+        {
+          matrix: updatedTransformation,
+        },
+      );
+      this.#engine.redraw();
+      return true;
+    });
+  }
+
+  #calculateOrigin(origin?: Origin): [number, number] {
+    const metrix = this.readMetrics();
+    const [, , , , e, f] = [...metrix.transformation];
+    // Default origin is top left
+    let result: [number, number] = [e, f];
+
+    if (!origin) {
+      return result;
+    }
+
+    const layerWidth =
+      metrix.transformedGraphicalBounds[1][0] -
+      metrix.transformedGraphicalBounds[0][0];
+    const layerHeight =
+      metrix.transformedGraphicalBounds[1][1] -
+      metrix.transformedGraphicalBounds[0][1];
+
+    if (Array.isArray(origin)) {
+      const [x, y] = origin;
+
+      if (x === "left") {
+        result[0] = e;
+      } else if (x === "center") {
+        result[0] = e + layerWidth / 2;
+      } else if (x === "right") {
+        result[0] = e + layerWidth;
+      }
+
+      if (y === "top") {
+        result[1] = f;
+      } else if (y === "center") {
+        result[1] = f + layerHeight / 2;
+      } else if (y === "bottom") {
+        result[1] = f + layerHeight;
+      }
+    }
+    if (typeof origin === "string" && origin === "center") {
+      result = [e + layerWidth / 2, f + layerHeight / 2];
+    }
+
+    return result;
   }
 }

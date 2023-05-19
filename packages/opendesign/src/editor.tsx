@@ -1,10 +1,10 @@
 import type { PasteEvent } from "@opendesign/react";
-import { RelativeMarker } from "@opendesign/react";
-import { useLayerList } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
+  LayerMaskWrapper,
   useEditor,
+  useLayerList,
   usePaste,
 } from "@opendesign/react";
 import type {
@@ -19,11 +19,19 @@ import {
   readOctopusFile,
 } from "@opendesign/universal";
 import type { PropsWithChildren } from "react";
-import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react";
+import React, {
+  Fragment,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { useSearchParams } from "react-router-dom";
 
 import type { LayerListItem } from "../../opendesign-universal/src/nodes/artboard.js";
+import type { Origin } from "../../opendesign-universal/src/nodes/layer.js";
 import { ErrorBoundary } from "./error-boundary.js";
 
 export async function convert(file: Blob) {
@@ -357,9 +365,12 @@ function Content({
 }
 
 function LayerOutline({ layer }: { layer: LayerNode }) {
-  return (
-    <RelativeMarker node={layer}>
-      <div className="border border-solid border-red-800" />
-    </RelativeMarker>
+  const changeDimensionsHandler = useCallback(
+    (width?: number, height?: number, origin?: Origin) => {
+      layer.setSize(width, height, origin);
+    },
+    [layer],
   );
+
+  return <LayerMaskWrapper onResize={changeDimensionsHandler} node={layer} />;
 }

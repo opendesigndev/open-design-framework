@@ -18,11 +18,11 @@
   },
   "bin": "./bin/opendesign.js",
   "dependencies": {
-    "@opendesign/engine-wasm": "0.3.1-02dfd1c-20230413"
+    "@opendesign/engine-wasm": "0.3.1-f64e572-20230510"
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.5",
-    "@opendesign/engine": "0.3.1-02dfd1c-20230413",
+    "@opendesign/engine": "0.3.1-f64e572-20230510",
     "@opendesign/react": "workspace:*",
     "@opendesign/universal": "workspace:*",
     "@types/express": "^4.17.17",
