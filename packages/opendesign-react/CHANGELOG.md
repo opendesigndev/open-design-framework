@@ -1,5 +1,20 @@
 # @opendesign/react
 
+## 0.7.0
+
+### Minor Changes
+
+- cabc4fb: Added layer scaling method
+
+### Patch Changes
+
+- c70d5be: add readme
+- ab2575d: specify license in package.json
+- Updated dependencies [c70d5be]
+- Updated dependencies [ab2575d]
+- Updated dependencies [cabc4fb]
+  - @opendesign/universal@0.8.0
+
 ## 0.6.1
 
 ### Patch Changes

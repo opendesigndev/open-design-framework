@@ -1,5 +1,18 @@
 # OpenDesign CLI
 
+## 0.3.0
+
+### Minor Changes
+
+- 8ddf131: editor now looks a bit nicer
+- c135f0c: editor: allow selecting layers from layer list
+- cabc4fb: Added layer scaling method
+
+### Patch Changes
+
+- c70d5be: add readme
+- ab2575d: specify license in package.json
+
 ## 0.2.0
 
 ### Minor Changes

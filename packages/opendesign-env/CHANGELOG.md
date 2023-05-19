@@ -1,5 +1,12 @@
 # @opendesign/env
 
+## 0.2.1
+
+### Patch Changes
+
+- c70d5be: add readme
+- ab2575d: specify license in package.json
+
 ## 0.2.0
 
 ### Minor Changes
