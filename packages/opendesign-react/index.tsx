@@ -262,6 +262,7 @@ export function RelativeMarker(
      * Can be negative.
      */
     inset?: number;
+    style?: React.CSSProperties;
     /**
      * this is a workaround since RelativeMarker does not react on changes in node (transformations)
      * TODO: fix this
@@ -339,6 +340,7 @@ export function RelativeMarker(
       style={{
         position: "absolute",
         display: "grid",
+        ...props.style,
       }}
     >
       {props.children}
@@ -397,8 +399,8 @@ function getDelta(event: KeyboardEvent, delta: number): number {
   return delta;
 }
 
-export { LayerFrame as LayerMask } from "./src/layer-frame/layer-frame.js";
-export { LayerFrameWrapper as LayerMaskWrapper } from "./src/layer-frame/layer-frame-wrapper.js";
+export { LayerFrame } from "./src/layer-frame/layer-frame.js";
+export { LayerFrameWrapper } from "./src/layer-frame/layer-frame-wrapper.js";
 export { useResizable } from "./src/layer-frame/use-resize.js";
 export { type PasteEvent, usePaste } from "./src/paste.js";
 export { useLayerList } from "./src/use-layer-list.js";

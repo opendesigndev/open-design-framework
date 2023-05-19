@@ -15,7 +15,7 @@ export type {
 } from "./src/engine/engine-wrapper.js";
 export type { ArtboardNode } from "./src/nodes/artboard.js";
 export type { DesignNode } from "./src/nodes/design.js";
-export type { LayerNode } from "./src/nodes/layer.js";
+export type { LayerNode, Transformation } from "./src/nodes/layer.js";
 export type { BaseNode, Node, NodeFilter } from "./src/nodes/node.js";
 export type { PageNode } from "./src/nodes/page.js";
 export { isOptimizedOctopusFile } from "./src/octopus-file/detect.js";
