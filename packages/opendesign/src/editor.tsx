@@ -1,10 +1,10 @@
 import type { PasteEvent } from "@opendesign/react";
-import { RelativeMarker } from "@opendesign/react";
-import { LayerMaskWrapper, useLayerList } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
+  LayerMaskWrapper,
   useEditor,
+  useLayerList,
   usePaste,
 } from "@opendesign/react";
 import type {
@@ -18,7 +18,6 @@ import {
   isOptimizedOctopusFile,
   readOctopusFile,
 } from "@opendesign/universal";
-import saveAs from "file-saver";
 import type { PropsWithChildren } from "react";
 import React, {
   Fragment,
@@ -332,49 +331,6 @@ function Content({
         <div className="basis-1/5 min-w-[200px] p-2">
           <div className="h-14 flex items-center p-1">
             <h2 className="text-lg font-semibold mb-2">Layers</h2>
-            <Suspense>
-              <LayerList selected={selectedLayer?.id} />
-            </Suspense>
-            <hr />
-            <h2 className="text-lg font-semibold mb-2">
-              Second layer list (without naturalOrder parameter)
-            </h2>
-            <Suspense>
-              <SecondLayerList />
-            </Suspense>
-          </div>
-          <div className="basis-4/5 border border-dashed">
-            <Suspense>
-              <EditorCanvas
-                editor={editor}
-                onClick={({ target }) => {
-                  if (
-                    target &&
-                    target?.type !== "ARTBOARD" &&
-                    target.type !== "PAGE"
-                  ) {
-                    setSelectedLayer(target);
-                  }
-                }}
-              >
-                <ErrorBoundary>
-                  {selectedLayer ? (
-                    <LayerOutline layer={selectedLayer} />
-                  ) : null}
-                </ErrorBoundary>
-              </EditorCanvas>
-            </Suspense>
-            {data.type === "file" ? (
-              <div className="absolute top-4 right-4">
-                <Button
-                  onClick={() =>
-                    void saveAs(new Blob([data.data]), "file.octopus")
-                  }
-                >
-                  Download .octopus
-                </Button>
-              </div>
-            ) : null}
           </div>
           <Suspense>
             <LayerList
