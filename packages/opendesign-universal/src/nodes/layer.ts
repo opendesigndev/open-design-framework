@@ -6,8 +6,8 @@ import { mat2d } from "gl-matrix";
 import type { Engine } from "../engine/engine.js";
 import { loadPastedImages } from "../engine/load-images.js";
 import { automaticScope, createStringRef } from "../engine/memory.js";
-import { isDefinedNumber } from "../utils.js";
 import type { OctopusFile } from "../octopus-file/octopus-file.js";
+import { isDefinedNumber } from "../utils.js";
 import type { BaseNode } from "./node.js";
 import { BaseNodeImpl } from "./node.js";
 
