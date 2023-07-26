@@ -9,8 +9,8 @@ import {
 } from "@opendesign/react";
 import type {
   Editor,
-  ImportedClipboardData,
   LayerNode,
+  OctopusFile,
   OctopusManifest,
 } from "@opendesign/universal";
 import {
@@ -49,7 +49,7 @@ export function EditorComponent({ file }: { file?: Uint8Array }) {
         data: Uint8Array;
         manifest: OctopusManifest;
       }
-    | { type: "paste"; data: ImportedClipboardData }
+    | { type: "paste"; data: OctopusFile }
   >(
     file
       ? () => ({
@@ -207,10 +207,7 @@ function ComponentSelect({
   );
 }
 
-function performPaste(
-  editor: Editor,
-  data: ImportedClipboardData | string | null,
-) {
+function performPaste(editor: Editor, data: OctopusFile | string | null) {
   if (data && typeof data !== "string") {
     editor.currentPage.paste(data).then(
       () => console.log("success"),
@@ -295,7 +292,7 @@ function Content({
 }: {
   data:
     | { type: "file"; data: Uint8Array }
-    | { type: "paste"; data: ImportedClipboardData };
+    | { type: "paste"; data: OctopusFile };
   componentId: string | null;
 }) {
   const editor = useEditor({
