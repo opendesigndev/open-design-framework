@@ -1,11 +1,15 @@
 import type { Manifest } from "@opendesign/manifest-ts";
-import { createConverter, SourcePluginReader } from "@opendesign/octopus-fig";
+import * as web from "@opendesign/octopus-fig/web.mjs";
 import type { Octopus } from "@opendesign/octopus-ts";
 
 import type { OctopusFile } from "../octopus-file/octopus-file.js";
 import { InMemoryOctopusFile } from "../octopus-file/read-octopus-file.js";
 import { hashString } from "../utils.js";
 import { MemoryExporter } from "./memory-exporter.js";
+
+const { createConverter, SourcePluginReader } =
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  web as typeof import("@opendesign/octopus-fig");
 
 /**
  * Parses data from clipboard into structure of a .octopus file. Depending on
