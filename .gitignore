@@ -1,5 +1,6 @@
 package-lock.json
 _release
+.direnv
 
 # Build artifacts
 dist
