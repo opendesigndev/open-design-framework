@@ -26,7 +26,7 @@ export type PasteEvent = {
  * this situation, because no non-chrome browser currently support this.
  *
  * The listener will receive one of the following:
- * - ImportedClipboardData which you can use to paste design, or inspect manually
+ * - OctopusFile which you can use to paste design, or inspect manually
  * - string with contents of the clipboard, if clipboard is textual
  * - null
  *
