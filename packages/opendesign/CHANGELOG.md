@@ -1,5 +1,17 @@
 # OpenDesign CLI
 
+## 0.4.0
+
+### Minor Changes
+
+- 2d18de5: added experimental adobe illustrator support, currently node.js-only
+- 03e49b3: OpenDesign CLI can now open and convert .ai and .psd files (aside from already supported .xd)
+
+  - this is currently very experimental
+  - it also supports special .clipboard files, which can be used to import paste data from figma in more automated workflows
+
+- 9365ec5: added experimental psd support, currently node.js-only
+
 ## 0.3.0
 
 ### Minor Changes

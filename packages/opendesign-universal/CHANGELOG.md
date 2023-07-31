@@ -1,5 +1,17 @@
 # @opendesign/universal
 
+## 0.9.0
+
+### Minor Changes
+
+- 2d18de5: added experimental adobe illustrator support, currently node.js-only
+- 03e49b3: **breaking**: import functions now return OctopusFile instead of special `ImportedClipboardData`, same for input of `paste`
+
+  - This does not affect you if you only pass the output to input of paste
+  - Also, removed `ImportedClipboardData` type export
+
+- 9365ec5: added experimental psd support, currently node.js-only
+
 ## 0.8.0
 
 ### Minor Changes

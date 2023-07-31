@@ -1,5 +1,19 @@
 # @opendesign/react
 
+## 0.7.1
+
+### Patch Changes
+
+- 03e49b3: **breaking**: import functions now return OctopusFile instead of special `ImportedClipboardData`, same for input of `paste`
+
+  - This does not affect you if you only pass the output to input of paste
+  - Also, removed `ImportedClipboardData` type export
+
+- Updated dependencies [2d18de5]
+- Updated dependencies [03e49b3]
+- Updated dependencies [9365ec5]
+  - @opendesign/universal@0.9.0
+
 ## 0.7.0
 
 ### Minor Changes
