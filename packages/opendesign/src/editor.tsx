@@ -2,7 +2,7 @@ import type { PasteEvent } from "@opendesign/react";
 import {
   EditorCanvas,
   EditorProvider,
-  LayerMaskWrapper,
+  LayerFrameWrapper,
   useEditor,
   useLayerList,
   usePaste,
@@ -369,5 +369,18 @@ function LayerOutline({ layer }: { layer: LayerNode }) {
     [layer],
   );
 
-  return <LayerMaskWrapper onResize={changeDimensionsHandler} node={layer} />;
+  const changeRotationHandler = useCallback(
+    (rad: number) => {
+      layer.rotate(rad);
+    },
+    [layer],
+  );
+
+  return (
+    <LayerFrameWrapper
+      onResize={changeDimensionsHandler}
+      onRotate={changeRotationHandler}
+      node={layer}
+    />
+  );
 }

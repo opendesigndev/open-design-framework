@@ -4,14 +4,16 @@ import { useCanvasContext } from "../context.js";
 import { EdgeHandle } from "./edge-handle.js";
 import type { Origin } from "./layer-frame-context.js";
 import { LayerFrameContext } from "./layer-frame-context.js";
+import { RotateHandle } from "./rotate-handle.js";
 import { ResizeHandleType } from "./use-resize.js";
 import { VertexHandle } from "./vertex-handle.js";
 
 export interface ILayerFrameProps {
   onResize?: (width: number, height: number, origin?: Origin) => void;
+  onRotate?: (angle: number) => void;
 }
 
-export function LayerFrame({ onResize }: ILayerFrameProps) {
+export function LayerFrame({ onResize, onRotate }: ILayerFrameProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvas = useCanvasContext();
   const { state, dispatch } = useContext(LayerFrameContext);
@@ -41,15 +43,22 @@ export function LayerFrame({ onResize }: ILayerFrameProps) {
         onResize?.(newWidth, newHeight, state.origin);
       }
     }
+
+    if (state.rotating && onRotate) {
+      onRotate(state.rotationRad);
+    }
   }, [
     canvas,
     onResize,
+    onRotate,
     state.deltaX,
     state.deltaY,
     state.newHeight,
     state.newWidth,
     state.origin,
     state.resizing,
+    state.rotating,
+    state.rotationRad,
     state.shiftKey,
   ]);
 
@@ -61,6 +70,7 @@ export function LayerFrame({ onResize }: ILayerFrameProps) {
       }}
       ref={containerRef}
     >
+      <RotateHandle />
       <VertexHandle type={ResizeHandleType.TopLeft} />
       <VertexHandle type={ResizeHandleType.TopRight} />
       <VertexHandle type={ResizeHandleType.BottomRight} />

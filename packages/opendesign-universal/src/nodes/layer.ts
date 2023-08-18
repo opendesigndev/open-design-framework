@@ -94,13 +94,13 @@ export interface LayerNode extends BaseNode {
    */
   setSize(width?: number, height?: number, origin?: Origin): boolean;
 
-  // /**
-  //  * Rotate layer by given angle
-  //  * @param angle angle in degrees
-  //  * @param origin origin represented by string (center) or an array of two strings (sides), default is center
-  //  * @returns true if transformation was applied, false if it was not applied
-  //  */
-  // rotate(angle: number, origin?: Origin): boolean;
+  /**
+   * Rotate layer by given angle
+   * @param angle angle in radians
+   * @param origin origin represented by string (center) or an array of two strings (sides), default is center
+   * @returns true if transformation was applied, false if it was not applied
+   */
+  rotate(angle: number, origin?: Origin): boolean;
 }
 
 export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
@@ -287,6 +287,42 @@ export class LayerNodeImpl extends BaseNodeImpl implements LayerNode {
         },
       );
       this.#engine.redraw();
+      return true;
+    });
+  }
+
+  rotate(angle: number): boolean {
+    return automaticScope((scope) => {
+      // const calculatedOrigin = this.#calculateOrigin("center");
+      const metrics = this.readMetrics();
+      const originX = metrics.logicalBounds[1][0] / 2;
+      const originY = metrics.logicalBounds[1][1] / 2;
+      const mA = mat2d.create();
+      // mat2d.fromTranslation(mA, [-calculatedOrigin[0], -calculatedOrigin[1]]);
+
+      const mB = mat2d.fromTranslation(mat2d.create(), [-originX, -originY]);
+
+      const mC = mat2d.fromTranslation(mat2d.create(), [originX, originY]);
+
+      mat2d.multiply(mA, mC, mA);
+      mat2d.rotate(mA, mA, angle);
+      mat2d.multiply(mA, mB, mA);
+
+      const transformationMatrix = [
+        mA[0],
+        mA[1],
+        mA[2],
+        mA[3],
+        mA[4],
+        mA[5],
+      ] satisfies Scalar_array_6;
+
+      const id = createStringRef(this.#engine.ode, scope, this.id);
+      this.#engine.ode.component_transformLayer(this.#component, id, "LAYER", {
+        matrix: transformationMatrix,
+      });
+      this.#engine.redraw();
+
       return true;
     });
   }

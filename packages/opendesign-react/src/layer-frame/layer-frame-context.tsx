@@ -18,12 +18,19 @@ export type LayerFrameState = {
   resizingEnded: boolean;
   resizingHandle: EventTarget | null;
   resizingStarted: boolean;
+  rotating: boolean;
+  rotationAngle: number;
+  rotationRad: number;
   shiftKey: boolean;
   startX: number;
   startY: number;
 };
 
 export type LayerFrameAction =
+  | {
+      type: "initLayerMask";
+      rotationAngle: number;
+    }
   | {
       type: "setOriginalSize";
       originalWidth: number;
@@ -50,6 +57,20 @@ export type LayerFrameAction =
     }
   | {
       type: "stopResize";
+    }
+  | {
+      type: "startRotate";
+    }
+  | {
+      type: "rotate";
+      shiftKey: boolean;
+      rotationAngle: number;
+      rotationRad: number;
+      deltaX: number;
+      deltaY: number;
+    }
+  | {
+      type: "stopRotate";
     };
 
 export const initialState: LayerFrameState = {
@@ -66,6 +87,9 @@ export const initialState: LayerFrameState = {
   resizingEnded: true,
   resizingHandle: null,
   resizingStarted: false,
+  rotating: false,
+  rotationAngle: 0,
+  rotationRad: 0,
   shiftKey: false,
   startX: 0,
   startY: 0,
@@ -121,6 +145,30 @@ export function reducer(
       return {
         ...initialState,
         resizingEnded: true,
+      };
+    case "startRotate":
+      return {
+        ...state,
+        rotating: true,
+      };
+    case "rotate":
+      return {
+        ...state,
+        shiftKey: action.shiftKey,
+        rotationAngle: action.rotationAngle,
+        rotationRad: action.rotationRad,
+        deltaX: action.deltaX,
+        deltaY: action.deltaY,
+      };
+    case "stopRotate":
+      return {
+        ...initialState,
+        rotationAngle: state.rotationAngle,
+      };
+    case "initLayerMask":
+      return {
+        ...state,
+        rotationAngle: action.rotationAngle,
       };
     default:
       throw new Error(
